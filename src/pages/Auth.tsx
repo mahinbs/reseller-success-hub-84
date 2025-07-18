@@ -1,17 +1,23 @@
+
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { useAuth } from '@/hooks/useAuth';
 
 const AuthPage = () => {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user && !loading) {
-      navigate('/');
+    if (user && profile && !loading) {
+      // Redirect to appropriate dashboard based on role
+      if (profile.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     }
-  }, [user, loading, navigate]);
+  }, [user, profile, loading, navigate]);
 
   if (loading) {
     return (
@@ -21,7 +27,7 @@ const AuthPage = () => {
     );
   }
 
-  if (user) {
+  if (user && profile) {
     return null; // Will redirect via useEffect
   }
 

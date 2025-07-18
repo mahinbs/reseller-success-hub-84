@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { Header } from "@/components/layout/Header";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import ServicesPage from "./pages/Services";
@@ -30,16 +32,83 @@ const App = () => (
             <div className="min-h-screen bg-background">
               <Header />
               <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/services" element={<ServicesPage />} />
-                <Route path="/services/:id" element={<ServiceDetailPage />} />
-                <Route path="/bundles" element={<Bundles />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/dashboard" element={<CustomerDashboard />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                {/* Public routes - redirect authenticated users to dashboard */}
+                <Route 
+                  path="/" 
+                  element={
+                    <ProtectedRoute requireAuth={false}>
+                      <Index />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/auth" 
+                  element={
+                    <ProtectedRoute requireAuth={false}>
+                      <AuthPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/services" 
+                  element={
+                    <ProtectedRoute requireAuth={false}>
+                      <ServicesPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/services/:id" 
+                  element={
+                    <ProtectedRoute requireAuth={false}>
+                      <ServiceDetailPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/bundles" 
+                  element={
+                    <ProtectedRoute requireAuth={false}>
+                      <Bundles />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/about" 
+                  element={
+                    <ProtectedRoute requireAuth={false}>
+                      <About />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/cart" 
+                  element={
+                    <ProtectedRoute requireAuth={false}>
+                      <CartPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Protected routes - require authentication */}
+                <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute requireAuth={true}>
+                      <CustomerDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/admin" 
+                  element={
+                    <ProtectedRoute requireAuth={true}>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Catch-all route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
