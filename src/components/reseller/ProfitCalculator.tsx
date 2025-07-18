@@ -30,7 +30,7 @@ export const ProfitCalculator = ({ baseCost, serviceName }: ProfitCalculatorProp
       <CardContent className="space-y-4">
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="resell-price">Your Resell Price ($)</Label>
+            <Label htmlFor="resell-price">Your Resell Price (₹)</Label>
             <Input
               id="resell-price"
               type="number"
@@ -53,15 +53,15 @@ export const ProfitCalculator = ({ baseCost, serviceName }: ProfitCalculatorProp
 
         <div className="grid md:grid-cols-3 gap-4 pt-4 border-t">
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-500">${profitPerSale.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-green-500">₹{profitPerSale.toLocaleString()}</div>
             <div className="text-sm text-muted-foreground">Profit per Sale</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-primary">${monthlyProfit.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-primary">₹{monthlyProfit.toLocaleString()}</div>
             <div className="text-sm text-muted-foreground">Monthly Profit</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-500">${yearlyProfit.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-purple-500">₹{yearlyProfit.toLocaleString()}</div>
             <div className="text-sm text-muted-foreground">Yearly Profit</div>
           </div>
         </div>

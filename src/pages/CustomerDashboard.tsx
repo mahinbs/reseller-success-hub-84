@@ -14,6 +14,7 @@ import { Navigate } from 'react-router-dom';
 import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare, Users, Handshake } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal';
+
 interface Service {
   id: string;
   name: string;
@@ -24,6 +25,7 @@ interface Service {
   features: string[];
   image_url?: string;
 }
+
 interface Bundle {
   id: string;
   name: string;
@@ -38,11 +40,13 @@ interface Bundle {
     price: number;
   }[];
 }
+
 interface UserStats {
   totalPurchases: number;
   totalSpent: number;
   activeServices: number;
 }
+
 interface Purchase {
   id: string;
   total_amount: number;
@@ -53,9 +57,11 @@ interface Purchase {
     item_price: number;
   }[];
 }
+
 interface CustomerDashboardProps {
   activeTab?: 'overview' | 'services' | 'bundles' | 'purchases' | 'profile' | 'support';
 }
+
 const CustomerDashboard = ({
   activeTab = 'overview'
 }: CustomerDashboardProps) => {
@@ -82,6 +88,7 @@ const CustomerDashboard = ({
   });
   const [recentPurchases, setRecentPurchases] = useState<Purchase[]>([]);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
   useEffect(() => {
     if (!user) return;
     const loadData = async () => {
@@ -143,26 +150,32 @@ const CustomerDashboard = ({
     };
     loadData();
   }, [user]);
+
   if (authLoading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>;
   }
+
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
+
   if (profile?.role === 'admin') {
     return <Navigate to="/admin" replace />;
   }
+
   const categories = ['all', ...Array.from(new Set(services.map(s => s.category)))];
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(search.toLowerCase()) || service.description.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || service.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
+
   const filteredBundles = bundles.filter(bundle => {
     return bundle.name.toLowerCase().includes(search.toLowerCase()) || bundle.description.toLowerCase().includes(search.toLowerCase());
   });
+
   const handleAddToCart = (item: Service | Bundle, type: 'service' | 'bundle') => {
     addToCart({
       id: item.id,
@@ -176,13 +189,13 @@ const CustomerDashboard = ({
       description: `${item.name} has been added to your cart.`
     });
   };
+
   const calculateOriginalPrice = (bundle: Bundle) => {
     if (!bundle.services) return bundle.total_price;
     const originalTotal = bundle.services.reduce((sum, service) => sum + service.price, 0);
     return originalTotal;
   };
 
-  // Render different content based on activeTab
   const renderContent = () => {
     switch (activeTab) {
       case 'services':
@@ -199,7 +212,9 @@ const CustomerDashboard = ({
         return renderOverviewTab();
     }
   };
-  const renderOverviewTab = () => <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
+
+  const renderOverviewTab = () => (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
       {/* Profile Dashboard Section */}
       <div className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5 py-8 px-4">
         <div className="container mx-auto max-w-7xl">
@@ -232,7 +247,7 @@ const CustomerDashboard = ({
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
-                    <p className="text-3xl font-bold text-green-500">${userStats.totalSpent.toFixed(2)}</p>
+                    <p className="text-3xl font-bold text-green-500">₹{userStats.totalSpent.toFixed(2)}</p>
                   </div>
                   <div className="p-3 bg-gradient-to-br from-green-500/20 to-emerald-400/20 rounded-full">
                     <DollarSign className="h-6 w-6 text-green-500" />
@@ -310,14 +325,18 @@ const CustomerDashboard = ({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {recentPurchases.length === 0 ? <div className="text-center py-8">
+                {recentPurchases.length === 0 ? (
+                  <div className="text-center py-8">
                     <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
                     <p className="text-muted-foreground mb-4">No purchases yet</p>
                     <Button asChild className="glass-button hover:glow-button transition-all duration-300">
                       <Link to="/dashboard/services">Browse Services</Link>
                     </Button>
-                  </div> : <div className="space-y-3">
-                    {recentPurchases.slice(0, 3).map(purchase => <div key={purchase.id} className="flex items-center justify-between p-3 glass-subtle rounded-lg">
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {recentPurchases.slice(0, 3).map(purchase => (
+                      <div key={purchase.id} className="flex items-center justify-between p-3 glass-subtle rounded-lg">
                         <div>
                           <p className="font-medium text-sm">
                             {purchase.purchase_items?.[0]?.item_name || 'Purchase'}
@@ -327,20 +346,25 @@ const CustomerDashboard = ({
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-sm">${purchase.total_amount}</p>
+                          <p className="font-bold text-sm">₹{purchase.total_amount}</p>
                           <Badge variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'} className="text-xs">
                             {purchase.payment_status}
                           </Badge>
                         </div>
-                      </div>)}
-                  </div>}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-    </div>;
-  const renderServicesTab = () => <div className="py-8 px-4">
+    </div>
+  );
+
+  const renderServicesTab = () => (
+    <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Services
@@ -422,7 +446,8 @@ const CustomerDashboard = ({
         </div>
 
         {/* Services Grid */}
-        {loading ? <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {loading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map(i => <Card key={i} className="glass-card animate-pulse">
                 <CardContent className="p-6">
                   <div className="h-4 bg-muted/30 rounded mb-4"></div>
@@ -430,18 +455,25 @@ const CustomerDashboard = ({
                   <div className="h-8 bg-muted/30 rounded"></div>
                 </CardContent>
               </Card>)}
-          </div> : filteredServices.length === 0 ? <div className="text-center py-12">
+          </div>
+        ) : filteredServices.length === 0 ? (
+          <div className="text-center py-12">
             <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No services found</h3>
             <p className="text-muted-foreground">Try adjusting your search criteria</p>
-          </div> : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredServices.map(service => <Card key={service.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[400px]">
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredServices.map(service => (
+              <Card key={service.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[400px]">
                 {/* Background Image with Overlay */}
-                {service.image_url && <div className="absolute inset-0 bg-cover bg-center" style={{
+                {service.image_url && (
+                  <div className="absolute inset-0 bg-cover bg-center" style={{
             backgroundImage: `url(${service.image_url})`
           }}>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
-                  </div>}
+                  </div>
+                )}
                 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col h-full">
@@ -452,7 +484,7 @@ const CustomerDashboard = ({
                       </Badge>
                       <div className="text-right">
                         <div className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-                          ${service.price}
+                          ₹{service.price}
                         </div>
                         <div className="text-xs text-muted-foreground">/{service.billing_period}</div>
                       </div>
@@ -481,11 +513,16 @@ const CustomerDashboard = ({
                     </div>
                   </CardContent>
                 </div>
-              </Card>)}
-          </div>}
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
-    </div>;
-  const renderBundlesTab = () => <div className="py-8 px-4">
+    </div>
+  );
+
+  const renderBundlesTab = () => (
+    <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Bundles
@@ -498,7 +535,8 @@ const CustomerDashboard = ({
         </div>
 
         {/* Bundles Grid */}
-        {loading ? <div className="grid md:grid-cols-2 gap-6">
+        {loading ? (
+          <div className="grid md:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map(i => <Card key={i} className="glass-card animate-pulse">
                 <CardContent className="p-6">
                   <div className="h-4 bg-muted/30 rounded mb-4"></div>
@@ -506,18 +544,25 @@ const CustomerDashboard = ({
                   <div className="h-32 bg-muted/30 rounded"></div>
                 </CardContent>
               </Card>)}
-          </div> : filteredBundles.length === 0 ? <div className="text-center py-12">
+          </div>
+        ) : filteredBundles.length === 0 ? (
+          <div className="text-center py-12">
             <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No bundles found</h3>
             <p className="text-muted-foreground">Try adjusting your search criteria</p>
-          </div> : <div className="grid md:grid-cols-2 gap-6">
-            {filteredBundles.map(bundle => <Card key={bundle.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[500px]">
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {filteredBundles.map(bundle => (
+              <Card key={bundle.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[500px]">
                 {/* Background Image with Overlay */}
-                {bundle.image_url && <div className="absolute inset-0 bg-cover bg-center" style={{
+                {bundle.image_url && (
+                  <div className="absolute inset-0 bg-cover bg-center" style={{
             backgroundImage: `url(${bundle.image_url})`
           }}>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
-                  </div>}
+                  </div>
+                )}
 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col h-full">
@@ -543,33 +588,39 @@ const CustomerDashboard = ({
 
                   <div className="flex-1 px-6 space-y-4">
                     {/* Included Services */}
-                    {bundle.services && bundle.services.length > 0 && <div className="space-y-2">
+                    {bundle.services && bundle.services.length > 0 && (
+                      <div className="space-y-2">
                         <h4 className="font-semibold text-sm text-gray-300">Included Services:</h4>
                         <div className="space-y-1">
-                          {bundle.services.slice(0, 3).map(service => <div key={service.id} className="flex items-center justify-between text-sm glass-subtle p-2 rounded-lg backdrop-blur-sm">
+                          {bundle.services.slice(0, 3).map(service => (
+                            <div key={service.id} className="flex items-center justify-between text-sm glass-subtle p-2 rounded-lg backdrop-blur-sm">
                               <span className="text-white">{service.name}</span>
                               <Badge variant="outline" className="text-xs border-white/30 text-white">
-                                ${service.price}
+                                ₹{service.price}
                               </Badge>
-                            </div>)}
-                          {bundle.services.length > 3 && <div className="text-xs text-gray-300 text-center py-1">
+                            </div>
+                          ))}
+                          {bundle.services.length > 3 && (
+                            <div className="text-xs text-gray-300 text-center py-1">
                               +{bundle.services.length - 3} more services
-                            </div>}
+                            </div>
+                          )}
                         </div>
-                      </div>}
+                      </div>
+                    )}
 
                     {/* Pricing */}
                     <div className="space-y-2 pt-2 border-t border-white/20">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-300">Original Price:</span>
                         <span className="line-through text-gray-300">
-                          ${calculateOriginalPrice(bundle).toLocaleString()}
+                          ₹{calculateOriginalPrice(bundle).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between text-lg font-bold">
                         <span className="text-white">Bundle Price:</span>
                         <span className="bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
-                          ${bundle.total_price.toLocaleString()}
+                          ₹{bundle.total_price.toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -589,25 +640,34 @@ const CustomerDashboard = ({
                     </div>
                   </CardContent>
                 </div>
-              </Card>)}
-          </div>}
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
-    </div>;
-  const renderPurchasesTab = () => <div className="py-8 px-4">
+    </div>
+  );
+
+  const renderPurchasesTab = () => (
+    <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           My Purchases
         </h1>
         
-        {recentPurchases.length === 0 ? <div className="text-center py-12">
+        {recentPurchases.length === 0 ? (
+          <div className="text-center py-12">
             <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No purchases yet</h3>
             <p className="text-muted-foreground mb-4">Start exploring our services and bundles</p>
             <Button asChild className="glass-button hover:glow-button transition-all duration-300">
               <Link to="/dashboard/services">Browse Services</Link>
             </Button>
-          </div> : <div className="space-y-6">
-            {recentPurchases.map(purchase => <Card key={purchase.id} className="glass-card">
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {recentPurchases.map(purchase => (
+              <Card key={purchase.id} className="glass-card">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div>
@@ -619,26 +679,35 @@ const CustomerDashboard = ({
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-primary">${purchase.total_amount}</p>
+                      <p className="text-2xl font-bold text-primary">₹{purchase.total_amount}</p>
                       <Badge variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'}>
                         {purchase.payment_status}
                       </Badge>
                     </div>
                   </div>
                   
-                  {purchase.purchase_items && purchase.purchase_items.length > 0 && <div className="space-y-2">
+                  {purchase.purchase_items && purchase.purchase_items.length > 0 && (
+                    <div className="space-y-2">
                       <h4 className="font-medium text-sm text-muted-foreground">Items:</h4>
-                      {purchase.purchase_items.map((item, index) => <div key={index} className="flex justify-between text-sm">
+                      {purchase.purchase_items.map((item, index) => (
+                        <div key={index} className="flex justify-between text-sm">
                           <span>{item.item_name}</span>
-                          <span>${item.item_price}</span>
-                        </div>)}
-                    </div>}
+                          <span>₹{item.item_price}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
-              </Card>)}
-          </div>}
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
-    </div>;
-  const renderProfileTab = () => <div className="py-8 px-4">
+    </div>
+  );
+
+  const renderProfileTab = () => (
+    <div className="py-8 px-4">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Profile Settings
@@ -680,8 +749,11 @@ const CustomerDashboard = ({
           </CardContent>
         </Card>
       </div>
-    </div>;
-  const renderSupportTab = () => <div className="py-8 px-4">
+    </div>
+  );
+
+  const renderSupportTab = () => (
+    <div className="py-8 px-4">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Support & Help
@@ -760,10 +832,15 @@ const CustomerDashboard = ({
           </Card>
         </div>
       </div>
-    </div>;
-  return <>
+    </div>
+  );
+
+  return (
+    <>
       {renderContent()}
       <ProfileEditModal open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen} />
-    </>;
+    </>
+  );
 };
+
 export default CustomerDashboard;

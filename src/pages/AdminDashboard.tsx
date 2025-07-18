@@ -461,7 +461,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     {
       icon: DollarSign,
       label: 'Total Revenue',
-      value: `$${stats.totalRevenue.toFixed(2)}`,
+      value: `₹${stats.totalRevenue.toFixed(2)}`,
       color: 'text-accent-green',
       gradient: 'gradient-success'
     },
@@ -601,7 +601,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                             {service.category}
                           </Badge>
                           <span className="text-sm font-medium text-accent-green">
-                            ${service.price}
+                            ₹{service.price}
                           </span>
                           <Badge 
                             variant={service.is_active ? 'default' : 'secondary'}
@@ -687,7 +687,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                         <h3 className="font-semibold text-lg text-foreground">{bundle.name}</h3>
                         <div className="flex items-center gap-3 mt-2">
                           <span className="text-sm font-medium text-accent-green">
-                            ${Number(bundle.total_price).toFixed(2)}
+                            ₹{Number(bundle.total_price).toFixed(2)}
                           </span>
                           <Badge variant="outline" className="glass-subtle border-accent-orange/30 text-accent-orange">
                             {bundle.discount_percentage}% off
