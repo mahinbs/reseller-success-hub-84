@@ -30,17 +30,23 @@ export const BundleModal: React.FC<BundleModalProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto glass-card border-0 rounded-2xl">
+        <DialogHeader className="pb-6">
+          <DialogTitle className="text-2xl bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
+            {title}
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground text-base">
+            {description}
+          </DialogDescription>
         </DialogHeader>
-        <BundleForm
-          initialData={initialData}
-          onSubmit={onSubmit}
-          onCancel={onClose}
-          isLoading={isLoading}
-        />
+        <div className="glass-subtle rounded-xl p-6">
+          <BundleForm
+            initialData={initialData}
+            onSubmit={onSubmit}
+            onCancel={onClose}
+            isLoading={isLoading}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

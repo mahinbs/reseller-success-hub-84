@@ -428,8 +428,11 @@ const AdminDashboard = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center gradient-bg">
+        <div className="glass-card p-8 rounded-2xl">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-center mt-4 text-muted-foreground">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
@@ -448,45 +451,51 @@ const AdminDashboard = () => {
       icon: Users,
       label: 'Total Users',
       value: stats.totalUsers.toString(),
-      color: 'text-blue-600'
+      color: 'text-primary',
+      gradient: 'gradient-primary'
     },
     {
       icon: DollarSign,
       label: 'Total Revenue',
       value: `$${stats.totalRevenue.toFixed(2)}`,
-      color: 'text-green-600'
+      color: 'text-accent-green',
+      gradient: 'gradient-success'
     },
     {
       icon: Package,
       label: 'Services',
       value: stats.totalServices.toString(),
-      color: 'text-purple-600'
+      color: 'text-accent-purple',
+      gradient: 'gradient-accent'
     },
     {
       icon: ShoppingCart,
       label: 'Purchases',
       value: stats.totalPurchases.toString(),
-      color: 'text-orange-600'
+      color: 'text-accent-orange',
+      gradient: 'gradient-warning'
     }
   ];
 
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className="min-h-screen gradient-bg py-8 px-4">
       <div className="container mx-auto max-w-7xl">
-        {/* Header */}
+        {/* Enhanced Header with glass morphism */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Manage your AI services platform</p>
+          <div className="animate-slide-in">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
+              Admin Dashboard
+            </h1>
+            <p className="text-muted-foreground mt-2">Manage your AI services platform with style</p>
           </div>
-          <Button className="gradient-primary">
+          <Button className="gradient-primary hover-lift hover-glow animate-slide-in-delay">
             <Settings className="mr-2 h-4 w-4" />
             Settings
           </Button>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex gap-4 mb-8">
+        {/* Enhanced Navigation Tabs with glass morphism */}
+        <div className="flex gap-4 mb-8 glass-nav p-2 rounded-2xl animate-slide-in">
           {[
             { id: 'overview', label: 'Overview' },
             { id: 'services', label: 'Services' },
@@ -495,58 +504,72 @@ const AdminDashboard = () => {
           ].map((tab) => (
             <Button
               key={tab.id}
-              variant={activeTab === tab.id ? 'default' : 'outline'}
+              variant={activeTab === tab.id ? 'default' : 'ghost'}
               onClick={() => setActiveTab(tab.id as any)}
-              className="hover:scale-105 transition-all-smooth"
+              className={`hover-lift transition-all-smooth ${
+                activeTab === tab.id 
+                  ? 'gradient-primary text-white shadow-lg' 
+                  : 'hover:bg-muted/20 hover:text-primary'
+              }`}
             >
               {tab.label}
             </Button>
           ))}
         </div>
 
-        {/* Overview Tab */}
+        {/* Overview Tab with enhanced glass morphism cards */}
         {activeTab === 'overview' && (
           <div className="space-y-8">
-            {/* Stats Cards */}
+            {/* Enhanced Stats Cards */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {statCards.map((stat, index) => (
-                <Card key={index} className="glass-subtle hover:scale-105 transition-all-smooth">
+                <Card key={index} className="glass-card hover-lift hover-glow transition-all-smooth animate-slide-in border-0 rounded-2xl">
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground">{stat.label}</p>
-                        <p className="text-2xl font-bold">{stat.value}</p>
+                        <p className="text-sm text-muted-foreground mb-2">{stat.label}</p>
+                        <p className="text-3xl font-bold text-foreground">{stat.value}</p>
                       </div>
-                      <stat.icon className={`h-8 w-8 ${stat.color}`} />
+                      <div className={`p-3 rounded-xl ${stat.gradient}`}>
+                        <stat.icon className="h-6 w-6 text-white" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
 
-            {/* Recent Activity */}
-            <Card className="glass">
+            {/* Enhanced Recent Activity Card */}
+            <Card className="glass-card hover-lift border-0 rounded-2xl animate-slide-in-delay">
               <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Latest platform activity and metrics</CardDescription>
+                <CardTitle className="text-2xl bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
+                  Recent Activity
+                </CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  Latest platform activity and metrics
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  <ShoppingCart className="h-12 w-12 mx-auto mb-4" />
-                  <p>Activity tracking coming soon...</p>
+                <div className="text-center py-12">
+                  <div className="glass-subtle p-6 rounded-2xl inline-block animate-float">
+                    <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-primary" />
+                    <p className="text-muted-foreground">Activity tracking coming soon...</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Services Tab */}
+        {/* Enhanced Services Tab */}
         {activeTab === 'services' && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Service Management</h2>
+            <div className="flex justify-between items-center animate-slide-in">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
+                Service Management
+              </h2>
               <Button 
-                className="gradient-primary"
+                className="gradient-primary hover-lift hover-glow"
                 onClick={() => setServiceModal({ isOpen: true, mode: 'create' })}
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -554,37 +577,48 @@ const AdminDashboard = () => {
               </Button>
             </div>
 
-            <Card className="glass">
+            <Card className="glass-card border-0 rounded-2xl overflow-hidden animate-slide-in-delay">
               <CardContent className="p-0">
                 {loading ? (
                   <div className="p-6">
                     <div className="space-y-4">
                       {[1, 2, 3].map((i) => (
-                        <div key={i} className="animate-pulse h-16 bg-muted rounded"></div>
+                        <div key={i} className="animate-pulse h-16 glass-subtle rounded-xl"></div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <div className="divide-y divide-border">
-                    {services.map((service) => (
-                      <div key={service.id} className="p-6 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                  <div className="divide-y divide-border/20">
+                    {services.map((service, index) => (
+                      <div key={service.id} className="p-6 flex items-center justify-between hover:bg-muted/10 transition-all-smooth group">
                         <div className="flex items-center gap-4">
+                          <div className="glass-subtle p-3 rounded-xl group-hover:scale-110 transition-transform">
+                            <Package className="h-5 w-5 text-primary" />
+                          </div>
                           <div>
-                            <h3 className="font-semibold">{service.name}</h3>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="secondary">{service.category}</Badge>
-                              <span className="text-sm text-muted-foreground">${service.price}</span>
-                              <Badge variant={service.is_active ? 'default' : 'secondary'}>
+                            <h3 className="font-semibold text-lg text-foreground">{service.name}</h3>
+                            <div className="flex items-center gap-3 mt-2">
+                              <Badge variant="secondary" className="glass-subtle border-primary/20">
+                                {service.category}
+                              </Badge>
+                              <span className="text-sm font-medium text-accent-green">
+                                ${service.price}
+                              </span>
+                              <Badge 
+                                variant={service.is_active ? 'default' : 'secondary'}
+                                className={service.is_active ? 'gradient-success' : 'glass-subtle'}
+                              >
                                 {service.is_active ? 'Active' : 'Inactive'}
                               </Badge>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Button 
                             variant="ghost" 
                             size="sm"
+                            className="hover:bg-primary/20 hover:text-primary"
                             onClick={() => setServiceModal({ isOpen: true, mode: 'view', service })}
                           >
                             <Eye className="h-4 w-4" />
@@ -592,6 +626,7 @@ const AdminDashboard = () => {
                           <Button 
                             variant="ghost" 
                             size="sm"
+                            className="hover:bg-accent-purple/20 hover:text-accent-purple"
                             onClick={() => setServiceModal({ isOpen: true, mode: 'edit', service })}
                           >
                             <Edit className="h-4 w-4" />
@@ -599,7 +634,7 @@ const AdminDashboard = () => {
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="text-destructive hover:text-destructive"
+                            className="hover:bg-destructive/20 hover:text-destructive"
                             onClick={() => setDeleteModal({ isOpen: true, type: 'service', item: service })}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -614,13 +649,15 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {/* Bundles Tab */}
+        {/* Enhanced Bundles Tab */}
         {activeTab === 'bundles' && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Bundle Management</h2>
+            <div className="flex justify-between items-center animate-slide-in">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
+                Bundle Management
+              </h2>
               <Button 
-                className="gradient-primary"
+                className="gradient-primary hover-lift hover-glow"
                 onClick={() => setBundleModal({ isOpen: true, mode: 'create' })}
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -628,39 +665,48 @@ const AdminDashboard = () => {
               </Button>
             </div>
 
-            <Card className="glass">
+            <Card className="glass-card border-0 rounded-2xl overflow-hidden animate-slide-in-delay">
               <CardContent className="p-0">
                 {loading ? (
                   <div className="p-6">
                     <div className="space-y-4">
                       {[1, 2, 3].map((i) => (
-                        <div key={i} className="animate-pulse h-16 bg-muted rounded"></div>
+                        <div key={i} className="animate-pulse h-16 glass-subtle rounded-xl"></div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <div className="divide-y divide-border">
+                  <div className="divide-y divide-border/20">
                     {bundles.map((bundle) => (
-                      <div key={bundle.id} className="p-6 flex items-center justify-between hover:bg-muted/50 transition-colors">
-                        <div>
-                          <h3 className="font-semibold">{bundle.name}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm text-muted-foreground">
-                              ${Number(bundle.total_price).toFixed(2)}
-                            </span>
-                            <Badge variant="outline">
-                              {bundle.discount_percentage}% off
-                            </Badge>
-                            <Badge variant={bundle.is_active ? 'default' : 'secondary'}>
-                              {bundle.is_active ? 'Active' : 'Inactive'}
-                            </Badge>
+                      <div key={bundle.id} className="p-6 flex items-center justify-between hover:bg-muted/10 transition-all-smooth group">
+                        <div className="flex items-center gap-4">
+                          <div className="glass-subtle p-3 rounded-xl group-hover:scale-110 transition-transform">
+                            <Package className="h-5 w-5 text-accent-purple" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg text-foreground">{bundle.name}</h3>
+                            <div className="flex items-center gap-3 mt-2">
+                              <span className="text-sm font-medium text-accent-green">
+                                ${Number(bundle.total_price).toFixed(2)}
+                              </span>
+                              <Badge variant="outline" className="glass-subtle border-accent-orange/30 text-accent-orange">
+                                {bundle.discount_percentage}% off
+                              </Badge>
+                              <Badge 
+                                variant={bundle.is_active ? 'default' : 'secondary'}
+                                className={bundle.is_active ? 'gradient-success' : 'glass-subtle'}
+                              >
+                                {bundle.is_active ? 'Active' : 'Inactive'}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Button 
                             variant="ghost" 
                             size="sm"
+                            className="hover:bg-primary/20 hover:text-primary"
                             onClick={() => setBundleModal({ isOpen: true, mode: 'view', bundle })}
                           >
                             <Eye className="h-4 w-4" />
@@ -668,6 +714,7 @@ const AdminDashboard = () => {
                           <Button 
                             variant="ghost" 
                             size="sm"
+                            className="hover:bg-accent-purple/20 hover:text-accent-purple"
                             onClick={() => setBundleModal({ isOpen: true, mode: 'edit', bundle })}
                           >
                             <Edit className="h-4 w-4" />
@@ -675,7 +722,7 @@ const AdminDashboard = () => {
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="text-destructive hover:text-destructive"
+                            className="hover:bg-destructive/20 hover:text-destructive"
                             onClick={() => setDeleteModal({ isOpen: true, type: 'bundle', item: bundle })}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -690,44 +737,64 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {/* Users Tab */}
+        {/* Enhanced Users Tab */}
         {activeTab === 'users' && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold">User Management</h2>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent animate-slide-in">
+              User Management
+            </h2>
 
-            <Card className="glass">
+            <Card className="glass-card border-0 rounded-2xl overflow-hidden animate-slide-in-delay">
               <CardContent className="p-0">
                 {loading ? (
                   <div className="p-6">
                     <div className="space-y-4">
                       {[1, 2, 3].map((i) => (
-                        <div key={i} className="animate-pulse h-16 bg-muted rounded"></div>
+                        <div key={i} className="animate-pulse h-16 glass-subtle rounded-xl"></div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <div className="divide-y divide-border">
+                  <div className="divide-y divide-border/20">
                     {users.map((user) => (
-                      <div key={user.id} className="p-6 flex items-center justify-between hover:bg-muted/50 transition-colors">
-                        <div>
-                          <h3 className="font-semibold">{user.full_name || 'No name'}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm text-muted-foreground">{user.email}</span>
-                            <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                              {user.role}
-                            </Badge>
+                      <div key={user.id} className="p-6 flex items-center justify-between hover:bg-muted/10 transition-all-smooth group">
+                        <div className="flex items-center gap-4">
+                          <div className="glass-subtle p-3 rounded-xl group-hover:scale-110 transition-transform">
+                            <Users className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg text-foreground">
+                              {user.full_name || 'No name'}
+                            </h3>
+                            <div className="flex items-center gap-3 mt-2">
+                              <span className="text-sm text-muted-foreground">{user.email}</span>
+                              <Badge 
+                                variant={user.role === 'admin' ? 'default' : 'secondary'}
+                                className={user.role === 'admin' ? 'gradient-primary' : 'glass-subtle'}
+                              >
+                                {user.role}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
                         
                         <div className="text-right">
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-muted-foreground mb-2">
                             Joined {new Date(user.created_at).toLocaleDateString()}
                           </p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <Button variant="ghost" size="sm">
+                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="hover:bg-primary/20 hover:text-primary"
+                            >
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="hover:bg-accent-purple/20 hover:text-accent-purple"
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                           </div>
