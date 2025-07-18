@@ -115,7 +115,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
             full_name: fullName || '',
           },
@@ -150,8 +150,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) throw error;
       
       if (data.user) {
-        // Force page reload for clean state
-        window.location.href = '/';
+        // Redirect to dashboard instead of homepage
+        window.location.href = '/dashboard';
       }
     } catch (error) {
       throw error;

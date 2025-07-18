@@ -1,104 +1,36 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* BoostMySites AI Services Platform Design System
-Enhanced Dark Glass Morphism Theme to match existing website
-*/
-
 @layer base {
   :root {
-    --background: 220 15% 8%;
-    --foreground: 0 0% 98%;
-    --card: 220 15% 12%;
-    --card-foreground: 0 0% 98%;
-    --popover: 220 15% 10%;
-    --popover-foreground: 0 0% 98%;
-    
-    /* Enhanced brand colors with more vibrant tones */
-    --primary: 216 98% 52%; /* Bright blue #0066FF */
-    --primary-foreground: 0 0% 100%;
-    --primary-light: 218 95% 62%; /* Medium blue */
-    --primary-lighter: 220 93% 72%; /* Light blue */
-    --accent-purple: 270 95% 62%; /* Vibrant purple */
-    --accent-green: 142 86% 52%; /* Vibrant green */
-    --accent-orange: 25 95% 62%; /* Vibrant orange */
-    
-    --secondary: 220 15% 15%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 220 15% 18%;
-    --muted-foreground: 225 8% 65%;
-    --accent: 218 95% 62%;
-    --accent-foreground: 0 0% 100%;
-    
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 25%;
-    --input: 220 15% 20%;
-    --ring: 216 98% 52%;
-    
-    /* Enhanced glassmorphism variables */
-    --glass-bg: 220 15% 12% / 0.7;
-    --glass-bg-light: 220 15% 18% / 0.5;
-    --glass-border: 220 25% 35% / 0.3;
-    --glass-shadow: 216 98% 52% / 0.15;
-    --glass-glow: 216 98% 52% / 0.25;
-    
-    --radius: 1rem;
-    
-    --sidebar-background: 220 15% 10%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 216 98% 52%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 220 15% 15%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 15% 25%;
-    --sidebar-ring: 216 98% 52%;
-  }
-
-  .dark {
-    /* Already dark by default, keeping consistent */
-    --background: 220 15% 8%;
-    --foreground: 0 0% 98%;
-    --card: 220 15% 12%;
-    --card-foreground: 0 0% 98%;
-    --popover: 220 15% 10%;
-    --popover-foreground: 0 0% 98%;
-    
-    --primary: 218 95% 62%;
-    --primary-foreground: 220 15% 8%;
-    --primary-light: 220 93% 72%;
-    --primary-lighter: 222 91% 82%;
-    
-    --secondary: 220 15% 15%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 220 15% 18%;
-    --muted-foreground: 225 8% 65%;
-    --accent: 218 95% 62%;
-    --accent-foreground: 220 15% 8%;
-    
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 25%;
-    --input: 220 15% 20%;
-    --ring: 218 95% 62%;
-    
-    /* Enhanced dark mode glassmorphism */
-    --glass-bg: 220 15% 12% / 0.7;
-    --glass-bg-light: 220 15% 18% / 0.5;
-    --glass-border: 220 25% 35% / 0.3;
-    --glass-shadow: 218 95% 62% / 0.15;
-    --glass-glow: 218 95% 62% / 0.25;
-    
-    --sidebar-background: 220 15% 10%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 216 98% 52%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 15% 15%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 15% 25%;
-    --sidebar-ring: 216 98% 52%;
+    --background: 220 15% 6%;
+    --foreground: 220 8% 95%;
+    --card: 220 20% 8%;
+    --card-foreground: 220 8% 92%;
+    --popover: 220 25% 7%;
+    --popover-foreground: 220 8% 95%;
+    --primary: 217 100% 65%;
+    --primary-foreground: 220 15% 6%;
+    --secondary: 220 20% 12%;
+    --secondary-foreground: 220 8% 88%;
+    --muted: 220 20% 14%;
+    --muted-foreground: 220 8% 65%;
+    --accent: 220 25% 16%;
+    --accent-foreground: 220 8% 90%;
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 220 25% 18%;
+    --input: 220 25% 16%;
+    --ring: 217 100% 65%;
+    --radius: 0.75rem;
+    --chart-1: 217 100% 65%;
+    --chart-2: 268 85% 60%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 120 65% 50%;
+    --chart-5: 340 75% 55%;
   }
 }
 
@@ -106,187 +38,131 @@ Enhanced Dark Glass Morphism Theme to match existing website
   * {
     @apply border-border;
   }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-[Inter];
     font-feature-settings: "rlig" 1, "calt" 1;
-    background: linear-gradient(135deg, hsl(var(--background)), hsl(220 15% 6%));
-    min-height: 100vh;
   }
 }
 
+/* Enhanced Glass Morphism Components */
 @layer components {
-  /* Enhanced Glassmorphism utilities */
   .glass {
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(20px);
-    border: 1px solid hsl(var(--glass-border));
-    box-shadow: 
-      0 8px 32px hsl(var(--glass-shadow)),
-      inset 0 1px 0 hsl(220 25% 45% / 0.2);
+    @apply bg-black/20 border border-white/10 backdrop-blur-xl;
   }
   
   .glass-subtle {
-    background: hsl(var(--glass-bg-light));
-    backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--glass-border));
-    box-shadow: 
-      0 4px 20px hsl(var(--glass-shadow)),
-      inset 0 1px 0 hsl(220 25% 45% / 0.15);
+    @apply bg-black/10 border border-white/5 backdrop-blur-lg;
   }
-
+  
   .glass-card {
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(16px);
-    border: 1px solid hsl(var(--glass-border));
-    box-shadow: 
-      0 8px 32px hsl(var(--glass-shadow)),
-      0 0 20px hsl(var(--glass-glow)),
-      inset 0 1px 0 hsl(220 25% 45% / 0.2);
-  }
-
-  .glass-nav {
-    background: hsl(var(--glass-bg-light));
-    backdrop-filter: blur(20px);
-    border: 1px solid hsl(var(--glass-border));
-    box-shadow: 
-      0 4px 16px hsl(var(--glass-shadow)),
-      inset 0 1px 0 hsl(220 25% 50% / 0.3);
+    @apply bg-gradient-to-br from-black/25 to-black/10 border border-white/10 backdrop-blur-xl shadow-2xl;
   }
   
-  /* Enhanced Gradient utilities */
+  .glass-input {
+    @apply bg-black/20 border border-white/10 backdrop-blur-lg placeholder:text-muted-foreground/70;
+  }
+  
+  .glass-button {
+    @apply bg-gradient-to-r from-primary/20 to-blue-500/20 border border-primary/30 backdrop-blur-sm text-primary font-medium;
+  }
+  
+  .glass-badge {
+    @apply bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-400/30 text-purple-200 backdrop-blur-sm;
+  }
+  
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
+    @apply bg-gradient-to-r from-primary via-blue-500 to-purple-500;
   }
   
-  .gradient-accent {
-    background: linear-gradient(135deg, hsl(var(--accent-purple)), hsl(var(--primary)));
-  }
-
-  .gradient-success {
-    background: linear-gradient(135deg, hsl(var(--accent-green)), hsl(142 86% 42%));
-  }
-
-  .gradient-warning {
-    background: linear-gradient(135deg, hsl(var(--accent-orange)), hsl(25 95% 52%));
-  }
-
-  .gradient-bg {
-    background: linear-gradient(135deg, 
-      hsl(220 15% 8%), 
-      hsl(220 15% 6%), 
-      hsl(225 15% 10%));
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent;
   }
   
-  /* Enhanced Animation utilities */
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
+  /* Enhanced Glow Effects */
+  .glow-subtle {
+    @apply shadow-lg shadow-primary/20;
   }
   
-  .animate-glow {
-    animation: glow 3s ease-in-out infinite alternate;
-  }
-
-  .animate-pulse-slow {
-    animation: pulse-slow 4s ease-in-out infinite;
+  .glow-button {
+    @apply shadow-lg shadow-primary/30 scale-105;
   }
   
-  .transition-all-smooth {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  .hover\\:glow-subtle:hover {
+    @apply shadow-lg shadow-primary/25;
   }
-
-  .hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: 
-      0 12px 40px hsl(var(--glass-shadow)),
-      0 0 30px hsl(var(--glass-glow));
-  }
-
-  .hover-glow:hover {
-    box-shadow: 
-      0 0 20px hsl(var(--primary) / 0.4),
-      0 0 40px hsl(var(--primary) / 0.2),
-      inset 0 1px 0 hsl(220 25% 50% / 0.3);
+  
+  .hover\\:glow-button:hover {
+    @apply shadow-lg shadow-primary/40 scale-105;
   }
 }
 
+/* Animation Utilities */
 @layer utilities {
-  /* Enhanced animations */
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-12px);
-    }
-  }
-  
-  @keyframes glow {
-    from {
-      box-shadow: 
-        0 0 20px hsl(var(--primary) / 0.3),
-        0 0 40px hsl(var(--primary) / 0.1);
-    }
-    to {
-      box-shadow: 
-        0 0 30px hsl(var(--primary) / 0.6),
-        0 0 60px hsl(var(--primary) / 0.3);
-    }
-  }
-
-  @keyframes pulse-slow {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.7;
-    }
-  }
-  
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .transition-all-smooth {
+    @apply transition-all duration-300 ease-out;
   }
   
   .animate-slide-in {
-    animation: slideIn 0.8s ease-out;
+    animation: slideIn 0.6s ease-out forwards;
   }
   
   .animate-slide-in-delay {
-    animation: slideIn 0.8s ease-out 0.3s both;
+    animation: slideIn 0.8s ease-out 0.2s forwards;
+    opacity: 0;
   }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+}
 
-  /* Color utilities for icons and accents */
-  .text-accent-purple {
-    color: hsl(var(--accent-purple));
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  .text-accent-green {
-    color: hsl(var(--accent-green));
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .text-accent-orange {
-    color: hsl(var(--accent-orange));
-  }
+}
 
-  .bg-accent-purple {
-    background-color: hsl(var(--accent-purple));
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
   }
-  
-  .bg-accent-green {
-    background-color: hsl(var(--accent-green));
+  50% {
+    transform: translateY(-10px);
   }
-  
-  .bg-accent-orange {
-    background-color: hsl(var(--accent-orange));
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 20px -10px rgba(59, 130, 246, 0.5);
   }
+  to {
+    box-shadow: 0 0 30px -5px rgba(59, 130, 246, 0.8);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-black/10;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary/50;
 }
