@@ -437,7 +437,7 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
             {filteredServices.map((service) => (
               <Card 
                 key={service.id} 
-                className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden"
+                className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[400px]"
               >
                 {/* Background Image with Overlay */}
                 {service.image_url && (
@@ -450,8 +450,8 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                 )}
                 
                 {/* Content */}
-                <div className="relative z-10">
-                  <CardHeader className="pb-3">
+                <div className="relative z-10 flex flex-col h-full">
+                  <CardHeader className="pb-3 flex-shrink-0">
                     <div className="flex justify-between items-start mb-2">
                       <Badge variant="secondary" className="glass-badge backdrop-blur-sm">
                         {service.category}
@@ -470,7 +470,11 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                       {service.description}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="pt-0">
+                  
+                  {/* Spacer to push buttons to bottom */}
+                  <div className="flex-1"></div>
+                  
+                  <CardContent className="pt-0 mt-auto">
                     <div className="flex gap-2">
                       <Button 
                         asChild
@@ -540,7 +544,7 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
             {filteredBundles.map((bundle) => (
               <Card 
                 key={bundle.id} 
-                className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden"
+                className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[500px]"
               >
                 {/* Background Image with Overlay */}
                 {bundle.image_url && (
@@ -553,14 +557,14 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                 )}
 
                 {/* Content */}
-                <div className="relative z-10">
+                <div className="relative z-10 flex flex-col h-full">
                   <div className="absolute top-4 right-4 z-20">
                     <Badge className="bg-gradient-to-r from-green-500 to-emerald-400 text-white shadow-lg backdrop-blur-sm">
                       {bundle.discount_percentage}% OFF
                     </Badge>
                   </div>
                   
-                  <CardHeader>
+                  <CardHeader className="flex-shrink-0">
                     <div className="flex items-start gap-3">
                       <div className="p-2 rounded-lg bg-gradient-to-br from-primary/30 to-purple-500/30 backdrop-blur-sm">
                         <Package className="h-6 w-6 text-white" />
@@ -574,7 +578,7 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                     </div>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
+                  <div className="flex-1 px-6 space-y-4">
                     {/* Included Services */}
                     {bundle.services && bundle.services.length > 0 && (
                       <div className="space-y-2">
@@ -612,9 +616,11 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                         </span>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2">
+                  {/* Action Buttons - Fixed at bottom */}
+                  <CardContent className="pt-0 mt-auto">
+                    <div className="flex gap-2">
                       <Button 
                         asChild
                         className="flex-1 glass-button hover:glow-button transition-all duration-300 backdrop-blur-sm"
