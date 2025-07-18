@@ -14,7 +14,6 @@ import { Navigate } from 'react-router-dom';
 import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare, Users, Handshake } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal';
-
 interface Service {
   id: string;
   name: string;
@@ -25,7 +24,6 @@ interface Service {
   features: string[];
   image_url?: string;
 }
-
 interface Bundle {
   id: string;
   name: string;
@@ -40,13 +38,11 @@ interface Bundle {
     price: number;
   }[];
 }
-
 interface UserStats {
   totalPurchases: number;
   totalSpent: number;
   activeServices: number;
 }
-
 interface Purchase {
   id: string;
   total_amount: number;
@@ -57,89 +53,82 @@ interface Purchase {
     item_price: number;
   }[];
 }
-
 interface CustomerDashboardProps {
   activeTab?: 'overview' | 'services' | 'bundles' | 'purchases' | 'profile' | 'support';
 }
-
-const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) => {
-  const { user, profile, loading: authLoading } = useAuth();
-  const { addToCart } = useCart();
-  const { toast } = useToast();
+const CustomerDashboard = ({
+  activeTab = 'overview'
+}: CustomerDashboardProps) => {
+  const {
+    user,
+    profile,
+    loading: authLoading
+  } = useAuth();
+  const {
+    addToCart
+  } = useCart();
+  const {
+    toast
+  } = useToast();
   const [services, setServices] = useState<Service[]>([]);
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [userStats, setUserStats] = useState<UserStats>({ totalPurchases: 0, totalSpent: 0, activeServices: 0 });
+  const [userStats, setUserStats] = useState<UserStats>({
+    totalPurchases: 0,
+    totalSpent: 0,
+    activeServices: 0
+  });
   const [recentPurchases, setRecentPurchases] = useState<Purchase[]>([]);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-
   useEffect(() => {
     if (!user) return;
-
     const loadData = async () => {
       try {
-        const [servicesResponse, bundlesResponse, purchasesResponse] = await Promise.all([
-          supabase.from('services').select('*').eq('is_active', true),
-          supabase.from('bundles').select('*').eq('is_active', true),
-          supabase.from('purchases')
-            .select(`
+        const [servicesResponse, bundlesResponse, purchasesResponse] = await Promise.all([supabase.from('services').select('*').eq('is_active', true), supabase.from('bundles').select('*').eq('is_active', true), supabase.from('purchases').select(`
               id,
               total_amount,
               payment_status,
               created_at,
               purchase_items(item_name, item_price)
-            `)
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(5)
-        ]);
-
+            `).eq('user_id', user.id).order('created_at', {
+          ascending: false
+        }).limit(5)]);
         if (servicesResponse.data) {
           const formattedServices = servicesResponse.data.map(service => ({
             ...service,
-            features: Array.isArray(service.features) ? service.features : 
-                     typeof service.features === 'string' ? JSON.parse(service.features || '[]') : []
+            features: Array.isArray(service.features) ? service.features : typeof service.features === 'string' ? JSON.parse(service.features || '[]') : []
           }));
           setServices(formattedServices);
         }
-        
         if (bundlesResponse.data) {
           // Fetch services for each bundle
-          const bundlesWithServices = await Promise.all(
-            bundlesResponse.data.map(async (bundle) => {
-              const { data: servicesData } = await supabase
-                .from('bundle_services')
-                .select(`
+          const bundlesWithServices = await Promise.all(bundlesResponse.data.map(async bundle => {
+            const {
+              data: servicesData
+            } = await supabase.from('bundle_services').select(`
                   services:service_id (
                     id,
                     name,
                     category,
                     price
                   )
-                `)
-                .eq('bundle_id', bundle.id);
-
-              return {
-                ...bundle,
-                services: servicesData?.map(item => item.services).filter(Boolean) || []
-              };
-            })
-          );
+                `).eq('bundle_id', bundle.id);
+            return {
+              ...bundle,
+              services: servicesData?.map(item => item.services).filter(Boolean) || []
+            };
+          }));
           setBundles(bundlesWithServices);
         }
 
         // Load user statistics
         if (purchasesResponse.data) {
           setRecentPurchases(purchasesResponse.data);
-          
           const completedPurchases = purchasesResponse.data.filter(p => p.payment_status === 'completed');
           const totalSpent = completedPurchases.reduce((sum, p) => sum + Number(p.total_amount), 0);
-          const activeServicesCount = completedPurchases.reduce((sum, p) => 
-            sum + (p.purchase_items?.length || 0), 0
-          );
-
+          const activeServicesCount = completedPurchases.reduce((sum, p) => sum + (p.purchase_items?.length || 0), 0);
           setUserStats({
             totalPurchases: completedPurchases.length,
             totalSpent,
@@ -152,40 +141,28 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
         setLoading(false);
       }
     };
-
     loadData();
   }, [user]);
-
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+      </div>;
   }
-
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
-
   if (profile?.role === 'admin') {
     return <Navigate to="/admin" replace />;
   }
-
   const categories = ['all', ...Array.from(new Set(services.map(s => s.category)))];
-  
   const filteredServices = services.filter(service => {
-    const matchesSearch = service.name.toLowerCase().includes(search.toLowerCase()) ||
-                         service.description.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = service.name.toLowerCase().includes(search.toLowerCase()) || service.description.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || service.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
-
   const filteredBundles = bundles.filter(bundle => {
-    return bundle.name.toLowerCase().includes(search.toLowerCase()) ||
-           bundle.description.toLowerCase().includes(search.toLowerCase());
+    return bundle.name.toLowerCase().includes(search.toLowerCase()) || bundle.description.toLowerCase().includes(search.toLowerCase());
   });
-
   const handleAddToCart = (item: Service | Bundle, type: 'service' | 'bundle') => {
     addToCart({
       id: item.id,
@@ -194,13 +171,11 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
       type,
       billing_period: type === 'service' ? (item as Service).billing_period : 'bundle'
     });
-
     toast({
       title: "Added to Cart",
-      description: `${item.name} has been added to your cart.`,
+      description: `${item.name} has been added to your cart.`
     });
   };
-
   const calculateOriginalPrice = (bundle: Bundle) => {
     if (!bundle.services) return bundle.total_price;
     const originalTotal = bundle.services.reduce((sum, service) => sum + service.price, 0);
@@ -224,9 +199,7 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
         return renderOverviewTab();
     }
   };
-
-  const renderOverviewTab = () => (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
+  const renderOverviewTab = () => <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
       {/* Profile Dashboard Section */}
       <div className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5 py-8 px-4">
         <div className="container mx-auto max-w-7xl">
@@ -321,11 +294,7 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                     <p className="text-sm text-muted-foreground">Account Type</p>
                   </div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  className="w-full mt-4 glass-button hover:glow-button transition-all duration-300"
-                  onClick={() => setIsProfileModalOpen(true)}
-                >
+                <Button variant="outline" className="w-full mt-4 glass-button hover:glow-button transition-all duration-300" onClick={() => setIsProfileModalOpen(true)}>
                   <Edit3 className="h-4 w-4 mr-2" />
                   Edit Profile
                 </Button>
@@ -341,21 +310,14 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {recentPurchases.length === 0 ? (
-                  <div className="text-center py-8">
+                {recentPurchases.length === 0 ? <div className="text-center py-8">
                     <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
                     <p className="text-muted-foreground mb-4">No purchases yet</p>
-                    <Button 
-                      asChild
-                      className="glass-button hover:glow-button transition-all duration-300"
-                    >
+                    <Button asChild className="glass-button hover:glow-button transition-all duration-300">
                       <Link to="/dashboard/services">Browse Services</Link>
                     </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {recentPurchases.slice(0, 3).map((purchase) => (
-                      <div key={purchase.id} className="flex items-center justify-between p-3 glass-subtle rounded-lg">
+                  </div> : <div className="space-y-3">
+                    {recentPurchases.slice(0, 3).map(purchase => <div key={purchase.id} className="flex items-center justify-between p-3 glass-subtle rounded-lg">
                         <div>
                           <p className="font-medium text-sm">
                             {purchase.purchase_items?.[0]?.item_name || 'Purchase'}
@@ -366,27 +328,19 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-sm">${purchase.total_amount}</p>
-                          <Badge 
-                            variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'}
-                            className="text-xs"
-                          >
+                          <Badge variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'} className="text-xs">
                             {purchase.payment_status}
                           </Badge>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      </div>)}
+                  </div>}
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-    </div>
-  );
-
-  const renderServicesTab = () => (
-    <div className="py-8 px-4">
+    </div>;
+  const renderServicesTab = () => <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Services
@@ -411,10 +365,10 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
               <div className="text-center p-4 rounded-lg bg-white/50 border border-green-500/20">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Users className="h-5 w-5 text-green-600" />
-                  <span className="text-2xl font-bold text-green-600">70%</span>
+                  <span className="text-2xl font-bold text-gray-950">70%</span>
                 </div>
-                <h4 className="font-semibold mb-1">Your Profit</h4>
-                <p className="text-sm text-muted-foreground">Keep 70% of every sale you make to your clients</p>
+                <h4 className="font-semibold mb-1 text-lime-300">Your Profit</h4>
+                <p className="text-sm text-gray-950">Keep 70% of every sale you make to your clients</p>
               </div>
 
               <div className="text-center p-4 rounded-lg bg-white/50 border border-primary/20">
@@ -451,12 +405,7 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search services..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 glass-input hover:glow-subtle transition-all duration-300"
-            />
+            <Input placeholder="Search services..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10 glass-input hover:glow-subtle transition-all duration-300" />
           </div>
           
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
@@ -465,50 +414,34 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent className="glass">
-              {categories.map(category => (
-                <SelectItem key={category} value={category}>
+              {categories.map(category => <SelectItem key={category} value={category}>
                   {category === 'all' ? 'All Categories' : category}
-                </SelectItem>
-              ))}
+                </SelectItem>)}
             </SelectContent>
           </Select>
         </div>
 
         {/* Services Grid */}
-        {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className="glass-card animate-pulse">
+        {loading ? <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map(i => <Card key={i} className="glass-card animate-pulse">
                 <CardContent className="p-6">
                   <div className="h-4 bg-muted/30 rounded mb-4"></div>
                   <div className="h-16 bg-muted/30 rounded mb-4"></div>
                   <div className="h-8 bg-muted/30 rounded"></div>
                 </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : filteredServices.length === 0 ? (
-          <div className="text-center py-12">
+              </Card>)}
+          </div> : filteredServices.length === 0 ? <div className="text-center py-12">
             <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No services found</h3>
             <p className="text-muted-foreground">Try adjusting your search criteria</p>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredServices.map((service) => (
-              <Card 
-                key={service.id} 
-                className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[400px]"
-              >
+          </div> : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredServices.map(service => <Card key={service.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[400px]">
                 {/* Background Image with Overlay */}
-                {service.image_url && (
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{ backgroundImage: `url(${service.image_url})` }}
-                  >
+                {service.image_url && <div className="absolute inset-0 bg-cover bg-center" style={{
+            backgroundImage: `url(${service.image_url})`
+          }}>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
-                  </div>
-                )}
+                  </div>}
                 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col h-full">
@@ -537,34 +470,22 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                   
                   <CardContent className="pt-0 mt-auto">
                     <div className="flex gap-2">
-                      <Button 
-                        asChild
-                        className="flex-1 glass-button hover:glow-button transition-all duration-300 backdrop-blur-sm"
-                      >
+                      <Button asChild className="flex-1 glass-button hover:glow-button transition-all duration-300 backdrop-blur-sm">
                         <Link to={`/services/${service.id}`}>
                           View Details
                         </Link>
                       </Button>
-                      <Button
-                        size="icon"
-                        onClick={() => handleAddToCart(service, 'service')}
-                        className="glass-button hover:glow-button transition-all duration-300 shrink-0 backdrop-blur-sm"
-                      >
+                      <Button size="icon" onClick={() => handleAddToCart(service, 'service')} className="glass-button hover:glow-button transition-all duration-300 shrink-0 backdrop-blur-sm">
                         <ShoppingCart className="h-4 w-4" />
                       </Button>
                     </div>
                   </CardContent>
                 </div>
-              </Card>
-            ))}
-          </div>
-        )}
+              </Card>)}
+          </div>}
       </div>
-    </div>
-  );
-
-  const renderBundlesTab = () => (
-    <div className="py-8 px-4">
+    </div>;
+  const renderBundlesTab = () => <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Bundles
@@ -573,49 +494,30 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
         {/* Search */}
         <div className="relative mb-8">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Search bundles..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 glass-input hover:glow-subtle transition-all duration-300"
-          />
+          <Input placeholder="Search bundles..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10 glass-input hover:glow-subtle transition-all duration-300" />
         </div>
 
         {/* Bundles Grid */}
-        {loading ? (
-          <div className="grid md:grid-cols-2 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="glass-card animate-pulse">
+        {loading ? <div className="grid md:grid-cols-2 gap-6">
+            {[1, 2, 3, 4].map(i => <Card key={i} className="glass-card animate-pulse">
                 <CardContent className="p-6">
                   <div className="h-4 bg-muted/30 rounded mb-4"></div>
                   <div className="h-16 bg-muted/30 rounded mb-4"></div>
                   <div className="h-32 bg-muted/30 rounded"></div>
                 </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : filteredBundles.length === 0 ? (
-          <div className="text-center py-12">
+              </Card>)}
+          </div> : filteredBundles.length === 0 ? <div className="text-center py-12">
             <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No bundles found</h3>
             <p className="text-muted-foreground">Try adjusting your search criteria</p>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            {filteredBundles.map((bundle) => (
-              <Card 
-                key={bundle.id} 
-                className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[500px]"
-              >
+          </div> : <div className="grid md:grid-cols-2 gap-6">
+            {filteredBundles.map(bundle => <Card key={bundle.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[500px]">
                 {/* Background Image with Overlay */}
-                {bundle.image_url && (
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{ backgroundImage: `url(${bundle.image_url})` }}
-                  >
+                {bundle.image_url && <div className="absolute inset-0 bg-cover bg-center" style={{
+            backgroundImage: `url(${bundle.image_url})`
+          }}>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
-                  </div>
-                )}
+                  </div>}
 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col h-full">
@@ -641,26 +543,20 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
 
                   <div className="flex-1 px-6 space-y-4">
                     {/* Included Services */}
-                    {bundle.services && bundle.services.length > 0 && (
-                      <div className="space-y-2">
+                    {bundle.services && bundle.services.length > 0 && <div className="space-y-2">
                         <h4 className="font-semibold text-sm text-gray-300">Included Services:</h4>
                         <div className="space-y-1">
-                          {bundle.services.slice(0, 3).map((service) => (
-                            <div key={service.id} className="flex items-center justify-between text-sm glass-subtle p-2 rounded-lg backdrop-blur-sm">
+                          {bundle.services.slice(0, 3).map(service => <div key={service.id} className="flex items-center justify-between text-sm glass-subtle p-2 rounded-lg backdrop-blur-sm">
                               <span className="text-white">{service.name}</span>
                               <Badge variant="outline" className="text-xs border-white/30 text-white">
                                 ${service.price}
                               </Badge>
-                            </div>
-                          ))}
-                          {bundle.services.length > 3 && (
-                            <div className="text-xs text-gray-300 text-center py-1">
+                            </div>)}
+                          {bundle.services.length > 3 && <div className="text-xs text-gray-300 text-center py-1">
                               +{bundle.services.length - 3} more services
-                            </div>
-                          )}
+                            </div>}
                         </div>
-                      </div>
-                    )}
+                      </div>}
 
                     {/* Pricing */}
                     <div className="space-y-2 pt-2 border-t border-white/20">
@@ -682,52 +578,36 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                   {/* Action Buttons - Fixed at bottom */}
                   <CardContent className="pt-0 mt-auto">
                     <div className="flex gap-2">
-                      <Button 
-                        asChild
-                        className="flex-1 glass-button hover:glow-button transition-all duration-300 backdrop-blur-sm"
-                      >
+                      <Button asChild className="flex-1 glass-button hover:glow-button transition-all duration-300 backdrop-blur-sm">
                         <Link to={`/bundles/${bundle.id}`}>
                           View Details
                         </Link>
                       </Button>
-                      <Button
-                        size="icon"
-                        onClick={() => handleAddToCart(bundle, 'bundle')}
-                        className="glass-button hover:glow-button transition-all duration-300 shrink-0 backdrop-blur-sm"
-                      >
+                      <Button size="icon" onClick={() => handleAddToCart(bundle, 'bundle')} className="glass-button hover:glow-button transition-all duration-300 shrink-0 backdrop-blur-sm">
                         <ShoppingCart className="h-4 w-4" />
                       </Button>
                     </div>
                   </CardContent>
                 </div>
-              </Card>
-            ))}
-          </div>
-        )}
+              </Card>)}
+          </div>}
       </div>
-    </div>
-  );
-
-  const renderPurchasesTab = () => (
-    <div className="py-8 px-4">
+    </div>;
+  const renderPurchasesTab = () => <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           My Purchases
         </h1>
         
-        {recentPurchases.length === 0 ? (
-          <div className="text-center py-12">
+        {recentPurchases.length === 0 ? <div className="text-center py-12">
             <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No purchases yet</h3>
             <p className="text-muted-foreground mb-4">Start exploring our services and bundles</p>
             <Button asChild className="glass-button hover:glow-button transition-all duration-300">
               <Link to="/dashboard/services">Browse Services</Link>
             </Button>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {recentPurchases.map((purchase) => (
-              <Card key={purchase.id} className="glass-card">
+          </div> : <div className="space-y-6">
+            {recentPurchases.map(purchase => <Card key={purchase.id} className="glass-card">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div>
@@ -740,36 +620,25 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-primary">${purchase.total_amount}</p>
-                      <Badge 
-                        variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'}
-                      >
+                      <Badge variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'}>
                         {purchase.payment_status}
                       </Badge>
                     </div>
                   </div>
                   
-                  {purchase.purchase_items && purchase.purchase_items.length > 0 && (
-                    <div className="space-y-2">
+                  {purchase.purchase_items && purchase.purchase_items.length > 0 && <div className="space-y-2">
                       <h4 className="font-medium text-sm text-muted-foreground">Items:</h4>
-                      {purchase.purchase_items.map((item, index) => (
-                        <div key={index} className="flex justify-between text-sm">
+                      {purchase.purchase_items.map((item, index) => <div key={index} className="flex justify-between text-sm">
                           <span>{item.item_name}</span>
                           <span>${item.item_price}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        </div>)}
+                    </div>}
                 </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+              </Card>)}
+          </div>}
       </div>
-    </div>
-  );
-
-  const renderProfileTab = () => (
-    <div className="py-8 px-4">
+    </div>;
+  const renderProfileTab = () => <div className="py-8 px-4">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Profile Settings
@@ -789,19 +658,11 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Full Name</label>
-                <Input 
-                  value={profile?.full_name || ''} 
-                  className="glass-input"
-                  placeholder="Enter your full name"
-                />
+                <Input value={profile?.full_name || ''} className="glass-input" placeholder="Enter your full name" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Email Address</label>
-                <Input 
-                  value={profile?.email || ''} 
-                  className="glass-input"
-                  disabled
-                />
+                <Input value={profile?.email || ''} className="glass-input" disabled />
               </div>
             </div>
             
@@ -819,11 +680,8 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
-
-  const renderSupportTab = () => (
-    <div className="py-8 px-4">
+    </div>;
+  const renderSupportTab = () => <div className="py-8 px-4">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Support & Help
@@ -902,18 +760,10 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
           </Card>
         </div>
       </div>
-    </div>
-  );
-
-  return (
-    <>
+    </div>;
+  return <>
       {renderContent()}
-      <ProfileEditModal 
-        open={isProfileModalOpen} 
-        onOpenChange={setIsProfileModalOpen} 
-      />
-    </>
-  );
+      <ProfileEditModal open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen} />
+    </>;
 };
-
 export default CustomerDashboard;
