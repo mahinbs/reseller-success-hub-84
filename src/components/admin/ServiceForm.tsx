@@ -56,7 +56,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
       features: typeof initialData?.features === 'string' 
         ? initialData.features 
         : Array.isArray(initialData?.features) 
-          ? initialData.features.join(', ') 
+          ? (initialData.features as string[]).join(', ') 
           : '',
       brochure_url: initialData?.brochure_url || '',
       deck_url: initialData?.deck_url || '',
