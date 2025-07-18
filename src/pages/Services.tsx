@@ -1,6 +1,6 @@
+
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { Search, Filter, Grid, List, TrendingUp, ShoppingCart, Users, DollarSign, Handshake } from 'lucide-react';
-import { createServiceSlug } from '@/lib/serviceUtils';
 import { ResellableBanner } from '@/components/reseller/ResellableBanner';
 import { OnboardingModal } from '@/components/reseller/OnboardingModal';
 import { ResellableTooltip } from '@/components/reseller/ResellableTooltip';
@@ -338,12 +337,7 @@ const ServicesPage = () => {
                   <CardHeader className={viewMode === 'list' ? 'flex-1' : ''}>
                     <div className="flex justify-between items-start pr-20">
                       <CardTitle className="text-lg">
-                        <Link 
-                          to={`/service/${createServiceSlug(service.name)}`}
-                          className="hover:text-primary transition-colors"
-                        >
-                          {service.name}
-                        </Link>
+                        {service.name}
                       </CardTitle>
                     </div>
                     <div className="flex gap-2 mb-2">
@@ -387,26 +381,13 @@ const ServicesPage = () => {
                       </div>
                     </div>
                     
-                    <div className={`flex gap-2 ${viewMode === 'list' ? 'flex-row' : 'flex-col'}`}>
-                      <Button 
-                        asChild
-                        variant="outline" 
-                        className="group-hover:scale-105 transition-all-smooth"
-                      >
-                        <ResellableTooltip content="See what your clients will receive">
-                          <Link to={`/service/${createServiceSlug(service.name)}`}>
-                            See Sales Materials
-                          </Link>
-                        </ResellableTooltip>
-                      </Button>
-                      <Button
-                        onClick={() => handleAddToCart(service, 'service')}
-                        className="gradient-primary group-hover:scale-105 transition-all-smooth"
-                      >
-                        <ShoppingCart className="mr-2 h-4 w-4" />
-                        Buy to Resell
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={() => handleAddToCart(service, 'service')}
+                      className="w-full gradient-primary group-hover:scale-105 transition-all-smooth"
+                    >
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Buy to Resell
+                    </Button>
                   </CardContent>
                 </Card>
               ))}

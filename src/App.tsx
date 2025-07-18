@@ -12,10 +12,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import ServicesPage from "./pages/Services";
-import ServiceLandingPage from "./pages/ServiceLandingPage";
 import Portfolio from "./pages/Portfolio";
-import Bundles from "./pages/Bundles";
-import BundleDetail from "./pages/BundleDetail";
 import About from "./pages/About";
 import CartPage from "./pages/Cart";
 import CustomerDashboard from "./pages/CustomerDashboard";
@@ -59,43 +56,11 @@ const App = () => (
                     </ProtectedRoute>
                   </>
                 } />
-                <Route path="/services/:slug" element={
-                  <>
-                    <Header />
-                    <ProtectedRoute requireAuth={false}>
-                      <ServiceLandingPage />
-                    </ProtectedRoute>
-                  </>
-                } />
-                <Route path="/service/:slug" element={
-                  <>
-                    <Header />
-                    <ProtectedRoute requireAuth={false}>
-                      <ServiceLandingPage />
-                    </ProtectedRoute>
-                  </>
-                } />
                 <Route path="/portfolio" element={
                   <>
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <Portfolio />
-                    </ProtectedRoute>
-                  </>
-                } />
-                <Route path="/bundles" element={
-                  <>
-                    <Header />
-                    <ProtectedRoute requireAuth={false}>
-                      <Bundles />
-                    </ProtectedRoute>
-                  </>
-                } />
-                <Route path="/bundles/:id" element={
-                  <>
-                    <Header />
-                    <ProtectedRoute requireAuth={false}>
-                      <BundleDetail />
                     </ProtectedRoute>
                   </>
                 } />
