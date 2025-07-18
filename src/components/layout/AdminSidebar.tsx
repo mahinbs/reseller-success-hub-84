@@ -8,7 +8,8 @@ import {
   Users, 
   FileText,
   BarChart3,
-  Settings 
+  Settings,
+  LogOut 
 } from 'lucide-react';
 import {
   Sidebar,
@@ -21,8 +22,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useAuth } from '@/hooks/useAuth';
 
-const navigationItems = [
+const mainNavigationItems = [
   {
     title: 'Overview',
     url: '/admin',
@@ -53,7 +55,10 @@ const navigationItems = [
     title: 'Analytics',
     url: '/admin/analytics',
     icon: BarChart3
-  },
+  }
+];
+
+const accountItems = [
   {
     title: 'Settings',
     url: '/admin/settings',
@@ -64,6 +69,7 @@ const navigationItems = [
 export function AdminSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
+  const { signOut } = useAuth();
   const isCollapsed = state === 'collapsed';
 
   const isActive = (url: string, exact?: boolean) => {
@@ -73,24 +79,33 @@ export function AdminSidebar() {
     return location.pathname.startsWith(url);
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   return (
     <Sidebar 
       className={`glass-sidebar transition-all duration-300 ease-out ${
-        isCollapsed ? 'w-20' : 'w-72'
+        isCollapsed ? 'w-20' : 'w-80'
       }`}
     >
-      <SidebarContent className="overflow-hidden">
-        <SidebarGroup>
+      <SidebarContent className="overflow-hidden flex flex-col h-full">
+        {/* Main Navigation Group */}
+        <SidebarGroup className="flex-1">
           <SidebarGroupLabel 
-            className={`text-sm font-semibold gradient-text px-4 py-4 transition-all duration-300 ${
+            className={`text-sm font-semibold gradient-text px-6 py-4 transition-all duration-300 ${
               isCollapsed ? 'opacity-0 scale-0' : 'opacity-100 scale-100'
             } animate-fade-in-scale`}
           >
             Admin Portal
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2 px-3">
-              {navigationItems.map((item, index) => (
+            <SidebarMenu className="space-y-2 px-4">
+              {mainNavigationItems.map((item, index) => (
                 <SidebarMenuItem 
                   key={item.title}
                   className={`animate-stagger-in animate-stagger-${Math.min(index + 1, 5)}`}
@@ -99,7 +114,7 @@ export function AdminSidebar() {
                     <NavLink 
                       to={item.url}
                       className={({ isActive }) => 
-                        `sidebar-item group flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 ${
+                        `sidebar-item group flex items-center gap-5 px-6 py-4 rounded-xl transition-all duration-300 ${
                           isActive 
                             ? 'sidebar-item-active bg-gradient-to-r from-primary/25 via-primary/15 to-purple-500/10 text-primary border border-primary/20 shadow-lg shadow-primary/20' 
                             : 'hover:bg-gradient-to-r hover:from-muted/50 hover:to-muted/30 text-muted-foreground hover:text-foreground hover:shadow-md'
@@ -107,7 +122,7 @@ export function AdminSidebar() {
                       }
                     >
                       <div className="relative">
-                        <item.icon className={`sidebar-icon h-5 w-5 shrink-0 transition-all duration-300 ${
+                        <item.icon className={`sidebar-icon h-6 w-6 shrink-0 transition-all duration-300 ${
                           isActive(item.url, item.exact) ? 'text-primary animate-icon-bounce' : 'group-hover:scale-110'
                         }`} />
                         {isActive(item.url, item.exact) && (
@@ -124,12 +139,90 @@ export function AdminSidebar() {
                         {item.title}
                       </span>
                       {!isCollapsed && isActive(item.url, item.exact) && (
-                        <div className="absolute right-3 w-2 h-2 bg-primary rounded-full animate-pulse" />
+                        <div className="absolute right-4 w-2 h-2 bg-primary rounded-full animate-pulse" />
                       )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Separator */}
+        <div className="px-6 py-2">
+          <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent opacity-50" />
+        </div>
+
+        {/* Account Actions Group */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-2 px-4">
+              {accountItems.map((item, index) => (
+                <SidebarMenuItem 
+                  key={item.title}
+                  className={`animate-stagger-in animate-stagger-${Math.min(index + 1, 5)}`}
+                >
+                  <SidebarMenuButton asChild isActive={isActive(item.url, item.exact)}>
+                    <NavLink 
+                      to={item.url}
+                      className={({ isActive }) => 
+                        `sidebar-item group flex items-center gap-5 px-6 py-4 rounded-xl transition-all duration-300 relative ${
+                          isActive 
+                            ? 'sidebar-item-active bg-gradient-to-r from-primary/25 via-primary/15 to-purple-500/10 text-primary border border-primary/20 shadow-lg shadow-primary/20' 
+                            : 'hover:bg-gradient-to-r hover:from-muted/50 hover:to-muted/30 text-muted-foreground hover:text-foreground hover:shadow-md'
+                        } ${isCollapsed ? 'justify-center' : 'justify-start'}`
+                      }
+                    >
+                      <div className="relative">
+                        <item.icon className={`sidebar-icon h-6 w-6 shrink-0 transition-all duration-300 ${
+                          isActive(item.url, item.exact) ? 'text-primary animate-icon-bounce' : 'group-hover:scale-110'
+                        }`} />
+                        {isActive(item.url, item.exact) && (
+                          <div className="absolute inset-0 bg-primary/20 rounded-full blur-md animate-pulse-glow" />
+                        )}
+                      </div>
+                      <span 
+                        className={`sidebar-text font-medium transition-all duration-300 ${
+                          isCollapsed 
+                            ? 'opacity-0 scale-0 w-0 overflow-hidden' 
+                            : 'opacity-100 scale-100 w-auto'
+                        }`}
+                      >
+                        {item.title}
+                      </span>
+                      {!isCollapsed && isActive(item.url, item.exact) && (
+                        <div className="absolute right-4 w-2 h-2 bg-primary rounded-full animate-pulse" />
+                      )}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+
+              {/* Sign Out Button */}
+              <SidebarMenuItem className="animate-stagger-in animate-stagger-5">
+                <SidebarMenuButton asChild>
+                  <button
+                    onClick={handleSignOut}
+                    className={`sidebar-item group flex items-center gap-5 px-6 py-4 rounded-xl transition-all duration-300 w-full text-left hover:bg-gradient-to-r hover:from-red-500/10 hover:to-red-400/5 text-muted-foreground hover:text-red-400 hover:shadow-md ${
+                      isCollapsed ? 'justify-center' : 'justify-start'
+                    }`}
+                  >
+                    <div className="relative">
+                      <LogOut className="sidebar-icon h-6 w-6 shrink-0 transition-all duration-300 group-hover:scale-110" />
+                    </div>
+                    <span 
+                      className={`sidebar-text font-medium transition-all duration-300 ${
+                        isCollapsed 
+                          ? 'opacity-0 scale-0 w-0 overflow-hidden' 
+                          : 'opacity-100 scale-100 w-auto'
+                      }`}
+                    >
+                      Sign Out
+                    </span>
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
