@@ -13,6 +13,7 @@ import { useCart } from '@/hooks/useCart';
 import { Navigate } from 'react-router-dom';
 import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ProfileEditModal } from '@/components/profile/ProfileEditModal';
 
 interface Service {
   id: string;
@@ -72,6 +73,7 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [userStats, setUserStats] = useState<UserStats>({ totalPurchases: 0, totalSpent: 0, activeServices: 0 });
   const [recentPurchases, setRecentPurchases] = useState<Purchase[]>([]);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -319,19 +321,14 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                     <p className="text-sm text-muted-foreground">Account Type</p>
                   </div>
                 </div>
-            <Button 
-              variant="outline" 
-              className="w-full mt-4 glass-button hover:glow-button transition-all duration-300"
-              onClick={() => {
-                toast({
-                  title: "Edit Profile",
-                  description: "Profile editing functionality coming soon!",
-                });
-              }}
-            >
-              <Edit3 className="h-4 w-4 mr-2" />
-              Edit Profile
-            </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4 glass-button hover:glow-button transition-all duration-300"
+                  onClick={() => setIsProfileModalOpen(true)}
+                >
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
               </CardContent>
             </Card>
 
@@ -853,7 +850,15 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
     </div>
   );
 
-  return renderContent();
+  return (
+    <>
+      {renderContent()}
+      <ProfileEditModal 
+        open={isProfileModalOpen} 
+        onOpenChange={setIsProfileModalOpen} 
+      />
+    </>
+  );
 };
 
 export default CustomerDashboard;
