@@ -319,10 +319,19 @@ const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) =
                     <p className="text-sm text-muted-foreground">Account Type</p>
                   </div>
                 </div>
-                <Button variant="outline" className="w-full mt-4 glass-button hover:glow-button transition-all duration-300">
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Edit Profile
-                </Button>
+            <Button 
+              variant="outline" 
+              className="w-full mt-4 glass-button hover:glow-button transition-all duration-300"
+              onClick={() => {
+                toast({
+                  title: "Edit Profile",
+                  description: "Profile editing functionality coming soon!",
+                });
+              }}
+            >
+              <Edit3 className="h-4 w-4 mr-2" />
+              Edit Profile
+            </Button>
               </CardContent>
             </Card>
 
