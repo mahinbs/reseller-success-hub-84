@@ -89,6 +89,7 @@ const CustomerDashboard = ({
   });
   const [recentPurchases, setRecentPurchases] = useState<Purchase[]>([]);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [faqSearchTerm, setFaqSearchTerm] = useState('');
 
   useEffect(() => {
     if (!user) return;
@@ -839,7 +840,6 @@ const CustomerDashboard = ({
   );
 
   const renderFaqTab = () => {
-    const [searchTerm, setSearchTerm] = useState('');
 
     const faqSections = [
       {
@@ -931,8 +931,8 @@ const CustomerDashboard = ({
     const filteredSections = faqSections.map(section => ({
       ...section,
       questions: section.questions.filter(q =>
-        q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        q.answer.toLowerCase().includes(searchTerm.toLowerCase())
+        q.question.toLowerCase().includes(faqSearchTerm.toLowerCase()) ||
+        q.answer.toLowerCase().includes(faqSearchTerm.toLowerCase())
       )
     })).filter(section => section.questions.length > 0);
 
@@ -953,8 +953,8 @@ const CustomerDashboard = ({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Search FAQ..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={faqSearchTerm}
+              onChange={(e) => setFaqSearchTerm(e.target.value)}
               className="pl-10 glass-input hover:glow-subtle transition-all duration-300"
             />
           </div>
@@ -969,19 +969,19 @@ const CustomerDashboard = ({
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setSearchTerm('revenue sharing')}>
+                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setFaqSearchTerm('revenue sharing')}>
                   <DollarSign className="h-4 w-4 mr-2" />
                   Revenue Sharing
                 </Button>
-                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setSearchTerm('subscription')}>
+                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setFaqSearchTerm('subscription')}>
                   <Package className="h-4 w-4 mr-2" />
                   Subscription Details
                 </Button>
-                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setSearchTerm('services')}>
+                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setFaqSearchTerm('services')}>
                   <Settings className="h-4 w-4 mr-2" />
                   Available Services
                 </Button>
-                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setSearchTerm('technical knowledge')}>
+                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setFaqSearchTerm('technical knowledge')}>
                   <Users className="h-4 w-4 mr-2" />
                   Getting Started
                 </Button>
