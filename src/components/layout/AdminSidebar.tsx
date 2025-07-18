@@ -62,7 +62,8 @@ const accountItems = [
   {
     title: 'Settings',
     url: '/admin/settings',
-    icon: Settings
+    icon: Settings,
+    exact: false
   }
 ];
 

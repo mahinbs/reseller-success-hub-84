@@ -64,7 +64,8 @@ const accountItems = [
   {
     title: 'Profile',
     url: '/dashboard/profile',
-    icon: User
+    icon: User,
+    exact: false
   }
 ];
 
