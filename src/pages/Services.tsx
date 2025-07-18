@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
-import { Search, Filter, Grid, List, TrendingUp, ShoppingCart } from 'lucide-react';
+import { Search, Filter, Grid, List, TrendingUp, ShoppingCart, Users, DollarSign, Handshake } from 'lucide-react';
 import { createServiceSlug } from '@/lib/serviceUtils';
 import { ResellableBanner } from '@/components/reseller/ResellableBanner';
 import { OnboardingModal } from '@/components/reseller/OnboardingModal';
@@ -249,10 +249,58 @@ const ServicesPage = () => {
             </div>
           </div>
 
-          <div className="mb-6 p-4 bg-gradient-to-r from-primary/5 to-green-500/5 rounded-lg border border-primary/20">
-            <p className="text-center text-muted-foreground">
-              <strong>All services below are white-labeled.</strong> Buy and start selling immediately — no delivery or fulfillment needed on your end.
-            </p>
+          <div className="mb-8 p-6 bg-gradient-to-br from-primary/10 via-green-500/10 to-blue-500/10 rounded-xl border border-primary/20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-green-500/5 animate-pulse" />
+            
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <Handshake className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-bold">How Our Partnership Works</h3>
+                <Badge className="bg-green-500/20 text-green-600 border-green-500/30">
+                  Win-Win Partnership
+                </Badge>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6 mb-6">
+                <div className="text-center p-4 rounded-lg bg-white/50 border border-green-500/20">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Users className="h-5 w-5 text-green-600" />
+                    <span className="text-2xl font-bold text-green-600">70%</span>
+                  </div>
+                  <h4 className="font-semibold mb-1">Your Profit</h4>
+                  <p className="text-sm text-muted-foreground">Keep 70% of every sale you make to your clients</p>
+                </div>
+
+                <div className="text-center p-4 rounded-lg bg-white/50 border border-primary/20">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <DollarSign className="h-5 w-5 text-primary" />
+                    <span className="text-2xl font-bold text-primary">30%</span>
+                  </div>
+                  <h4 className="font-semibold mb-1">BoostMySites</h4>
+                  <p className="text-sm text-muted-foreground">We handle fulfillment and support for this share</p>
+                </div>
+
+                <div className="text-center p-4 rounded-lg bg-white/50 border border-blue-500/20">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                    <span className="text-lg font-bold text-blue-600">100%</span>
+                  </div>
+                  <h4 className="font-semibold mb-1">You Set Prices</h4>
+                  <p className="text-sm text-muted-foreground">Complete control over your pricing strategy</p>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <p className="text-muted-foreground mb-2">
+                  <strong>Sell these services to your clients and keep 70% profit!</strong>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  You focus on sales and client relationships → We handle all delivery, fulfillment, and technical support
+                </p>
+              </div>
+            </div>
           </div>
 
           {loading ? (
