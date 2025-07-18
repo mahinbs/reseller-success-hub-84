@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,6 +17,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { serviceStockImages, getImagesByCategory } from '@/lib/stockImages';
+import { Eye } from 'lucide-react';
 
 const serviceSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -27,6 +29,7 @@ const serviceSchema = z.object({
   features: z.string().optional(),
   brochure_url: z.string().url().optional().or(z.literal('')),
   deck_url: z.string().url().optional().or(z.literal('')),
+  image_url: z.string().url().optional().or(z.literal('')),
   is_active: z.boolean(),
 });
 
@@ -45,6 +48,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
+  const [selectedImageUrl, setSelectedImageUrl] = useState(initialData?.image_url || '');
   const form = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
     defaultValues: {
@@ -60,6 +64,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
           : '',
       brochure_url: initialData?.brochure_url || '',
       deck_url: initialData?.deck_url || '',
+      image_url: initialData?.image_url || '',
       is_active: initialData?.is_active ?? true,
     },
   });
@@ -211,6 +216,89 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="image_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Background Image</FormLabel>
+              <div className="space-y-4">
+                {/* Predefined Images */}
+                <div>
+                  <FormLabel className="text-sm font-medium">Select from Stock Images</FormLabel>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+                    {serviceStockImages
+                      .filter(img => !form.watch('category') || img.category.includes(form.watch('category')))
+                      .slice(0, 8)
+                      .map((image) => (
+                      <div 
+                        key={image.url}
+                        className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                          selectedImageUrl === image.url ? 'border-primary ring-2 ring-primary/20' : 'border-border hover:border-primary/50'
+                        }`}
+                        onClick={() => {
+                          field.onChange(image.url);
+                          setSelectedImageUrl(image.url);
+                        }}
+                      >
+                        <img 
+                          src={image.url} 
+                          alt={image.title}
+                          className="w-full h-16 object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                          <Eye className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1">
+                          <p className="text-white text-xs truncate">{image.title}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom URL Input */}
+                <div>
+                  <FormLabel className="text-sm font-medium">Or Enter Custom URL</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="https://example.com/image.jpg" 
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e.target.value);
+                        setSelectedImageUrl(e.target.value);
+                      }}
+                    />
+                  </FormControl>
+                </div>
+
+                {/* Image Preview */}
+                {selectedImageUrl && (
+                  <div className="mt-3">
+                    <FormLabel className="text-sm font-medium">Preview</FormLabel>
+                    <div className="mt-2 rounded-lg overflow-hidden border border-border">
+                      <div 
+                        className="w-full h-32 bg-cover bg-center relative"
+                        style={{ backgroundImage: `url(${selectedImageUrl})` }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                        <div className="absolute bottom-3 left-3">
+                          <p className="text-white font-medium">Sample Service Card</p>
+                          <p className="text-white/80 text-sm">Background preview</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <FormDescription>
+                Choose a background image for this service card. Images will be displayed with a dark overlay for text readability.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}

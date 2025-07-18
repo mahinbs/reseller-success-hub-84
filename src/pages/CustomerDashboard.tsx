@@ -23,6 +23,7 @@ interface Service {
   price: number;
   billing_period: string;
   features: string[];
+  image_url?: string;
 }
 
 interface Bundle {
@@ -31,6 +32,7 @@ interface Bundle {
   description: string;
   discount_percentage: number;
   total_price: number;
+  image_url?: string;
   services?: {
     id: string;
     name: string;
@@ -424,45 +426,61 @@ const CustomerDashboard = () => {
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredServices.map((service) => (
-                    <Card key={service.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group">
-                      <CardHeader className="pb-3">
-                        <div className="flex justify-between items-start mb-2">
-                          <Badge variant="secondary" className="glass-badge">
-                            {service.category}
-                          </Badge>
-                          <div className="text-right">
-                            <div className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-                              ${service.price}
+                    <Card 
+                      key={service.id} 
+                      className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden"
+                    >
+                      {/* Background Image with Overlay */}
+                      {service.image_url && (
+                        <div 
+                          className="absolute inset-0 bg-cover bg-center"
+                          style={{ backgroundImage: `url(${service.image_url})` }}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
+                        </div>
+                      )}
+                      
+                      {/* Content */}
+                      <div className="relative z-10">
+                        <CardHeader className="pb-3">
+                          <div className="flex justify-between items-start mb-2">
+                            <Badge variant="secondary" className="glass-badge backdrop-blur-sm">
+                              {service.category}
+                            </Badge>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
+                                ${service.price}
+                              </div>
+                              <div className="text-xs text-muted-foreground">/{service.billing_period}</div>
                             </div>
-                            <div className="text-xs text-muted-foreground">/{service.billing_period}</div>
                           </div>
-                        </div>
-                        <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                          {service.name}
-                        </CardTitle>
-                        <CardDescription className="line-clamp-2">
-                          {service.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="flex gap-2">
-                          <Button 
-                            asChild
-                            className="flex-1 glass-button hover:glow-button transition-all duration-300"
-                          >
-                            <Link to={`/services/${service.id}`}>
-                              View Details
-                            </Link>
-                          </Button>
-                          <Button
-                            size="icon"
-                            onClick={() => handleAddToCart(service, 'service')}
-                            className="glass-button hover:glow-button transition-all duration-300 shrink-0"
-                          >
-                            <ShoppingCart className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardContent>
+                          <CardTitle className="text-lg group-hover:text-primary transition-colors text-white">
+                            {service.name}
+                          </CardTitle>
+                          <CardDescription className="line-clamp-2 text-gray-200">
+                            {service.description}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="flex gap-2">
+                            <Button 
+                              asChild
+                              className="flex-1 glass-button hover:glow-button transition-all duration-300 backdrop-blur-sm"
+                            >
+                              <Link to={`/services/${service.id}`}>
+                                View Details
+                              </Link>
+                            </Button>
+                            <Button
+                              size="icon"
+                              onClick={() => handleAddToCart(service, 'service')}
+                              className="glass-button hover:glow-button transition-all duration-300 shrink-0 backdrop-blur-sm"
+                            >
+                              <ShoppingCart className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </div>
                     </Card>
                   ))}
                 </div>
@@ -492,83 +510,99 @@ const CustomerDashboard = () => {
               ) : (
                 <div className="grid md:grid-cols-2 gap-6">
                   {filteredBundles.map((bundle) => (
-                    <Card key={bundle.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative">
-                      <div className="absolute top-4 right-4 z-10">
-                        <Badge className="bg-gradient-to-r from-green-500 to-emerald-400 text-white shadow-lg">
-                          {bundle.discount_percentage}% OFF
-                        </Badge>
-                      </div>
-                      
-                      <CardHeader>
-                        <div className="flex items-start gap-3">
-                          <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-purple-500/20">
-                            <Package className="h-6 w-6 text-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <CardTitle className="text-xl mb-2 group-hover:text-primary transition-colors">
-                              {bundle.name}
-                            </CardTitle>
-                            <CardDescription>{bundle.description}</CardDescription>
-                          </div>
+                    <Card 
+                      key={bundle.id} 
+                      className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden"
+                    >
+                      {/* Background Image with Overlay */}
+                      {bundle.image_url && (
+                        <div 
+                          className="absolute inset-0 bg-cover bg-center"
+                          style={{ backgroundImage: `url(${bundle.image_url})` }}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
                         </div>
-                      </CardHeader>
+                      )}
 
-                      <CardContent className="space-y-4">
-                        {/* Included Services */}
-                        {bundle.services && bundle.services.length > 0 && (
-                          <div className="space-y-2">
-                            <h4 className="font-semibold text-sm text-muted-foreground">Included Services:</h4>
-                            <div className="space-y-1">
-                              {bundle.services.slice(0, 3).map((service) => (
-                                <div key={service.id} className="flex items-center justify-between text-sm glass-subtle p-2 rounded-lg">
-                                  <span>{service.name}</span>
-                                  <Badge variant="outline" className="text-xs">
-                                    ${service.price}
-                                  </Badge>
-                                </div>
-                              ))}
-                              {bundle.services.length > 3 && (
-                                <div className="text-xs text-muted-foreground text-center py-1">
-                                  +{bundle.services.length - 3} more services
-                                </div>
-                              )}
+                      {/* Content */}
+                      <div className="relative z-10">
+                        <div className="absolute top-4 right-4 z-20">
+                          <Badge className="bg-gradient-to-r from-green-500 to-emerald-400 text-white shadow-lg backdrop-blur-sm">
+                            {bundle.discount_percentage}% OFF
+                          </Badge>
+                        </div>
+                        
+                        <CardHeader>
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 rounded-lg bg-gradient-to-br from-primary/30 to-purple-500/30 backdrop-blur-sm">
+                              <Package className="h-6 w-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <CardTitle className="text-xl mb-2 group-hover:text-primary transition-colors text-white">
+                                {bundle.name}
+                              </CardTitle>
+                              <CardDescription className="text-gray-200">{bundle.description}</CardDescription>
                             </div>
                           </div>
-                        )}
+                        </CardHeader>
 
-                        {/* Pricing */}
-                        <div className="space-y-2 pt-2 border-t border-border/30">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Original Price:</span>
-                            <span className="line-through text-muted-foreground">
-                              ${calculateOriginalPrice(bundle).toLocaleString()}
-                            </span>
-                          </div>
-                          <div className="flex justify-between text-lg font-bold">
-                            <span>Bundle Price:</span>
-                            <span className="bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
-                              ${bundle.total_price.toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
+                        <CardContent className="space-y-4">
+                          {/* Included Services */}
+                          {bundle.services && bundle.services.length > 0 && (
+                            <div className="space-y-2">
+                              <h4 className="font-semibold text-sm text-gray-300">Included Services:</h4>
+                              <div className="space-y-1">
+                                {bundle.services.slice(0, 3).map((service) => (
+                                  <div key={service.id} className="flex items-center justify-between text-sm glass-subtle p-2 rounded-lg backdrop-blur-sm">
+                                    <span className="text-white">{service.name}</span>
+                                    <Badge variant="outline" className="text-xs border-white/30 text-white">
+                                      ${service.price}
+                                    </Badge>
+                                  </div>
+                                ))}
+                                {bundle.services.length > 3 && (
+                                  <div className="text-xs text-gray-300 text-center py-1">
+                                    +{bundle.services.length - 3} more services
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-2 pt-2">
-                          <Button 
-                            className="flex-1 glass-button hover:glow-button transition-all duration-300"
-                            onClick={() => {/* Could add bundle detail view */}}
-                          >
-                            View Details
-                          </Button>
-                          <Button
-                            size="icon"
-                            onClick={() => handleAddToCart(bundle, 'bundle')}
-                            className="glass-button hover:glow-button transition-all duration-300 shrink-0"
-                          >
-                            <ShoppingCart className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardContent>
+                          {/* Pricing */}
+                          <div className="space-y-2 pt-2 border-t border-white/20">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-300">Original Price:</span>
+                              <span className="line-through text-gray-300">
+                                ${calculateOriginalPrice(bundle).toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-lg font-bold">
+                              <span className="text-white">Bundle Price:</span>
+                              <span className="bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
+                                ${bundle.total_price.toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-2 pt-2">
+                            <Button 
+                              className="flex-1 glass-button hover:glow-button transition-all duration-300 backdrop-blur-sm"
+                              onClick={() => {/* Could add bundle detail view */}}
+                            >
+                              View Details
+                            </Button>
+                            <Button
+                              size="icon"
+                              onClick={() => handleAddToCart(bundle, 'bundle')}
+                              className="glass-button hover:glow-button transition-all duration-300 shrink-0 backdrop-blur-sm"
+                            >
+                              <ShoppingCart className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </div>
                     </Card>
                   ))}
                 </div>
