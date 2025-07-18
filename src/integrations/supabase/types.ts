@@ -80,6 +80,88 @@ export type Database = {
         }
         Relationships: []
       }
+      order_items: {
+        Row: {
+          bundle_id: string | null
+          created_at: string
+          id: string
+          item_name: string
+          item_price: number
+          order_id: string
+          quantity: number
+          service_id: string | null
+        }
+        Insert: {
+          bundle_id?: string | null
+          created_at?: string
+          id?: string
+          item_name: string
+          item_price: number
+          order_id: string
+          quantity?: number
+          service_id?: string | null
+        }
+        Update: {
+          bundle_id?: string | null
+          created_at?: string
+          id?: string
+          item_name?: string
+          item_price?: number
+          order_id?: string
+          quantity?: number
+          service_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          id: string
+          status: string
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
