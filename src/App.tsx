@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { Header } from "@/components/layout/Header";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import ServicesPage from "./pages/Services";
@@ -31,108 +33,121 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <div className="min-h-screen bg-background">
-              <Header />
               <Routes>
-                {/* Public routes - redirect authenticated users to dashboard */}
-                <Route 
-                  path="/" 
-                  element={
+                {/* Public routes with header */}
+                <Route path="/" element={
+                  <>
+                    <Header />
                     <ProtectedRoute requireAuth={false}>
                       <Index />
                     </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/auth" 
-                  element={
+                  </>
+                } />
+                <Route path="/auth" element={
+                  <>
+                    <Header />
                     <ProtectedRoute requireAuth={false}>
                       <AuthPage />
                     </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/services" 
-                  element={
+                  </>
+                } />
+                <Route path="/services" element={
+                  <>
+                    <Header />
                     <ProtectedRoute requireAuth={false}>
                       <ServicesPage />
                     </ProtectedRoute>
-                  } 
-                />
-                {/* Both UUID-based (backward compatibility) and slug-based service routes */}
-                <Route 
-                  path="/services/:slug" 
-                  element={
+                  </>
+                } />
+                <Route path="/services/:slug" element={
+                  <>
+                    <Header />
                     <ProtectedRoute requireAuth={false}>
                       <ServiceLandingPage />
                     </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/service/:slug" 
-                  element={
+                  </>
+                } />
+                <Route path="/service/:slug" element={
+                  <>
+                    <Header />
                     <ProtectedRoute requireAuth={false}>
                       <ServiceLandingPage />
                     </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/portfolio" 
-                  element={
+                  </>
+                } />
+                <Route path="/portfolio" element={
+                  <>
+                    <Header />
                     <ProtectedRoute requireAuth={false}>
                       <Portfolio />
                     </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/bundles" 
-                  element={
+                  </>
+                } />
+                <Route path="/bundles" element={
+                  <>
+                    <Header />
                     <ProtectedRoute requireAuth={false}>
                       <Bundles />
                     </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/bundles/:id" 
-                  element={
+                  </>
+                } />
+                <Route path="/bundles/:id" element={
+                  <>
+                    <Header />
                     <ProtectedRoute requireAuth={false}>
                       <BundleDetail />
                     </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/about" 
-                  element={
+                  </>
+                } />
+                <Route path="/about" element={
+                  <>
+                    <Header />
                     <ProtectedRoute requireAuth={false}>
                       <About />
                     </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/cart" 
-                  element={
+                  </>
+                } />
+                <Route path="/cart" element={
+                  <>
+                    <Header />
                     <ProtectedRoute requireAuth={false}>
                       <CartPage />
                     </ProtectedRoute>
-                  } 
-                />
+                  </>
+                } />
                 
-                {/* Protected routes - require authentication */}
-                <Route 
-                  path="/dashboard" 
-                  element={
-                    <ProtectedRoute requireAuth={true}>
-                      <CustomerDashboard />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/admin" 
-                  element={
-                    <ProtectedRoute requireAuth={true}>
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  } 
-                />
+                {/* Protected dashboard routes with sidebar layout */}
+                <Route path="/dashboard/*" element={
+                  <ProtectedRoute requireAuth={true}>
+                    <DashboardLayout>
+                      <Routes>
+                        <Route index element={<CustomerDashboard />} />
+                        <Route path="services" element={<CustomerDashboard activeTab="services" />} />
+                        <Route path="bundles" element={<CustomerDashboard activeTab="bundles" />} />
+                        <Route path="purchases" element={<CustomerDashboard activeTab="purchases" />} />
+                        <Route path="profile" element={<CustomerDashboard activeTab="profile" />} />
+                        <Route path="support" element={<CustomerDashboard activeTab="support" />} />
+                      </Routes>
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                
+                {/* Protected admin routes with sidebar layout */}
+                <Route path="/admin/*" element={
+                  <ProtectedRoute requireAuth={true}>
+                    <DashboardLayout>
+                      <Routes>
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="services" element={<AdminDashboard activeTab="services" />} />
+                        <Route path="bundles" element={<AdminDashboard activeTab="bundles" />} />
+                        <Route path="users" element={<AdminDashboard activeTab="users" />} />
+                        <Route path="purchases" element={<AdminDashboard activeTab="purchases" />} />
+                        <Route path="analytics" element={<AdminDashboard activeTab="analytics" />} />
+                        <Route path="settings" element={<AdminDashboard activeTab="settings" />} />
+                      </Routes>
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
                 
                 {/* Catch-all route */}
                 <Route path="*" element={<NotFound />} />
