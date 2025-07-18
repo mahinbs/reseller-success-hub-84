@@ -53,7 +53,12 @@ const ServiceDetail = () => {
           return;
         }
 
-        setService(serviceData);
+        setService({
+          ...serviceData,
+          features: Array.isArray(serviceData.features) 
+            ? serviceData.features as string[]
+            : []
+        });
       } catch (error) {
         console.error('Error loading service:', error);
         setError('Failed to load service');
