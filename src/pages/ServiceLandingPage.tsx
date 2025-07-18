@@ -7,7 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowRight, Check, Star, Users, Shield, Zap, ChevronRight } from 'lucide-react';
+import { ArrowRight, Check, ChevronRight } from 'lucide-react';
+import { ServiceHero } from '@/components/service/ServiceHero';
+import { ServiceTestimonials } from '@/components/service/ServiceTestimonials';
+import { ServicePortfolio } from '@/components/service/ServicePortfolio';
+import { ServiceComparison } from '@/components/service/ServiceComparison';
+import { ConsultationForm } from '@/components/service/ConsultationForm';
 
 interface Service {
   id: string;
@@ -89,13 +94,6 @@ const ServiceLandingPage = () => {
     { step: '4', title: 'Optimization', description: 'Continuously improve and refine' }
   ];
 
-  const benefits = [
-    { icon: Zap, title: 'Fast Delivery', description: 'Quick turnaround times without compromising quality' },
-    { icon: Shield, title: 'Secure & Reliable', description: 'Enterprise-grade security and 99.9% uptime' },
-    { icon: Users, title: 'Expert Support', description: '24/7 support from certified professionals' },
-    { icon: Star, title: 'Proven Results', description: 'Track record of successful implementations' }
-  ];
-
   const faqs = [
     { question: 'How long does implementation take?', answer: 'Implementation typically takes 1-4 weeks depending on complexity and requirements.' },
     { question: 'Do you provide ongoing support?', answer: 'Yes, we provide 24/7 support and regular maintenance as part of our service.' },
@@ -139,46 +137,11 @@ const ServiceLandingPage = () => {
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-background to-primary-light/5">
-        <div className="container mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <Badge className="mb-4">{service.category}</Badge>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-slide-in">
-                {service.name}
-                <span className="block text-primary">Solutions</span>
-              </h1>
-              <p className="text-xl text-muted-foreground mb-8 animate-slide-in-delay">
-                {service.description}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 animate-slide-in-delay">
-                <Button size="lg" onClick={handleAddToCart} className="gradient-primary">
-                  Get Started - ${service.price}/{service.billing_period}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button size="lg" variant="outline">
-                  Learn More
-                </Button>
-              </div>
-            </div>
-            <div className="lg:text-right">
-              <div className="inline-block p-8 rounded-2xl bg-gradient-to-br from-primary/10 to-primary-light/10">
-                <div className="text-6xl mb-4">🚀</div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-center lg:justify-end gap-2">
-                    <Star className="h-5 w-5 text-yellow-500 fill-current" />
-                    <span className="font-semibold">4.9/5 Rating</span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Trusted by 1000+ businesses
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Enhanced Hero Section */}
+      <ServiceHero service={service} onGetStarted={handleAddToCart} />
+
+      {/* Portfolio Section */}
+      <ServicePortfolio serviceName={service.name} />
 
       {/* Features Section */}
       <section className="py-16 px-4">
@@ -231,30 +194,11 @@ const ServiceLandingPage = () => {
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Why Choose Us</h2>
-            <p className="text-lg text-muted-foreground">
-              The advantages of working with our expert team
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {benefits.map((benefit, index) => (
-              <Card key={index} className="glass-subtle text-center hover:scale-105 transition-all-smooth">
-                <CardHeader>
-                  <benefit.icon className="h-12 w-12 text-primary mx-auto mb-4" />
-                  <CardTitle className="text-lg">{benefit.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{benefit.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Testimonials Section */}
+      <ServiceTestimonials serviceName={service.name} />
+
+      {/* Comparison Section */}
+      <ServiceComparison serviceName={service.name} />
 
       {/* Pricing Section */}
       <section className="py-16 px-4 bg-gradient-to-r from-primary/5 to-primary-light/5">
@@ -301,6 +245,9 @@ const ServiceLandingPage = () => {
         </div>
       </section>
 
+      {/* Consultation Form */}
+      <ConsultationForm serviceName={service.name} />
+
       {/* FAQ Section */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-3xl">
@@ -334,14 +281,23 @@ const ServiceLandingPage = () => {
           <p className="text-xl mb-8 opacity-90">
             Join thousands of satisfied customers who've chosen our {service.name.toLowerCase()} solutions
           </p>
-          <Button 
-            size="lg" 
-            variant="secondary" 
-            onClick={handleAddToCart}
-            className="hover:scale-105 transition-all-smooth"
-          >
-            Get Started Now <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              variant="secondary" 
+              onClick={handleAddToCart}
+              className="hover:scale-105 transition-all-smooth"
+            >
+              Get Started Now <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              Schedule Consultation
+            </Button>
+          </div>
         </div>
       </section>
     </div>
