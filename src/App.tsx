@@ -11,7 +11,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
-import ServicesPage from "./pages/Services";
+
 import Portfolio from "./pages/Portfolio";
 import About from "./pages/About";
 import CartPage from "./pages/Cart";
@@ -45,14 +45,6 @@ const App = () => (
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <AuthPage />
-                    </ProtectedRoute>
-                  </>
-                } />
-                <Route path="/services" element={
-                  <>
-                    <Header />
-                    <ProtectedRoute requireAuth={false}>
-                      <ServicesPage />
                     </ProtectedRoute>
                   </>
                 } />
