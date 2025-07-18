@@ -58,7 +58,7 @@ interface Purchase {
 }
 
 interface CustomerDashboardProps {
-  activeTab?: 'services' | 'bundles' | 'purchases' | 'profile' | 'support';
+  activeTab?: 'overview' | 'services' | 'bundles' | 'purchases' | 'profile' | 'support';
 }
 
 const CustomerDashboard = ({ activeTab = 'overview' }: CustomerDashboardProps) => {

@@ -65,7 +65,7 @@ interface User {
 }
 
 interface AdminDashboardProps {
-  activeTab?: 'services' | 'bundles' | 'users' | 'purchases' | 'analytics' | 'settings';
+  activeTab?: 'overview' | 'services' | 'bundles' | 'users' | 'purchases' | 'analytics' | 'settings';
 }
 
 const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
