@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
-import { Trash2, ShoppingBag, CreditCard, ArrowRight } from 'lucide-react';
+import { Trash2, ShoppingBag, CreditCard, RefreshCw, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const CartPage = () => {
@@ -18,6 +18,28 @@ const CartPage = () => {
 
   // Check if we're in dashboard layout
   const isInDashboard = location.pathname.startsWith('/dashboard');
+
+  // Debug function to help troubleshoot cart issues
+  const handleDebugInfo = () => {
+    console.log('=== CART DEBUG INFO ===');
+    console.log('User:', user);
+    console.log('Cart items:', cart);
+    console.log('Cart count:', cart.length);
+    console.log('Is loading:', isLoading);
+    console.log('LocalStorage cart:', localStorage.getItem('cart'));
+    console.log('Location:', location.pathname);
+    console.log('=====================');
+    
+    toast({
+      title: "Debug Info",
+      description: "Cart debug information logged to console. Check browser dev tools.",
+    });
+  };
+
+  // Force refresh cart data
+  const handleRefreshCart = () => {
+    window.location.reload();
+  };
 
   if (!user) {
     return (
@@ -71,6 +93,34 @@ const CartPage = () => {
             <p className="text-muted-foreground mb-4">
               Discover our amazing AI services and add them to your cart
             </p>
+            
+            {/* Troubleshooting section for empty cart */}
+            <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="h-4 w-4 text-orange-500" />
+                <span className="text-sm font-medium">Cart Issues?</span>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefreshCart}
+                  className="text-xs"
+                >
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                  Refresh
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDebugInfo}
+                  className="text-xs"
+                >
+                  Debug Info
+                </Button>
+              </div>
+            </div>
+            
             <Button asChild className="gradient-primary">
               <a href={isInDashboard ? "/dashboard/services" : "/services"}>
                 Browse Services
@@ -87,9 +137,19 @@ const CartPage = () => {
       <div className="container mx-auto max-w-4xl">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Shopping Cart</h1>
-          <Badge variant="secondary" className="text-lg px-3 py-1">
-            {cart.length} item{cart.length !== 1 ? 's' : ''}
-          </Badge>
+          <div className="flex items-center gap-4">
+            <Badge variant="secondary" className="text-lg px-3 py-1">
+              {cart.length} item{cart.length !== 1 ? 's' : ''}
+            </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDebugInfo}
+              className="text-xs"
+            >
+              Debug
+            </Button>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
@@ -105,6 +165,9 @@ const CartPage = () => {
                         <Badge variant={item.type === 'bundle' ? 'default' : 'secondary'}>
                           {item.type === 'bundle' ? 'Bundle' : 'Service'}
                         </Badge>
+                      </div>
+                      <div className="text-muted-foreground text-sm mb-1">
+                        ID: {item.id}
                       </div>
                       <div className="text-muted-foreground">
                         ${item.price}{item.billing_period && `/${item.billing_period}`}
