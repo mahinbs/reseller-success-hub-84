@@ -99,8 +99,13 @@ const AdminDashboard = () => {
     );
   }
 
-  if (!user || profile?.role !== 'admin') {
-    return <Navigate to="/" replace />;
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  // Redirect non-admin users to customer dashboard
+  if (profile?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
   }
 
   const statCards = [

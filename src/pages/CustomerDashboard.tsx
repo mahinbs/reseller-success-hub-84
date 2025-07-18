@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,6 +55,11 @@ const CustomerDashboard = () => {
 
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Redirect admin users to admin dashboard
+  if (profile?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
   }
 
   const stats = [

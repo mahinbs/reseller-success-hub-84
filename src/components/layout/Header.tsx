@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
@@ -20,6 +21,15 @@ export const Header = () => {
   const getInitials = (name: string | null) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  // Role-based dashboard routing
+  const getDashboardRoute = () => {
+    return profile?.role === 'admin' ? '/admin' : '/dashboard';
+  };
+
+  const getDashboardLabel = () => {
+    return profile?.role === 'admin' ? 'Admin Dashboard' : 'Dashboard';
   };
 
   return (
@@ -86,23 +96,15 @@ export const Header = () => {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild className="hover:bg-primary/10 transition-all-smooth cursor-pointer">
-                    <Link to="/dashboard">
+                    <Link to={getDashboardRoute()}>
                       <User className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
+                      <span>{getDashboardLabel()}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="hover:bg-primary/10 transition-all-smooth cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
-                  {profile?.role === 'admin' && (
-                    <DropdownMenuItem asChild className="hover:bg-primary/10 transition-all-smooth cursor-pointer">
-                      <Link to="/admin">
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Admin Panel</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={signOut}
