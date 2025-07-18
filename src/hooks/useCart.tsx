@@ -1,8 +1,8 @@
-
 import React, { useState, createContext, useContext, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { CartBackup } from '@/utils/cartBackup';
 
 interface CartItem {
   id: string;
@@ -48,16 +48,45 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  // Load cart from localStorage with error handling
+  // Enhanced loading from localStorage with backup restoration
   const loadFromLocalStorage = (): CartItem[] => {
     try {
-      const savedCart = localStorage.getItem('cart');
-      const parsedCart = savedCart ? JSON.parse(savedCart) : [];
+      let savedCart = localStorage.getItem('cart');
+      let parsedCart = savedCart ? JSON.parse(savedCart) : [];
+      
+      // If no regular cart but there's a backup, restore from backup
+      if (parsedCart.length === 0) {
+        const backup = CartBackup.loadCartBackup();
+        if (backup.length > 0) {
+          parsedCart = backup;
+          localStorage.setItem('cart', JSON.stringify(parsedCart));
+          CartBackup.clearCartBackup();
+          logCartAction('RESTORE_FROM_BACKUP', { count: parsedCart.length });
+          
+          toast({
+            title: "Cart Restored",
+            description: `${parsedCart.length} item(s) restored to your cart.`,
+          });
+        }
+      }
+      
       logCartAction('LOAD_LOCALSTORAGE', { count: parsedCart.length });
       return parsedCart;
     } catch (error) {
       console.error('Error loading cart from localStorage:', error);
       logCartAction('LOAD_LOCALSTORAGE_ERROR', error);
+      
+      // Try to restore from backup as fallback
+      try {
+        const backup = CartBackup.restoreFromBackup();
+        if (backup.length > 0) {
+          logCartAction('FALLBACK_RESTORE', { count: backup.length });
+          return backup;
+        }
+      } catch (backupError) {
+        console.error('Error restoring from backup:', backupError);
+      }
+      
       return [];
     }
   };
@@ -178,7 +207,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Enhanced migration with better error handling
+  // Enhanced migration with backup handling
   const migrateToDatabase = async (localCart: CartItem[]) => {
     if (!user || localCart.length === 0) {
       logCartAction('MIGRATE_SKIP', { hasUser: !!user, localCount: localCart.length });
@@ -187,6 +216,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       logCartAction('MIGRATE_START', { localCount: localCart.length });
+      
+      // Save current cart as backup before migration
+      CartBackup.saveCartBackup(localCart);
       
       const dbCart = await loadFromDatabase();
       const mergedCart: CartItem[] = [...dbCart];
@@ -214,6 +246,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           setCart(mergedCart);
           // Clear localStorage after successful migration
           localStorage.removeItem('cart');
+          // Clear backup after successful migration
+          CartBackup.clearCartBackup();
           logCartAction('MIGRATE_SUCCESS', { finalCount: mergedCart.length });
           
           toast({
@@ -224,6 +258,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         setCart(dbCart);
         localStorage.removeItem('cart');
+        CartBackup.clearCartBackup();
         logCartAction('MIGRATE_NO_CHANGES');
       }
     } catch (error) {
@@ -254,7 +289,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             setCart(dbCart);
           }
         } else {
-          // User is not logged in, load from localStorage
+          // User is not logged in, load from localStorage (including backup restoration)
           logCartAction('INIT_LOAD_LOCAL_ONLY');
           const localCart = loadFromLocalStorage();
           setCart(localCart);
@@ -273,13 +308,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     initializeCart();
   }, [user]);
 
-  // Save cart whenever it changes (with debouncing)
+  // Enhanced cart change handler with backup
   useEffect(() => {
     if (isLoading) return; // Don't save during initial load
     
     logCartAction('CART_CHANGED', { count: cart.length });
     
     if (user) {
+      // Save backup before database operations
+      CartBackup.saveCartBackup(cart);
+      
       // Debounce database saves
       const timeoutId = setTimeout(() => {
         saveToDatabase(cart);

@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { CartBackup } from '@/utils/cartBackup';
 
 interface Profile {
   id: string;
@@ -160,6 +161,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
+      // NEW: Save current cart to backup before signing out
+      const currentCart = localStorage.getItem('cart');
+      if (currentCart) {
+        try {
+          const cartItems = JSON.parse(currentCart);
+          CartBackup.saveCartBackup(cartItems);
+          console.log('[AUTH] Saved cart backup before sign out');
+        } catch (error) {
+          console.error('[AUTH] Error parsing cart for backup:', error);
+        }
+      }
+
+      // Also try to get cart from database if user is signed in
+      if (user) {
+        try {
+          const { data: dbCartItems } = await supabase
+            .from('cart_items')
+            .select('*')
+            .eq('user_id', user.id);
+
+          if (dbCartItems && dbCartItems.length > 0) {
+            const cartItems = dbCartItems.map(item => ({
+              id: item.service_id || item.bundle_id || '',
+              name: item.item_name,
+              price: Number(item.item_price),
+              type: item.item_type as 'service' | 'bundle',
+              billing_period: item.billing_period || undefined
+            }));
+            CartBackup.saveCartBackup(cartItems);
+            console.log('[AUTH] Saved database cart to backup before sign out');
+          }
+        } catch (error) {
+          console.error('[AUTH] Error backing up database cart:', error);
+        }
+      }
+
       cleanupAuthState();
       
       try {
