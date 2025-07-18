@@ -66,7 +66,7 @@ const navigationItems = [
 export function CustomerSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
-  const { items } = useCart();
+  const { cart } = useCart();
   const isCollapsed = state === 'collapsed';
 
   const isActive = (url: string, exact?: boolean) => {
@@ -76,7 +76,7 @@ export function CustomerSidebar() {
     return location.pathname.startsWith(url);
   };
 
-  const cartItemsCount = items.reduce((total, item) => total + item.quantity, 0);
+  const cartItemsCount = cart.length;
 
   return (
     <Sidebar 
