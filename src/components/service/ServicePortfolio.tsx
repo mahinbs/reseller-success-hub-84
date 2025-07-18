@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -122,7 +122,14 @@ export const ServicePortfolio = ({ serviceName }: ServicePortfolioProps) => {
                   </div>
                 )}
                 
-                <Button variant="outline" className="w-full group">
+                <Button 
+                  variant="outline" 
+                  className="w-full group"
+                  onClick={() => {
+                    // For now, just scroll to top - can be enhanced later
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                >
                   View Case Study
                   <ExternalLink className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -132,9 +139,11 @@ export const ServicePortfolio = ({ serviceName }: ServicePortfolioProps) => {
         </div>
         
         <div className="text-center mt-12">
-          <Button size="lg" className="gradient-primary">
-            View Full Portfolio
-            <ArrowRight className="ml-2 h-5 w-5" />
+          <Button size="lg" className="gradient-primary" asChild>
+            <Link to="/portfolio">
+              View Full Portfolio
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
           </Button>
         </div>
       </div>

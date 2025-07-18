@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import ServicesPage from "./pages/Services";
 import ServiceLandingPage from "./pages/ServiceLandingPage";
+import Portfolio from "./pages/Portfolio";
 import Bundles from "./pages/Bundles";
 import About from "./pages/About";
 import CartPage from "./pages/Cart";
@@ -71,6 +72,14 @@ const App = () => (
                   element={
                     <ProtectedRoute requireAuth={false}>
                       <ServiceLandingPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/portfolio" 
+                  element={
+                    <ProtectedRoute requireAuth={false}>
+                      <Portfolio />
                     </ProtectedRoute>
                   } 
                 />
