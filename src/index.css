@@ -31,6 +31,12 @@
     --chart-3: 30 80% 55%;
     --chart-4: 120 65% 50%;
     --chart-5: 340 75% 55%;
+    
+    /* Enhanced Sidebar Variables */
+    --sidebar-width-expanded: 17.5rem;
+    --sidebar-width-collapsed: 5rem;
+    --sidebar-animation-duration: 300ms;
+    --sidebar-animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
@@ -57,6 +63,10 @@
   
   .glass-card {
     @apply bg-gradient-to-br from-black/25 to-black/10 border border-white/10 backdrop-blur-xl shadow-2xl;
+  }
+  
+  .glass-sidebar {
+    @apply bg-gradient-to-b from-black/30 via-black/20 to-black/25 border-r border-white/10 backdrop-blur-2xl shadow-2xl;
   }
   
   .glass-input {
@@ -95,6 +105,40 @@
   .hover\\:glow-button:hover {
     @apply shadow-lg shadow-primary/40 scale-105;
   }
+  
+  /* Enhanced Sidebar Animations */
+  .sidebar-item {
+    @apply relative transition-all duration-300 ease-out transform;
+  }
+  
+  .sidebar-item:hover {
+    @apply scale-[1.02] translate-x-1;
+  }
+  
+  .sidebar-item-active {
+    @apply bg-gradient-to-r from-primary/20 via-primary/15 to-transparent border-l-2 border-primary shadow-lg shadow-primary/20;
+  }
+  
+  .sidebar-item-active::before {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-blue-500 to-purple-500 rounded-r-full;
+  }
+  
+  .sidebar-icon {
+    @apply transition-all duration-200 ease-out;
+  }
+  
+  .sidebar-icon:hover {
+    @apply text-primary scale-110 drop-shadow-lg;
+  }
+  
+  .sidebar-text {
+    @apply transition-all duration-200 ease-out;
+  }
+  
+  .sidebar-badge {
+    @apply absolute -top-1 -right-1 h-5 w-5 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-xs font-bold text-white flex items-center justify-center shadow-lg animate-pulse-glow;
+  }
 }
 
 /* Animation Utilities */
@@ -118,6 +162,26 @@
   
   .animate-glow {
     animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  .animate-stagger-1 {
+    animation-delay: 0.1s;
+  }
+  
+  .animate-stagger-2 {
+    animation-delay: 0.2s;
+  }
+  
+  .animate-stagger-3 {
+    animation-delay: 0.3s;
+  }
+  
+  .animate-stagger-4 {
+    animation-delay: 0.4s;
+  }
+  
+  .animate-stagger-5 {
+    animation-delay: 0.5s;
   }
 }
 
@@ -165,4 +229,19 @@
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-primary/50;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-item,
+  .sidebar-icon,
+  .sidebar-text {
+    @apply transition-none;
+  }
+  
+  .animate-pulse-glow,
+  .animate-icon-bounce,
+  .animate-stagger-in {
+    animation: none;
+  }
 }
