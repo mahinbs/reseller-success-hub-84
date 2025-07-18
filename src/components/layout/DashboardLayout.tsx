@@ -57,7 +57,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <Breadcrumb>
               <BreadcrumbList>
                 {breadcrumbs.map((breadcrumb, index) => (
-                  <React.Fragment key={breadcrumb.href}>
+                  <div key={breadcrumb.href}>
                     <BreadcrumbItem>
                       {breadcrumb.isActive ? (
                         <BreadcrumbPage className="text-foreground">
@@ -73,7 +73,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       )}
                     </BreadcrumbItem>
                     {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-                  </React.Fragment>
+                  </div>
                 ))}
               </BreadcrumbList>
             </Breadcrumb>

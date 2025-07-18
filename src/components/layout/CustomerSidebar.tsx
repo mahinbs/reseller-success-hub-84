@@ -46,7 +46,7 @@ const navigationItems = [
   },
   {
     title: 'Cart',
-    url: '/cart',
+    url: '/dashboard/cart',
     icon: ShoppingCart
   },
   {

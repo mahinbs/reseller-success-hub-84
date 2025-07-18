@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +13,11 @@ const CartPage = () => {
   const { cart, removeFromCart, clearCart, getCartTotal, isLoading } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+
+  // Check if we're in dashboard layout
+  const isInDashboard = location.pathname.startsWith('/dashboard');
 
   if (!user) {
     return (
@@ -67,7 +72,9 @@ const CartPage = () => {
               Discover our amazing AI services and add them to your cart
             </p>
             <Button asChild className="gradient-primary">
-              <a href="/services">Browse Services</a>
+              <a href={isInDashboard ? "/dashboard/services" : "/services"}>
+                Browse Services
+              </a>
             </Button>
           </CardContent>
         </Card>
@@ -76,7 +83,7 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className={`${isInDashboard ? 'p-6' : 'min-h-screen py-8 px-4'}`}>
       <div className="container mx-auto max-w-4xl">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Shopping Cart</h1>
@@ -139,7 +146,7 @@ const CartPage = () => {
                 asChild
                 className="hover:scale-105 transition-all-smooth"
               >
-                <a href="/services">
+                <a href={isInDashboard ? "/dashboard/services" : "/services"}>
                   Continue Shopping
                 </a>
               </Button>
