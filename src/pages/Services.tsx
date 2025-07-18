@@ -9,8 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
-import { Search, Filter, Grid, List } from 'lucide-react';
+import { Search, Filter, Grid, List, TrendingUp, ShoppingCart } from 'lucide-react';
 import { createServiceSlug } from '@/lib/serviceUtils';
+import { ResellableBanner } from '@/components/reseller/ResellableBanner';
+import { OnboardingModal } from '@/components/reseller/OnboardingModal';
+import { ResellableTooltip } from '@/components/reseller/ResellableTooltip';
 
 interface Service {
   id: string;
@@ -93,37 +96,52 @@ const ServicesPage = () => {
     });
   };
 
+  const calculateSuggestedPrice = (cost: number) => cost * 2.5;
+  const calculateProfit = (cost: number) => calculateSuggestedPrice(cost) - cost;
+
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="container mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
+        <OnboardingModal />
+        
+        <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-slide-in">
-            AI Services & Tools
+            White-Label AI Services for Resellers
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-slide-in-delay">
-            Discover premium AI services and productivity tools to boost your business
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto animate-slide-in-delay mb-6">
+            Buy ready-to-sell services → Get full rights to resell → We fulfill, you profit
           </p>
+          <div className="flex justify-center gap-4 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              1000+ Active Resellers
+            </span>
+            <span>•</span>
+            <span>We Fulfill, You Profit</span>
+            <span>•</span>
+            <span>Set Your Own Prices</span>
+          </div>
         </div>
 
-        {/* Filters */}
+        <ResellableBanner />
+
         <div className="flex flex-col md:flex-row gap-4 mb-8 animate-slide-in-delay">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Search services..."
+              placeholder="Search resellable services..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 transition-all-smooth focus:scale-[1.02]"
+              className="pl-10 transition-all-smooth focus:scale-[1.02] glass-input"
             />
           </div>
           
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full md:w-48 transition-all-smooth">
+            <SelectTrigger className="w-full md:w-48 transition-all-smooth glass-input">
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Category" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="glass">
               {categories.map(category => (
                 <SelectItem key={category} value={category}>
                   {category === 'all' ? 'All Categories' : category}
@@ -152,32 +170,69 @@ const ServicesPage = () => {
           </div>
         </div>
 
-        {/* Featured Bundles */}
         {bundles.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Featured Bundles</h2>
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+              Complete Reseller Packages
+              <Badge className="glass-badge">Higher Profit Margins</Badge>
+            </h2>
             <div className="grid md:grid-cols-3 gap-6">
               {bundles.map((bundle) => (
-                <Card key={bundle.id} className="glass hover:scale-105 transition-all-smooth group">
+                <Card key={bundle.id} className="glass hover:scale-105 transition-all-smooth group relative">
+                  <div className="absolute top-4 right-4 z-10">
+                    <ResellableTooltip 
+                      content="Buy once, resell unlimited times to your clients"
+                      type="badge"
+                    >
+                      <Badge className="bg-green-500 hover:bg-green-600 text-white animate-pulse">
+                        🟢 RESELLER BUNDLE
+                      </Badge>
+                    </ResellableTooltip>
+                  </div>
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-xl">{bundle.name}</CardTitle>
-                      <Badge className="gradient-primary text-white">
-                        -{bundle.discount_percentage}% OFF
-                      </Badge>
                     </div>
                     <CardDescription>{bundle.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="mb-4">
-                      <span className="text-3xl font-bold text-primary">${bundle.total_price}</span>
-                      <span className="text-muted-foreground">/month</span>
+                    <div className="space-y-3 mb-4">
+                      <div className="flex justify-between text-sm">
+                        <ResellableTooltip 
+                          content="This is your cost - you set the resell price"
+                          type="price"
+                        >
+                          <span className="text-muted-foreground cursor-help">Your Cost:</span>
+                        </ResellableTooltip>
+                        <span className="font-semibold">${bundle.total_price.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-green-600">Suggested Resell:</span>
+                        <span className="text-green-600 font-semibold">
+                          ${calculateSuggestedPrice(bundle.total_price).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm border-t pt-2">
+                        <ResellableTooltip 
+                          content="Your profit per sale at suggested price"
+                          type="profit"
+                        >
+                          <span className="text-purple-500 font-medium cursor-help flex items-center gap-1">
+                            <TrendingUp className="h-3 w-3" />
+                            Potential Profit:
+                          </span>
+                        </ResellableTooltip>
+                        <span className="text-purple-500 font-bold">
+                          ${calculateProfit(bundle.total_price).toLocaleString()}
+                        </span>
+                      </div>
                     </div>
                     <Button 
                       onClick={() => handleAddToCart(bundle, 'bundle')}
                       className="w-full gradient-primary group-hover:scale-105 transition-all-smooth"
                     >
-                      Add Bundle to Cart
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Buy to Resell
                     </Button>
                   </CardContent>
                 </Card>
@@ -186,13 +241,18 @@ const ServicesPage = () => {
           </section>
         )}
 
-        {/* Services */}
         <section>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">All Services</h2>
+            <h2 className="text-2xl font-bold">Resellable Services</h2>
             <div className="text-sm text-muted-foreground">
-              {filteredServices.length} service{filteredServices.length !== 1 ? 's' : ''} found
+              {filteredServices.length} service{filteredServices.length !== 1 ? 's' : ''} ready to resell
             </div>
+          </div>
+
+          <div className="mb-6 p-4 bg-gradient-to-r from-primary/5 to-green-500/5 rounded-lg border border-primary/20">
+            <p className="text-center text-muted-foreground">
+              <strong>All services below are white-labeled.</strong> Buy and start selling immediately — no delivery or fulfillment needed on your end.
+            </p>
           </div>
 
           {loading ? (
@@ -212,12 +272,23 @@ const ServicesPage = () => {
               {filteredServices.map((service) => (
                 <Card 
                   key={service.id} 
-                  className={`glass-subtle hover:scale-105 transition-all-smooth group ${
+                  className={`glass-subtle hover:scale-105 transition-all-smooth group relative ${
                     viewMode === 'list' ? 'flex items-center' : ''
                   }`}
                 >
+                  <div className="absolute top-4 right-4 z-10">
+                    <ResellableTooltip 
+                      content="Buy once, resell unlimited times to your clients"
+                      type="badge"
+                    >
+                      <Badge className="bg-green-500 hover:bg-green-600 text-white animate-pulse cursor-help">
+                        🟢 RESELLABLE
+                      </Badge>
+                    </ResellableTooltip>
+                  </div>
+                  
                   <CardHeader className={viewMode === 'list' ? 'flex-1' : ''}>
-                    <div className="flex justify-between items-start">
+                    <div className="flex justify-between items-start pr-20">
                       <CardTitle className="text-lg">
                         <Link 
                           to={`/service/${createServiceSlug(service.name)}`}
@@ -226,32 +297,66 @@ const ServicesPage = () => {
                           {service.name}
                         </Link>
                       </CardTitle>
+                    </div>
+                    <div className="flex gap-2 mb-2">
                       <Badge variant="secondary">{service.category}</Badge>
                     </div>
                     <CardDescription className="line-clamp-2">
                       {service.description}
                     </CardDescription>
                   </CardHeader>
+                  
                   <CardContent className={viewMode === 'list' ? 'flex items-center gap-4' : ''}>
-                    <div className={viewMode === 'list' ? 'whitespace-nowrap' : 'mb-4'}>
-                      <span className="text-2xl font-bold text-primary">${service.price}</span>
-                      <span className="text-muted-foreground">/{service.billing_period}</span>
+                    <div className={`space-y-2 ${viewMode === 'list' ? 'whitespace-nowrap' : 'mb-4'}`}>
+                      <div className="flex justify-between text-sm">
+                        <ResellableTooltip 
+                          content="This is your cost - you set the resell price"
+                          type="price"
+                        >
+                          <span className="text-muted-foreground cursor-help">Your Cost:</span>
+                        </ResellableTooltip>
+                        <span className="font-semibold">${service.price.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-green-600">Suggested Resell:</span>
+                        <span className="text-green-600 font-semibold">
+                          ${calculateSuggestedPrice(service.price).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm border-t pt-2">
+                        <ResellableTooltip 
+                          content="Your profit per sale at suggested price"
+                          type="profit"
+                        >
+                          <span className="text-purple-500 font-medium cursor-help flex items-center gap-1">
+                            <TrendingUp className="h-3 w-3" />
+                            Profit:
+                          </span>
+                        </ResellableTooltip>
+                        <span className="text-purple-500 font-bold">
+                          ${calculateProfit(service.price).toLocaleString()}
+                        </span>
+                      </div>
                     </div>
+                    
                     <div className={`flex gap-2 ${viewMode === 'list' ? 'flex-row' : 'flex-col'}`}>
                       <Button 
                         asChild
                         variant="outline" 
                         className="group-hover:scale-105 transition-all-smooth"
                       >
-                        <Link to={`/service/${createServiceSlug(service.name)}`}>
-                          View Landing Page
-                        </Link>
+                        <ResellableTooltip content="See what your clients will receive">
+                          <Link to={`/service/${createServiceSlug(service.name)}`}>
+                            See Sales Materials
+                          </Link>
+                        </ResellableTooltip>
                       </Button>
                       <Button
                         onClick={() => handleAddToCart(service, 'service')}
                         className="gradient-primary group-hover:scale-105 transition-all-smooth"
                       >
-                        Add to Cart
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        Buy to Resell
                       </Button>
                     </div>
                   </CardContent>
@@ -262,7 +367,7 @@ const ServicesPage = () => {
 
           {!loading && filteredServices.length === 0 && (
             <div className="text-center py-12">
-              <h3 className="text-lg font-semibold mb-2">No services found</h3>
+              <h3 className="text-lg font-semibold mb-2">No resellable services found</h3>
               <p className="text-muted-foreground mb-4">
                 Try adjusting your search or filter criteria
               </p>
