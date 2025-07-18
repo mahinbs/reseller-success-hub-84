@@ -588,10 +588,12 @@ const CustomerDashboard = () => {
                           {/* Action Buttons */}
                           <div className="flex gap-2 pt-2">
                             <Button 
+                              asChild
                               className="flex-1 glass-button hover:glow-button transition-all duration-300 backdrop-blur-sm"
-                              onClick={() => {/* Could add bundle detail view */}}
                             >
-                              View Details
+                              <Link to={`/bundles/${bundle.id}`}>
+                                View Details
+                              </Link>
                             </Button>
                             <Button
                               size="icon"

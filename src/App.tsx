@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import ServicesPage from "./pages/Services";
 import ServiceLandingPage from "./pages/ServiceLandingPage";
 import Portfolio from "./pages/Portfolio";
 import Bundles from "./pages/Bundles";
+import BundleDetail from "./pages/BundleDetail";
 import About from "./pages/About";
 import CartPage from "./pages/Cart";
 import CustomerDashboard from "./pages/CustomerDashboard";
@@ -88,6 +88,14 @@ const App = () => (
                   element={
                     <ProtectedRoute requireAuth={false}>
                       <Bundles />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/bundles/:id" 
+                  element={
+                    <ProtectedRoute requireAuth={false}>
+                      <BundleDetail />
                     </ProtectedRoute>
                   } 
                 />
