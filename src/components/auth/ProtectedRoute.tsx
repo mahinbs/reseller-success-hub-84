@@ -1,6 +1,6 @@
 
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,6 +9,7 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute = ({ children, requireAuth = false }: ProtectedRouteProps) => {
   const { user, profile, loading } = useAuth();
+  const location = useLocation();
 
   // Show loading spinner while checking authentication
   if (loading) {
@@ -19,9 +20,19 @@ export const ProtectedRoute = ({ children, requireAuth = false }: ProtectedRoute
     );
   }
 
+  // Define service-related routes that authenticated users can access
+  const serviceRoutes = ['/services', '/bundles', '/cart'];
+  const isServiceRoute = serviceRoutes.some(route => location.pathname.startsWith(route)) || 
+                        location.pathname.startsWith('/service/');
+
   // If route requires no auth (public routes) but user is authenticated
   if (!requireAuth && user && profile) {
-    // Redirect authenticated users to their appropriate dashboard
+    // Allow authenticated users to access service-related pages
+    if (isServiceRoute) {
+      return <>{children}</>;
+    }
+    
+    // Redirect authenticated users from marketing pages to their dashboard
     if (profile.role === 'admin') {
       return <Navigate to="/admin" replace />;
     } else {
