@@ -365,10 +365,10 @@ const CustomerDashboard = ({
               <div className="text-center p-4 rounded-lg bg-white/50 border border-green-500/20">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Users className="h-5 w-5 text-green-600" />
-                  <span className="text-2xl font-bold text-gray-950">70%</span>
+                  <span className="text-2xl font-bold text-gray-800">70%</span>
                 </div>
-                <h4 className="font-semibold mb-1 text-lime-300">Your Profit</h4>
-                <p className="text-sm text-gray-950">Keep 70% of every sale you make to your clients</p>
+                <h4 className="font-semibold mb-1 text-green-700">Your Profit</h4>
+                <p className="text-sm text-gray-700">Keep 70% of every sale you make to your clients</p>
               </div>
 
               <div className="text-center p-4 rounded-lg bg-white/50 border border-primary/20">
@@ -377,16 +377,16 @@ const CustomerDashboard = ({
                   <span className="text-2xl font-bold text-primary">30%</span>
                 </div>
                 <h4 className="font-semibold mb-1">BoostMySites</h4>
-                <p className="text-sm text-muted-foreground">We handle fulfillment and support for this share</p>
+                <p className="text-sm text-gray-700">We handle fulfillment and support for this share</p>
               </div>
 
               <div className="text-center p-4 rounded-lg bg-white/50 border border-blue-500/20">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <TrendingUp className="h-5 w-5 text-blue-600" />
-                  <span className="text-lg font-bold text-blue-600">100%</span>
+                  <span className="text-lg font-bold text-blue-700">100%</span>
                 </div>
-                <h4 className="font-semibold mb-1">You Set Prices</h4>
-                <p className="text-sm text-muted-foreground">Complete control over your pricing strategy</p>
+                <h4 className="font-semibold mb-1 text-blue-700">You Set Prices</h4>
+                <p className="text-sm text-gray-700">Complete control over your pricing strategy</p>
               </div>
             </div>
 
