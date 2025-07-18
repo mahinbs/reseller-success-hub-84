@@ -374,7 +374,7 @@ const CustomerDashboard = ({
               <div className="text-center p-4 rounded-lg bg-white/50 border border-primary/20">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <DollarSign className="h-5 w-5 text-primary" />
-                  <span className="text-2xl font-bold text-primary">30%</span>
+                  <span className="text-2xl font-bold text-gray-950">30%</span>
                 </div>
                 <h4 className="font-semibold mb-1">BoostMySites</h4>
                 <p className="text-sm text-gray-700">We handle fulfillment and support for this share</p>
