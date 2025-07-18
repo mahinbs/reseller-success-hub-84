@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
@@ -8,11 +7,13 @@ import {
   ShoppingCart, 
   User, 
   FileText,
-  HelpCircle 
+  HelpCircle,
+  LogOut
 } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -22,6 +23,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useCart } from '@/hooks/useCart';
+import { useAuth } from '@/hooks/useAuth';
 
 const navigationItems = [
   {
@@ -67,6 +69,7 @@ export function CustomerSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const { cart } = useCart();
+  const { signOut } = useAuth();
   const isCollapsed = state === 'collapsed';
 
   const isActive = (url: string, exact?: boolean) => {
@@ -149,6 +152,30 @@ export function CustomerSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      
+      <SidebarFooter className="px-3 pb-3">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              onClick={signOut}
+              className={`group flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 text-red-600 hover:text-red-700 hover:bg-red-50 hover:shadow-md ${
+                isCollapsed ? 'justify-center' : 'justify-start'
+              }`}
+            >
+              <LogOut className="sidebar-icon h-5 w-5 shrink-0 transition-all duration-300 group-hover:scale-110" />
+              <span 
+                className={`sidebar-text font-medium transition-all duration-300 ${
+                  isCollapsed 
+                    ? 'opacity-0 scale-0 w-0 overflow-hidden' 
+                    : 'opacity-100 scale-100 w-auto'
+                }`}
+              >
+                Sign Out
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
