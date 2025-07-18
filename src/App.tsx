@@ -92,6 +92,7 @@ const App = () => (
                         <Route path="purchases" element={<CustomerDashboard activeTab="purchases" />} />
                         <Route path="cart" element={<CartPage />} />
                         <Route path="profile" element={<CustomerDashboard activeTab="profile" />} />
+                        <Route path="faq" element={<CustomerDashboard activeTab="faq" />} />
                         <Route path="support" element={<CustomerDashboard activeTab="support" />} />
                       </Routes>
                     </DashboardLayout>

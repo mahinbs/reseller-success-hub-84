@@ -8,10 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { Navigate } from 'react-router-dom';
-import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare, Users, Handshake } from 'lucide-react';
+import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare, Users, Handshake, Building, CreditCard, Settings, Star, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal';
 
@@ -59,7 +60,7 @@ interface Purchase {
 }
 
 interface CustomerDashboardProps {
-  activeTab?: 'overview' | 'services' | 'bundles' | 'purchases' | 'profile' | 'support';
+  activeTab?: 'overview' | 'services' | 'bundles' | 'purchases' | 'profile' | 'support' | 'faq';
 }
 
 const CustomerDashboard = ({
@@ -208,6 +209,8 @@ const CustomerDashboard = ({
         return renderProfileTab();
       case 'support':
         return renderSupportTab();
+      case 'faq':
+        return renderFaqTab();
       default:
         return renderOverviewTab();
     }
@@ -834,6 +837,232 @@ const CustomerDashboard = ({
       </div>
     </div>
   );
+
+  const renderFaqTab = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const faqSections = [
+      {
+        title: "Business Model & Revenue",
+        icon: Building,
+        questions: [
+          {
+            id: "baas-definition",
+            question: "What is Business as a Service (BaaS)?",
+            answer: "Business as a Service (BaaS) is a modern business model offered by BoostMySites where you can instantly start and run your own service-based business — without hiring a team, building infrastructure, or handling fulfillment.\n\nWe provide everything you need — from service delivery to branding and marketing — so you can focus purely on sales, growth, and profit.\n\nIt's like owning an agency, but with zero operational headaches."
+          },
+          {
+            id: "revenue-sharing",
+            question: "How does the revenue sharing work?",
+            answer: "When you make a sale, you keep 70% of the revenue, and 30% goes to BoostMySites.\n\nThis 30% covers:\n• Service fulfillment (done by our expert developers, marketers, designers, etc.)\n• Access to our business automation tools\n• CRM & dashboard setup\n• Project tracking, invoicing, and customer support\n\n✅ You earn the majority without the overhead of managing delivery."
+          },
+          {
+            id: "why-better",
+            question: "Why is this business model better than building everything on my own?",
+            answer: "Most people fail in business because of:\n• Not having the right team\n• Lack of tech knowledge\n• Burnout from doing everything alone\n• High upfront investment (tech, salaries, office, tools)\n\nWith BaaS, you:\n• Skip the startup stress and begin selling immediately\n• Use a proven backend team to deliver high-quality services\n• Avoid hiring or managing employees\n• Get mentorship and growth strategies included\n• Start with low risk and high potential\n\nThis model has empowered hundreds of entrepreneurs to earn consistently without having to code, design, or deliver."
+          },
+          {
+            id: "earnings-realistic",
+            question: "How much can I realistically earn?",
+            answer: "With consistent effort, many of our BaaS subscribers make ₹1.5L to ₹5L per month just by focusing on outreach, closing, and reselling. Since the backend is automated, they scale without stress.\n\nSome have even crossed ₹10L/month by building teams and using paid ads."
+          }
+        ]
+      },
+      {
+        title: "Subscription & Pricing",
+        icon: CreditCard,
+        questions: [
+          {
+            id: "subscription-included",
+            question: "What's included in the subscription?",
+            answer: "You get 1-year access to:\n\n✅ Ready-to-sell service bundles (AI, Web, Mobile, SaaS, Branding, SEO, etc.)\n✅ A professional website/portal under your brand\n✅ A trained delivery team to fulfill your client's orders\n✅ Branding support (Logo, brochures, pitch decks)\n✅ Daily growth tasks & mentorship\n✅ CRM dashboard to manage leads and clients\n✅ Meta & LinkedIn ad templates\n✅ Support for closing deals (Zoom calls + proposals)"
+          },
+          {
+            id: "subscription-validity",
+            question: "How long is the subscription valid?",
+            answer: "Your subscription is valid for 12 months. During this period, you can sell unlimited services and earn 70% of all revenue generated."
+          },
+          {
+            id: "custom-pricing",
+            question: "Can I set my own pricing and packages?",
+            answer: "Absolutely. You have full freedom to:\n• Customize pricing based on your audience\n• Create your own offers or bundles\n• Add your personal touch in client communication\n\nMany of our partners charge 2x–3x the listed rates and keep the margin."
+          }
+        ]
+      },
+      {
+        title: "Services & Delivery",
+        icon: Settings,
+        questions: [
+          {
+            id: "tech-knowledge",
+            question: "Do I need technical knowledge to run this?",
+            answer: "No. This model is specifically designed for non-technical entrepreneurs. Whether you are a student, creator, influencer, or a working professional — you don't need to code or deliver anything.\n\nYou focus on marketing, sales, and relationship building — we take care of everything else."
+          },
+          {
+            id: "services-available",
+            question: "What kind of services can I sell?",
+            answer: "You can sell:\n• AI Development (Chatbots, automation tools, agents)\n• Website & App Development\n• Full-stack Web Bundles\n• SaaS Product Creation\n• UI/UX Design & Branding\n• Digital Marketing & SEO\n• Business Automation\n…and more added every month!\n\nAll services are:\n• White-labeled\n• Delivered under your brand\n• High-quality (handled by BoostMySites' expert teams)"
+          },
+          {
+            id: "payment-process",
+            question: "How do I get paid?",
+            answer: "You receive earnings directly to your bank account every Monday, based on all cleared sales from the previous week. You'll have access to a transparent earnings dashboard."
+          }
+        ]
+      },
+      {
+        title: "Getting Started",
+        icon: Star,
+        questions: [
+          {
+            id: "ideal-for",
+            question: "Who is this ideal for?",
+            answer: "This model is ideal for:\n• Freelancers who want recurring income\n• Influencers who want to monetize their audience\n• Creators, marketers, and agency owners\n• Students and beginners with no tech background\n• People who want to escape the 9–5 grind"
+          },
+          {
+            id: "trust-boostmysites",
+            question: "Why should I trust BoostMySites?",
+            answer: "We've helped over 2,000+ clients build and grow their companies.\n\nOur services are used by funded startups and global businesses.\n\nWe provide full transparency, contract-based delivery, and real-time tracking.\n\nYou'll get a dedicated onboarding and success manager."
+          }
+        ]
+      }
+    ];
+
+    const filteredSections = faqSections.map(section => ({
+      ...section,
+      questions: section.questions.filter(q =>
+        q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        q.answer.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    })).filter(section => section.questions.length > 0);
+
+    return (
+      <div className="py-8 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Business as a Service (BaaS) FAQ
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Everything you need to know about starting your service business with BoostMySites
+            </p>
+          </div>
+
+          {/* Search Bar */}
+          <div className="relative mb-8">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search FAQ..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 glass-input hover:glow-subtle transition-all duration-300"
+            />
+          </div>
+
+          {/* Quick Links */}
+          <Card className="glass-card mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ArrowRight className="h-5 w-5 text-primary" />
+                Quick Links
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setSearchTerm('revenue sharing')}>
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  Revenue Sharing
+                </Button>
+                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setSearchTerm('subscription')}>
+                  <Package className="h-4 w-4 mr-2" />
+                  Subscription Details
+                </Button>
+                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setSearchTerm('services')}>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Available Services
+                </Button>
+                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setSearchTerm('technical knowledge')}>
+                  <Users className="h-4 w-4 mr-2" />
+                  Getting Started
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* FAQ Sections */}
+          {filteredSections.length === 0 ? (
+            <div className="text-center py-12">
+              <HelpCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+              <h3 className="text-xl font-semibold mb-2">No FAQ found</h3>
+              <p className="text-muted-foreground">Try adjusting your search terms</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {filteredSections.map((section, sectionIndex) => (
+                <Card key={section.title} className="glass-card">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-blue-500/20">
+                        <section.icon className="h-6 w-6 text-primary" />
+                      </div>
+                      {section.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                      {section.questions.map((faq, index) => (
+                        <AccordionItem key={faq.id} value={faq.id} className="border-border/50">
+                          <AccordionTrigger className="text-left hover:text-primary transition-colors">
+                            <span className="font-medium">{faq.question}</span>
+                          </AccordionTrigger>
+                          <AccordionContent className="text-muted-foreground">
+                            <div className="pt-2 space-y-2">
+                              {faq.answer.split('\n').map((line, lineIndex) => (
+                                <p key={lineIndex} className={line.startsWith('•') || line.startsWith('✅') ? 'ml-2' : ''}>
+                                  {line}
+                                </p>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Contact Support */}
+          <Card className="glass-card mt-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                Still have questions?
+              </CardTitle>
+              <CardDescription>
+                Our support team is here to help you get started with your BaaS journey
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button asChild className="flex-1 glass-button hover:glow-button transition-all duration-300">
+                  <Link to="/dashboard/support">
+                    <HelpCircle className="h-4 w-4 mr-2" />
+                    Contact Support
+                  </Link>
+                </Button>
+                <Button variant="outline" className="flex-1 glass-button hover:glow-button transition-all duration-300">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Email Us
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
