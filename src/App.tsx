@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,11 +11,12 @@ import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import ServicesPage from "./pages/Services";
 import ServiceDetailPage from "./pages/ServiceDetail";
+import ServiceLandingPage from "./pages/ServiceLandingPage";
+import Bundles from "./pages/Bundles";
+import About from "./pages/About";
 import CartPage from "./pages/Cart";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-import About from "./pages/About";
-import Bundles from "./pages/Bundles";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -62,6 +62,14 @@ const App = () => (
                   element={
                     <ProtectedRoute requireAuth={false}>
                       <ServiceDetailPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/service/:slug" 
+                  element={
+                    <ProtectedRoute requireAuth={false}>
+                      <ServiceLandingPage />
                     </ProtectedRoute>
                   } 
                 />

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { ArrowRight, Star, Zap, Shield, Users } from 'lucide-react';
+import { createServiceSlug } from '@/lib/serviceUtils';
 
 interface Service {
   id: string;
@@ -197,7 +198,14 @@ const Index = () => {
                 <Card key={service.id} className="glass-subtle hover:scale-105 transition-all-smooth group">
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{service.name}</CardTitle>
+                      <CardTitle className="text-lg">
+                        <Link 
+                          to={`/service/${createServiceSlug(service.name)}`}
+                          className="hover:text-primary transition-colors"
+                        >
+                          {service.name}
+                        </Link>
+                      </CardTitle>
                       <Badge variant="secondary">{service.category}</Badge>
                     </div>
                     <CardDescription className="line-clamp-2">
@@ -209,8 +217,14 @@ const Index = () => {
                       <span className="text-2xl font-bold text-primary">${service.price}</span>
                       <span className="text-muted-foreground">/{service.billing_period}</span>
                     </div>
-                    <Button className="w-full group-hover:scale-105 transition-all-smooth" variant="outline">
-                      View Details
+                    <Button 
+                      asChild
+                      className="w-full group-hover:scale-105 transition-all-smooth" 
+                      variant="outline"
+                    >
+                      <Link to={`/service/${createServiceSlug(service.name)}`}>
+                        Learn More
+                      </Link>
                     </Button>
                   </CardContent>
                 </Card>

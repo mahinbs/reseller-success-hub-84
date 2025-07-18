@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { Search, Filter, Grid, List } from 'lucide-react';
+import { createServiceSlug } from '@/lib/serviceUtils';
 
 interface Service {
   id: string;
@@ -219,7 +220,7 @@ const ServicesPage = () => {
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg">
                         <Link 
-                          to={`/services/${service.id}`}
+                          to={`/service/${createServiceSlug(service.name)}`}
                           className="hover:text-primary transition-colors"
                         >
                           {service.name}
@@ -242,8 +243,8 @@ const ServicesPage = () => {
                         variant="outline" 
                         className="group-hover:scale-105 transition-all-smooth"
                       >
-                        <Link to={`/services/${service.id}`}>
-                          View Details
+                        <Link to={`/service/${createServiceSlug(service.name)}`}>
+                          View Landing Page
                         </Link>
                       </Button>
                       <Button
