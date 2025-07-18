@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,7 +11,6 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import ServicesPage from "./pages/Services";
-import ServiceDetailPage from "./pages/ServiceDetail";
 import ServiceLandingPage from "./pages/ServiceLandingPage";
 import Bundles from "./pages/Bundles";
 import About from "./pages/About";
@@ -57,11 +57,12 @@ const App = () => (
                     </ProtectedRoute>
                   } 
                 />
+                {/* Both UUID-based (backward compatibility) and slug-based service routes */}
                 <Route 
-                  path="/services/:id" 
+                  path="/services/:slug" 
                   element={
                     <ProtectedRoute requireAuth={false}>
-                      <ServiceDetailPage />
+                      <ServiceLandingPage />
                     </ProtectedRoute>
                   } 
                 />

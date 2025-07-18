@@ -13,6 +13,7 @@ import { ServiceTestimonials } from '@/components/service/ServiceTestimonials';
 import { ServicePortfolio } from '@/components/service/ServicePortfolio';
 import { ServiceComparison } from '@/components/service/ServiceComparison';
 import { ConsultationForm } from '@/components/service/ConsultationForm';
+import { createServiceSlug, getServiceNameFromSlug } from '@/lib/serviceUtils';
 
 interface Service {
   id: string;
@@ -38,26 +39,48 @@ const ServiceLandingPage = () => {
       if (!slug) return;
       
       try {
-        // Convert slug back to service name for lookup
-        const serviceName = slug.split('-').map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1)
-        ).join(' ');
-
-        const { data, error } = await supabase
-          .from('services')
-          .select('*')
-          .ilike('name', `%${serviceName}%`)
-          .eq('is_active', true)
-          .single();
-
-        if (error) throw error;
+        let serviceData;
         
-        if (data) {
+        // Check if slug is a UUID (old routing) or actual slug (new routing)
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+        
+        if (isUUID) {
+          // Handle UUID-based lookup (backward compatibility)
+          const { data, error } = await supabase
+            .from('services')
+            .select('*')
+            .eq('id', slug)
+            .eq('is_active', true)
+            .single();
+
+          if (error) throw error;
+          serviceData = data;
+        } else {
+          // Handle slug-based lookup
+          const serviceName = getServiceNameFromSlug(slug);
+          
+          const { data, error } = await supabase
+            .from('services')
+            .select('*')
+            .eq('is_active', true);
+
+          if (error) throw error;
+          
+          // Find service by exact name match or similar name
+          serviceData = data?.find(service => 
+            service.name.toLowerCase() === serviceName.toLowerCase() ||
+            createServiceSlug(service.name) === slug
+          );
+        }
+        
+        if (serviceData) {
           setService({
-            ...data,
-            features: Array.isArray(data.features) ? data.features : 
-                     typeof data.features === 'string' ? JSON.parse(data.features || '[]') : []
+            ...serviceData,
+            features: Array.isArray(serviceData.features) ? serviceData.features : 
+                     typeof serviceData.features === 'string' ? JSON.parse(serviceData.features || '[]') : []
           });
+        } else {
+          navigate('/services');
         }
       } catch (error) {
         console.error('Error loading service:', error);
