@@ -40,11 +40,11 @@ export const Header = () => {
           <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
             <Link to="/services">Services</Link>
           </Button>
-          <Button variant="ghost" className="hover:text-primary transition-all-smooth">
-            Bundles
+          <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+            <Link to="/bundles">Bundles</Link>
           </Button>
-          <Button variant="ghost" className="hover:text-primary transition-all-smooth">
-            About
+          <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+            <Link to="/about">About</Link>
           </Button>
         </nav>
 
