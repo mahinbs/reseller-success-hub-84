@@ -9,7 +9,7 @@ import { Trash2, ShoppingBag, CreditCard, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const CartPage = () => {
-  const { cart, removeFromCart, clearCart, getCartTotal } = useCart();
+  const { cart, removeFromCart, clearCart, getCartTotal, isLoading } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -41,6 +41,20 @@ const CartPage = () => {
       description: "Payment integration will be available soon. Your cart items have been saved.",
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="pt-6">
+            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Loading your cart...</h2>
+            <p className="text-muted-foreground">Please wait while we fetch your items</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (cart.length === 0) {
     return (

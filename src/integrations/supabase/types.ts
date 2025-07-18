@@ -83,6 +83,60 @@ export type Database = {
         }
         Relationships: []
       }
+      cart_items: {
+        Row: {
+          billing_period: string | null
+          bundle_id: string | null
+          created_at: string
+          id: string
+          item_name: string
+          item_price: number
+          item_type: string
+          service_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_period?: string | null
+          bundle_id?: string | null
+          created_at?: string
+          id?: string
+          item_name: string
+          item_price: number
+          item_type: string
+          service_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_period?: string | null
+          bundle_id?: string | null
+          created_at?: string
+          id?: string
+          item_name?: string
+          item_price?: number
+          item_type?: string
+          service_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           bundle_id: string | null
