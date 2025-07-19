@@ -24,7 +24,6 @@ import { DeleteConfirmationModal } from '@/components/admin/DeleteConfirmationMo
 import { ServiceFormData } from '@/components/admin/ServiceForm';
 import { BundleFormData } from '@/components/admin/BundleForm';
 import { useToast } from '@/hooks/use-toast';
-import { AdminChatDashboard } from '@/components/chat/AdminChatDashboard';
 
 interface AdminStats {
   totalUsers: number;
@@ -66,7 +65,7 @@ interface User {
 }
 
 interface AdminDashboardProps {
-  activeTab?: 'overview' | 'services' | 'bundles' | 'users' | 'purchases' | 'analytics' | 'settings' | 'chat';
+  activeTab?: 'overview' | 'services' | 'bundles' | 'users' | 'purchases' | 'analytics' | 'settings';
 }
 
 const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
@@ -462,7 +461,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     {
       icon: DollarSign,
       label: 'Total Revenue',
-      value: `₹${stats.totalRevenue.toFixed(2)}`,
+      value: `$${stats.totalRevenue.toFixed(2)}`,
       color: 'text-accent-green',
       gradient: 'gradient-success'
     },
@@ -497,8 +496,6 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         return renderAnalyticsTab();
       case 'settings':
         return renderSettingsTab();
-      case 'chat':
-        return renderChatTab();
       default:
         return renderOverviewTab();
     }
@@ -604,7 +601,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                             {service.category}
                           </Badge>
                           <span className="text-sm font-medium text-accent-green">
-                            ₹{service.price}
+                            ${service.price}
                           </span>
                           <Badge 
                             variant={service.is_active ? 'default' : 'secondary'}
@@ -690,7 +687,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                         <h3 className="font-semibold text-lg text-foreground">{bundle.name}</h3>
                         <div className="flex items-center gap-3 mt-2">
                           <span className="text-sm font-medium text-accent-green">
-                            ₹{Number(bundle.total_price).toFixed(2)}
+                            ${Number(bundle.total_price).toFixed(2)}
                           </span>
                           <Badge variant="outline" className="glass-subtle border-accent-orange/30 text-accent-orange">
                             {bundle.discount_percentage}% off
@@ -863,17 +860,6 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
             <p className="text-muted-foreground">System configuration and platform settings will be available here</p>
           </CardContent>
         </Card>
-      </div>
-    </div>
-  );
-
-  const renderChatTab = () => (
-    <div className="py-8 px-4">
-      <div className="container mx-auto max-w-7xl">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent mb-8">
-          Live Chat Management
-        </h1>
-        <AdminChatDashboard />
       </div>
     </div>
   );

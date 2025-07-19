@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
@@ -9,8 +8,7 @@ import {
   FileText,
   BarChart3,
   Settings,
-  LogOut,
-  MessageCircle
+  LogOut
 } from 'lucide-react';
 import {
   Sidebar,
@@ -47,11 +45,6 @@ const navigationItems = [
     title: 'Users',
     url: '/admin/users',
     icon: Users
-  },
-  {
-    title: 'Live Chat',
-    url: '/admin/chat',
-    icon: MessageCircle
   },
   {
     title: 'Purchases',

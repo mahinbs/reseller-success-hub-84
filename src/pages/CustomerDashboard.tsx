@@ -8,15 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
-import { useChatWidget } from '@/hooks/useChatWidget';
 import { Navigate } from 'react-router-dom';
-import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare, Users, Handshake, Building, CreditCard, Settings, Star, ArrowRight } from 'lucide-react';
+import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare, Users, Handshake } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal';
-
 interface Service {
   id: string;
   name: string;
@@ -27,7 +24,6 @@ interface Service {
   features: string[];
   image_url?: string;
 }
-
 interface Bundle {
   id: string;
   name: string;
@@ -42,13 +38,11 @@ interface Bundle {
     price: number;
   }[];
 }
-
 interface UserStats {
   totalPurchases: number;
   totalSpent: number;
   activeServices: number;
 }
-
 interface Purchase {
   id: string;
   total_amount: number;
@@ -59,32 +53,20 @@ interface Purchase {
     item_price: number;
   }[];
 }
-
 interface CustomerDashboardProps {
-  activeTab?: 'overview' | 'services' | 'bundles' | 'purchases' | 'profile' | 'support' | 'faq';
+  activeTab?: 'overview' | 'services' | 'bundles' | 'purchases' | 'profile' | 'support';
 }
-
 const CustomerDashboard = ({
   activeTab = 'overview'
 }: CustomerDashboardProps) => {
-  console.log('🚀 CustomerDashboard component rendered with activeTab:', activeTab);
-  
   const {
     user,
     profile,
     loading: authLoading
   } = useAuth();
-  
-  console.log('🔐 Auth state:', { 
-    user: user ? 'present' : 'null',
-    profile: profile ? { role: profile.role, email: profile.email } : 'null',
-    authLoading 
-  });
-
   const {
     addToCart
   } = useCart();
-  const { openChat } = useChatWidget();
   const {
     toast
   } = useToast();
@@ -100,22 +82,11 @@ const CustomerDashboard = ({
   });
   const [recentPurchases, setRecentPurchases] = useState<Purchase[]>([]);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [faqSearchTerm, setFaqSearchTerm] = useState('');
-
   useEffect(() => {
-    console.log('📊 CustomerDashboard useEffect triggered with user:', !!user);
-    if (!user) {
-      console.log('❌ No user found, skipping data load');
-      return;
-    }
-    
+    if (!user) return;
     const loadData = async () => {
-      console.log('📥 Starting data load for user:', user.id);
       try {
-        const [servicesResponse, bundlesResponse, purchasesResponse] = await Promise.all([
-          supabase.from('services').select('*').eq('is_active', true), 
-          supabase.from('bundles').select('*').eq('is_active', true), 
-          supabase.from('purchases').select(`
+        const [servicesResponse, bundlesResponse, purchasesResponse] = await Promise.all([supabase.from('services').select('*').eq('is_active', true), supabase.from('bundles').select('*').eq('is_active', true), supabase.from('purchases').select(`
               id,
               total_amount,
               payment_status,
@@ -123,18 +94,7 @@ const CustomerDashboard = ({
               purchase_items(item_name, item_price)
             `).eq('user_id', user.id).order('created_at', {
           ascending: false
-        }).limit(5)
-        ]);
-        
-        console.log('📈 Data responses:', {
-          services: servicesResponse.data?.length || 0,
-          bundles: bundlesResponse.data?.length || 0,
-          purchases: purchasesResponse.data?.length || 0,
-          servicesError: servicesResponse.error,
-          bundlesError: bundlesResponse.error,
-          purchasesError: purchasesResponse.error
-        });
-
+        }).limit(5)]);
         if (servicesResponse.data) {
           const formattedServices = servicesResponse.data.map(service => ({
             ...service,
@@ -142,7 +102,6 @@ const CustomerDashboard = ({
           }));
           setServices(formattedServices);
         }
-        
         if (bundlesResponse.data) {
           // Fetch services for each bundle
           const bundlesWithServices = await Promise.all(bundlesResponse.data.map(async bundle => {
@@ -177,52 +136,33 @@ const CustomerDashboard = ({
           });
         }
       } catch (error) {
-        console.error('❌ Error loading data:', error);
+        console.error('Error loading data:', error);
       } finally {
-        console.log('✅ Data loading complete, setting loading to false');
         setLoading(false);
       }
     };
     loadData();
   }, [user]);
-
-  // Enhanced loading state with better visibility
   if (authLoading) {
-    console.log('⏳ Showing auth loading spinner');
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center p-8 rounded-lg border bg-card">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground text-lg">Loading dashboard...</p>
-          <p className="text-sm text-muted-foreground mt-2">Authenticating user...</p>
-        </div>
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>;
   }
-
   if (!user) {
-    console.log('🔄 No user, redirecting to auth');
     return <Navigate to="/auth" replace />;
   }
-
   if (profile?.role === 'admin') {
-    console.log('👑 Admin user, redirecting to admin dashboard');
     return <Navigate to="/admin" replace />;
   }
-
-  console.log('🎯 Rendering dashboard content for tab:', activeTab);
-
   const categories = ['all', ...Array.from(new Set(services.map(s => s.category)))];
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(search.toLowerCase()) || service.description.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || service.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
-
   const filteredBundles = bundles.filter(bundle => {
     return bundle.name.toLowerCase().includes(search.toLowerCase()) || bundle.description.toLowerCase().includes(search.toLowerCase());
   });
-
   const handleAddToCart = (item: Service | Bundle, type: 'service' | 'bundle') => {
     addToCart({
       id: item.id,
@@ -236,15 +176,14 @@ const CustomerDashboard = ({
       description: `${item.name} has been added to your cart.`
     });
   };
-
   const calculateOriginalPrice = (bundle: Bundle) => {
     if (!bundle.services) return bundle.total_price;
     const originalTotal = bundle.services.reduce((sum, service) => sum + service.price, 0);
     return originalTotal;
   };
 
+  // Render different content based on activeTab
   const renderContent = () => {
-    console.log('🖼️ Rendering content for activeTab:', activeTab);
     switch (activeTab) {
       case 'services':
         return renderServicesTab();
@@ -256,169 +195,152 @@ const CustomerDashboard = ({
         return renderProfileTab();
       case 'support':
         return renderSupportTab();
-      case 'faq':
-        return renderFaqTab();
       default:
-        console.log('🏠 Rendering overview tab (default)');
         return renderOverviewTab();
     }
   };
+  const renderOverviewTab = () => <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
+      {/* Profile Dashboard Section */}
+      <div className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5 py-8 px-4">
+        <div className="container mx-auto max-w-7xl">
+          {/* Welcome Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Welcome back, {profile?.full_name || 'Customer'}!
+            </h1>
+            <p className="text-muted-foreground text-lg">Your AI Services Dashboard</p>
+          </div>
 
-  const renderOverviewTab = () => {
-    console.log('📊 Rendering overview tab with stats:', userStats);
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
-        {/* Profile Dashboard Section */}
-        <div className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5 py-8 px-4">
-          <div className="container mx-auto max-w-7xl">
-            {/* Welcome Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Welcome back, {profile?.full_name || 'Customer'}!
-              </h1>
-              <p className="text-muted-foreground text-lg">Your AI Services Dashboard</p>
-            </div>
+          {/* Statistics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card className="glass-card hover:glow-subtle transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Purchases</p>
+                    <p className="text-3xl font-bold text-primary">{userStats.totalPurchases}</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-full">
+                    <Package className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="glass-card hover:glow-subtle transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Total Purchases</p>
-                      <p className="text-3xl font-bold text-primary">{userStats.totalPurchases}</p>
-                    </div>
-                    <div className="p-3 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-full">
-                      <Package className="h-6 w-6 text-primary" />
-                    </div>
+            <Card className="glass-card hover:glow-subtle transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
+                    <p className="text-3xl font-bold text-green-500">${userStats.totalSpent.toFixed(2)}</p>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="p-3 bg-gradient-to-br from-green-500/20 to-emerald-400/20 rounded-full">
+                    <DollarSign className="h-6 w-6 text-green-500" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card className="glass-card hover:glow-subtle transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
-                      <p className="text-3xl font-bold text-green-500">₹{userStats.totalSpent.toFixed(2)}</p>
-                    </div>
-                    <div className="p-3 bg-gradient-to-br from-green-500/20 to-emerald-400/20 rounded-full">
-                      <DollarSign className="h-6 w-6 text-green-500" />
-                    </div>
+            <Card className="glass-card hover:glow-subtle transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Active Services</p>
+                    <p className="text-3xl font-bold text-purple-500">{userStats.activeServices}</p>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full">
+                    <TrendingUp className="h-6 w-6 text-purple-500" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-              <Card className="glass-card hover:glow-subtle transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Active Services</p>
-                      <p className="text-3xl font-bold text-purple-500">{userStats.activeServices}</p>
-                    </div>
-                    <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full">
-                      <TrendingUp className="h-6 w-6 text-purple-500" />
-                    </div>
+          {/* Profile Information & Purchase History */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Profile Info */}
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-primary" />
+                  Profile Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-full">
+                    <User className="h-4 w-4 text-primary" />
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                  <div>
+                    <p className="font-medium">{profile?.full_name || 'Not set'}</p>
+                    <p className="text-sm text-muted-foreground">Full Name</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full">
+                    <Mail className="h-4 w-4 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{profile?.email}</p>
+                    <p className="text-sm text-muted-foreground">Email Address</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full">
+                    <Calendar className="h-4 w-4 text-purple-500" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Customer</p>
+                    <p className="text-sm text-muted-foreground">Account Type</p>
+                  </div>
+                </div>
+                <Button variant="outline" className="w-full mt-4 glass-button hover:glow-button transition-all duration-300" onClick={() => setIsProfileModalOpen(true)}>
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
+              </CardContent>
+            </Card>
 
-            {/* Profile Information & Purchase History */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {/* Profile Info */}
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-primary" />
-                    Profile Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-full">
-                      <User className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{profile?.full_name || 'Not set'}</p>
-                      <p className="text-sm text-muted-foreground">Full Name</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full">
-                      <Mail className="h-4 w-4 text-blue-500" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{profile?.email}</p>
-                      <p className="text-sm text-muted-foreground">Email Address</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full">
-                      <Calendar className="h-4 w-4 text-purple-500" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Customer</p>
-                      <p className="text-sm text-muted-foreground">Account Type</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" className="w-full mt-4 glass-button hover:glow-button transition-all duration-300" onClick={() => setIsProfileModalOpen(true)}>
-                    <Edit3 className="h-4 w-4 mr-2" />
-                    Edit Profile
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Recent Purchases */}
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-primary" />
-                    Recent Purchases
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {recentPurchases.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                      <p className="text-muted-foreground mb-4">No purchases yet</p>
-                      <Button asChild className="glass-button hover:glow-button transition-all duration-300">
-                        <Link to="/dashboard/services">Browse Services</Link>
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {recentPurchases.slice(0, 3).map(purchase => (
-                        <div key={purchase.id} className="flex items-center justify-between p-3 glass-subtle rounded-lg">
-                          <div>
-                            <p className="font-medium text-sm">
-                              {purchase.purchase_items?.[0]?.item_name || 'Purchase'}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(purchase.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-sm">₹{purchase.total_amount}</p>
-                            <Badge variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'} className="text-xs">
-                              {purchase.payment_status}
-                            </Badge>
-                          </div>
+            {/* Recent Purchases */}
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  Recent Purchases
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {recentPurchases.length === 0 ? <div className="text-center py-8">
+                    <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                    <p className="text-muted-foreground mb-4">No purchases yet</p>
+                    <Button asChild className="glass-button hover:glow-button transition-all duration-300">
+                      <Link to="/dashboard/services">Browse Services</Link>
+                    </Button>
+                  </div> : <div className="space-y-3">
+                    {recentPurchases.slice(0, 3).map(purchase => <div key={purchase.id} className="flex items-center justify-between p-3 glass-subtle rounded-lg">
+                        <div>
+                          <p className="font-medium text-sm">
+                            {purchase.purchase_items?.[0]?.item_name || 'Purchase'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(purchase.created_at).toLocaleDateString()}
+                          </p>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+                        <div className="text-right">
+                          <p className="font-bold text-sm">${purchase.total_amount}</p>
+                          <Badge variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'} className="text-xs">
+                            {purchase.payment_status}
+                          </Badge>
+                        </div>
+                      </div>)}
+                  </div>}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
-    );
-  };
-
-  const renderServicesTab = () => (
-    <div className="py-8 px-4">
+    </div>;
+  const renderServicesTab = () => <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Services
@@ -500,8 +422,7 @@ const CustomerDashboard = ({
         </div>
 
         {/* Services Grid */}
-        {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {loading ? <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map(i => <Card key={i} className="glass-card animate-pulse">
                 <CardContent className="p-6">
                   <div className="h-4 bg-muted/30 rounded mb-4"></div>
@@ -509,25 +430,18 @@ const CustomerDashboard = ({
                   <div className="h-8 bg-muted/30 rounded"></div>
                 </CardContent>
               </Card>)}
-          </div>
-        ) : filteredServices.length === 0 ? (
-          <div className="text-center py-12">
+          </div> : filteredServices.length === 0 ? <div className="text-center py-12">
             <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No services found</h3>
             <p className="text-muted-foreground">Try adjusting your search criteria</p>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredServices.map(service => (
-              <Card key={service.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[400px]">
+          </div> : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredServices.map(service => <Card key={service.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[400px]">
                 {/* Background Image with Overlay */}
-                {service.image_url && (
-                  <div className="absolute inset-0 bg-cover bg-center" style={{
+                {service.image_url && <div className="absolute inset-0 bg-cover bg-center" style={{
             backgroundImage: `url(${service.image_url})`
           }}>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
-                  </div>
-                )}
+                  </div>}
                 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col h-full">
@@ -538,7 +452,7 @@ const CustomerDashboard = ({
                       </Badge>
                       <div className="text-right">
                         <div className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-                          ₹{service.price}
+                          ${service.price}
                         </div>
                         <div className="text-xs text-muted-foreground">/{service.billing_period}</div>
                       </div>
@@ -567,16 +481,11 @@ const CustomerDashboard = ({
                     </div>
                   </CardContent>
                 </div>
-              </Card>
-            ))}
-          </div>
-        )}
+              </Card>)}
+          </div>}
       </div>
-    </div>
-  );
-
-  const renderBundlesTab = () => (
-    <div className="py-8 px-4">
+    </div>;
+  const renderBundlesTab = () => <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Bundles
@@ -589,8 +498,7 @@ const CustomerDashboard = ({
         </div>
 
         {/* Bundles Grid */}
-        {loading ? (
-          <div className="grid md:grid-cols-2 gap-6">
+        {loading ? <div className="grid md:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map(i => <Card key={i} className="glass-card animate-pulse">
                 <CardContent className="p-6">
                   <div className="h-4 bg-muted/30 rounded mb-4"></div>
@@ -598,25 +506,18 @@ const CustomerDashboard = ({
                   <div className="h-32 bg-muted/30 rounded"></div>
                 </CardContent>
               </Card>)}
-          </div>
-        ) : filteredBundles.length === 0 ? (
-          <div className="text-center py-12">
+          </div> : filteredBundles.length === 0 ? <div className="text-center py-12">
             <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No bundles found</h3>
             <p className="text-muted-foreground">Try adjusting your search criteria</p>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            {filteredBundles.map(bundle => (
-              <Card key={bundle.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[500px]">
+          </div> : <div className="grid md:grid-cols-2 gap-6">
+            {filteredBundles.map(bundle => <Card key={bundle.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[500px]">
                 {/* Background Image with Overlay */}
-                {bundle.image_url && (
-                  <div className="absolute inset-0 bg-cover bg-center" style={{
+                {bundle.image_url && <div className="absolute inset-0 bg-cover bg-center" style={{
             backgroundImage: `url(${bundle.image_url})`
           }}>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
-                  </div>
-                )}
+                  </div>}
 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col h-full">
@@ -642,39 +543,33 @@ const CustomerDashboard = ({
 
                   <div className="flex-1 px-6 space-y-4">
                     {/* Included Services */}
-                    {bundle.services && bundle.services.length > 0 && (
-                      <div className="space-y-2">
+                    {bundle.services && bundle.services.length > 0 && <div className="space-y-2">
                         <h4 className="font-semibold text-sm text-gray-300">Included Services:</h4>
                         <div className="space-y-1">
-                          {bundle.services.slice(0, 3).map(service => (
-                            <div key={service.id} className="flex items-center justify-between text-sm glass-subtle p-2 rounded-lg backdrop-blur-sm">
+                          {bundle.services.slice(0, 3).map(service => <div key={service.id} className="flex items-center justify-between text-sm glass-subtle p-2 rounded-lg backdrop-blur-sm">
                               <span className="text-white">{service.name}</span>
                               <Badge variant="outline" className="text-xs border-white/30 text-white">
-                                ₹{service.price}
+                                ${service.price}
                               </Badge>
-                            </div>
-                          ))}
-                          {bundle.services.length > 3 && (
-                            <div className="text-xs text-gray-300 text-center py-1">
+                            </div>)}
+                          {bundle.services.length > 3 && <div className="text-xs text-gray-300 text-center py-1">
                               +{bundle.services.length - 3} more services
-                            </div>
-                          )}
+                            </div>}
                         </div>
-                      </div>
-                    )}
+                      </div>}
 
                     {/* Pricing */}
                     <div className="space-y-2 pt-2 border-t border-white/20">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-300">Original Price:</span>
                         <span className="line-through text-gray-300">
-                          ₹{calculateOriginalPrice(bundle).toLocaleString()}
+                          ${calculateOriginalPrice(bundle).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between text-lg font-bold">
                         <span className="text-white">Bundle Price:</span>
                         <span className="bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
-                          ₹{bundle.total_price.toLocaleString()}
+                          ${bundle.total_price.toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -694,34 +589,25 @@ const CustomerDashboard = ({
                     </div>
                   </CardContent>
                 </div>
-              </Card>
-            ))}
-          </div>
-        )}
+              </Card>)}
+          </div>}
       </div>
-    </div>
-  );
-
-  const renderPurchasesTab = () => (
-    <div className="py-8 px-4">
+    </div>;
+  const renderPurchasesTab = () => <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           My Purchases
         </h1>
         
-        {recentPurchases.length === 0 ? (
-          <div className="text-center py-12">
+        {recentPurchases.length === 0 ? <div className="text-center py-12">
             <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No purchases yet</h3>
             <p className="text-muted-foreground mb-4">Start exploring our services and bundles</p>
             <Button asChild className="glass-button hover:glow-button transition-all duration-300">
               <Link to="/dashboard/services">Browse Services</Link>
             </Button>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {recentPurchases.map(purchase => (
-              <Card key={purchase.id} className="glass-card">
+          </div> : <div className="space-y-6">
+            {recentPurchases.map(purchase => <Card key={purchase.id} className="glass-card">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div>
@@ -733,35 +619,26 @@ const CustomerDashboard = ({
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-primary">₹{purchase.total_amount}</p>
+                      <p className="text-2xl font-bold text-primary">${purchase.total_amount}</p>
                       <Badge variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'}>
                         {purchase.payment_status}
                       </Badge>
                     </div>
                   </div>
                   
-                  {purchase.purchase_items && purchase.purchase_items.length > 0 && (
-                    <div className="space-y-2">
+                  {purchase.purchase_items && purchase.purchase_items.length > 0 && <div className="space-y-2">
                       <h4 className="font-medium text-sm text-muted-foreground">Items:</h4>
-                      {purchase.purchase_items.map((item, index) => (
-                        <div key={index} className="flex justify-between text-sm">
+                      {purchase.purchase_items.map((item, index) => <div key={index} className="flex justify-between text-sm">
                           <span>{item.item_name}</span>
-                          <span>₹{item.item_price}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                          <span>${item.item_price}</span>
+                        </div>)}
+                    </div>}
                 </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+              </Card>)}
+          </div>}
       </div>
-    </div>
-  );
-
-  const renderProfileTab = () => (
-    <div className="py-8 px-4">
+    </div>;
+  const renderProfileTab = () => <div className="py-8 px-4">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Profile Settings
@@ -803,11 +680,8 @@ const CustomerDashboard = ({
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
-
-  const renderSupportTab = () => (
-    <div className="py-8 px-4">
+    </div>;
+  const renderSupportTab = () => <div className="py-8 px-4">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
           Support & Help
@@ -825,10 +699,8 @@ const CustomerDashboard = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild variant="outline" className="w-full glass-button">
-                <Link to="/dashboard/faq">
-                  Browse FAQ
-                </Link>
+              <Button variant="outline" className="w-full glass-button">
+                Browse FAQ
               </Button>
             </CardContent>
           </Card>
@@ -844,7 +716,7 @@ const CustomerDashboard = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={openChat} className="w-full glass-button hover:glow-button">
+              <Button className="w-full glass-button hover:glow-button">
                 Start Chat
               </Button>
             </CardContent>
@@ -861,10 +733,8 @@ const CustomerDashboard = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild variant="outline" className="w-full glass-button">
-                <a href="mailto:ceo@boostmysites.com">
-                  Contact via Email
-                </a>
+              <Button variant="outline" className="w-full glass-button">
+                Contact via Email
               </Button>
             </CardContent>
           </Card>
@@ -890,242 +760,10 @@ const CustomerDashboard = ({
           </Card>
         </div>
       </div>
-    </div>
-  );
-
-  const renderFaqTab = () => {
-
-    const faqSections = [
-      {
-        title: "Business Model & Revenue",
-        icon: Building,
-        questions: [
-          {
-            id: "baas-definition",
-            question: "What is Business as a Service (BaaS)?",
-            answer: "Business as a Service (BaaS) is a modern business model offered by BoostMySites where you can instantly start and run your own service-based business — without hiring a team, building infrastructure, or handling fulfillment.\n\nWe provide everything you need — from service delivery to branding and marketing — so you can focus purely on sales, growth, and profit.\n\nIt's like owning an agency, but with zero operational headaches."
-          },
-          {
-            id: "revenue-sharing",
-            question: "How does the revenue sharing work?",
-            answer: "When you make a sale, you keep 70% of the revenue, and 30% goes to BoostMySites.\n\nThis 30% covers:\n• Service fulfillment (done by our expert developers, marketers, designers, etc.)\n• Access to our business automation tools\n• CRM & dashboard setup\n• Project tracking, invoicing, and customer support\n\n✅ You earn the majority without the overhead of managing delivery."
-          },
-          {
-            id: "why-better",
-            question: "Why is this business model better than building everything on my own?",
-            answer: "Most people fail in business because of:\n• Not having the right team\n• Lack of tech knowledge\n• Burnout from doing everything alone\n• High upfront investment (tech, salaries, office, tools)\n\nWith BaaS, you:\n• Skip the startup stress and begin selling immediately\n• Use a proven backend team to deliver high-quality services\n• Avoid hiring or managing employees\n• Get mentorship and growth strategies included\n• Start with low risk and high potential\n\nThis model has empowered hundreds of entrepreneurs to earn consistently without having to code, design, or deliver."
-          },
-          {
-            id: "earnings-realistic",
-            question: "How much can I realistically earn?",
-            answer: "With consistent effort, many of our BaaS subscribers make ₹1.5L to ₹5L per month just by focusing on outreach, closing, and reselling. Since the backend is automated, they scale without stress.\n\nSome have even crossed ₹10L/month by building teams and using paid ads."
-          }
-        ]
-      },
-      {
-        title: "Subscription & Pricing",
-        icon: CreditCard,
-        questions: [
-          {
-            id: "subscription-included",
-            question: "What's included in the subscription?",
-            answer: "You get 1-year access to:\n\n✅ Ready-to-sell service bundles (AI, Web, Mobile, SaaS, Branding, SEO, etc.)\n✅ A professional website/portal under your brand\n✅ A trained delivery team to fulfill your client's orders\n✅ Branding support (Logo, brochures, pitch decks)\n✅ Daily growth tasks & mentorship\n✅ CRM dashboard to manage leads and clients\n✅ Meta & LinkedIn ad templates\n✅ Support for closing deals (Zoom calls + proposals)"
-          },
-          {
-            id: "subscription-validity",
-            question: "How long is the subscription valid?",
-            answer: "Your subscription is valid for 12 months. During this period, you can sell unlimited services and earn 70% of all revenue generated."
-          },
-          {
-            id: "custom-pricing",
-            question: "Can I set my own pricing and packages?",
-            answer: "Absolutely. You have full freedom to:\n• Customize pricing based on your audience\n• Create your own offers or bundles\n• Add your personal touch in client communication\n\nMany of our partners charge 2x–3x the listed rates and keep the margin."
-          }
-        ]
-      },
-      {
-        title: "Services & Delivery",
-        icon: Settings,
-        questions: [
-          {
-            id: "tech-knowledge",
-            question: "Do I need technical knowledge to run this?",
-            answer: "No. This model is specifically designed for non-technical entrepreneurs. Whether you are a student, creator, influencer, or a working professional — you don't need to code or deliver anything.\n\nYou focus on marketing, sales, and relationship building — we take care of everything else."
-          },
-          {
-            id: "services-available",
-            question: "What kind of services can I sell?",
-            answer: "You can sell:\n• AI Development (Chatbots, automation tools, agents)\n• Website & App Development\n• Full-stack Web Bundles\n• SaaS Product Creation\n• UI/UX Design & Branding\n• Digital Marketing & SEO\n• Business Automation\n…and more added every month!\n\nAll services are:\n• White-labeled\n• Delivered under your brand\n• High-quality (handled by BoostMySites' expert teams)"
-          },
-          {
-            id: "payment-process",
-            question: "How do I get paid?",
-            answer: "You receive earnings directly to your bank account every Monday, based on all cleared sales from the previous week. You'll have access to a transparent earnings dashboard."
-          }
-        ]
-      },
-      {
-        title: "Getting Started",
-        icon: Star,
-        questions: [
-          {
-            id: "ideal-for",
-            question: "Who is this ideal for?",
-            answer: "This model is ideal for:\n• Freelancers who want recurring income\n• Influencers who want to monetize their audience\n• Creators, marketers, and agency owners\n• Students and beginners with no tech background\n• People who want to escape the 9–5 grind"
-          },
-          {
-            id: "trust-boostmysites",
-            question: "Why should I trust BoostMySites?",
-            answer: "We've helped over 2,000+ clients build and grow their companies.\n\nOur services are used by funded startups and global businesses.\n\nWe provide full transparency, contract-based delivery, and real-time tracking.\n\nYou'll get a dedicated onboarding and success manager."
-          }
-        ]
-      }
-    ];
-
-    const filteredSections = faqSections.map(section => ({
-      ...section,
-      questions: section.questions.filter(q =>
-        q.question.toLowerCase().includes(faqSearchTerm.toLowerCase()) ||
-        q.answer.toLowerCase().includes(faqSearchTerm.toLowerCase())
-      )
-    })).filter(section => section.questions.length > 0);
-
-    return (
-      <div className="py-8 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Business as a Service (BaaS) FAQ
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Everything you need to know about starting your service business with BoostMySites
-            </p>
-          </div>
-
-          {/* Search Bar */}
-          <div className="relative mb-8">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search FAQ..."
-              value={faqSearchTerm}
-              onChange={(e) => setFaqSearchTerm(e.target.value)}
-              className="pl-10 glass-input hover:glow-subtle transition-all duration-300"
-            />
-          </div>
-
-          {/* Quick Links */}
-          <Card className="glass-card mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ArrowRight className="h-5 w-5 text-primary" />
-                Quick Links
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setFaqSearchTerm('revenue sharing')}>
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  Revenue Sharing
-                </Button>
-                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setFaqSearchTerm('subscription')}>
-                  <Package className="h-4 w-4 mr-2" />
-                  Subscription Details
-                </Button>
-                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setFaqSearchTerm('services')}>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Available Services
-                </Button>
-                <Button variant="outline" className="justify-start glass-button hover:glow-button transition-all duration-300" onClick={() => setFaqSearchTerm('technical knowledge')}>
-                  <Users className="h-4 w-4 mr-2" />
-                  Getting Started
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* FAQ Sections */}
-          {filteredSections.length === 0 ? (
-            <div className="text-center py-12">
-              <HelpCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-              <h3 className="text-xl font-semibold mb-2">No FAQ found</h3>
-              <p className="text-muted-foreground">Try adjusting your search terms</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {filteredSections.map((section, sectionIndex) => (
-                <Card key={section.title} className="glass-card">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-blue-500/20">
-                        <section.icon className="h-6 w-6 text-primary" />
-                      </div>
-                      {section.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Accordion type="single" collapsible className="w-full">
-                      {section.questions.map((faq, index) => (
-                        <AccordionItem key={faq.id} value={faq.id} className="border-border/50">
-                          <AccordionTrigger className="text-left hover:text-primary transition-colors">
-                            <span className="font-medium">{faq.question}</span>
-                          </AccordionTrigger>
-                          <AccordionContent className="text-muted-foreground">
-                            <div className="pt-2 space-y-2">
-                              {faq.answer.split('\n').map((line, lineIndex) => (
-                                <p key={lineIndex} className={line.startsWith('•') || line.startsWith('✅') ? 'ml-2' : ''}>
-                                  {line}
-                                </p>
-                              ))}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          {/* Contact Support */}
-          <Card className="glass-card mt-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-primary" />
-                Still have questions?
-              </CardTitle>
-              <CardDescription>
-                Our support team is here to help you get started with your BaaS journey
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button onClick={openChat} className="flex-1 glass-button hover:glow-button transition-all duration-300">
-                  <HelpCircle className="h-4 w-4 mr-2" />
-                  Contact Support
-                </Button>
-                <Button variant="outline" className="flex-1 glass-button hover:glow-button transition-all duration-300">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Email Us
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  };
-
-  console.log('🎨 About to render final result');
-  const result = (
-    <div className="min-h-screen bg-background">
+    </div>;
+  return <>
       {renderContent()}
       <ProfileEditModal open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen} />
-    </div>
-  );
-
-  console.log('✅ CustomerDashboard returning result');
-  return result;
+    </>;
 };
-
 export default CustomerDashboard;

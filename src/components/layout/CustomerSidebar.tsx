@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
@@ -50,7 +49,7 @@ const navigationItems = [
   },
   {
     title: 'Cart',
-    url: '/cart',
+    url: '/dashboard/cart',
     icon: ShoppingCart,
     showBadge: true
   },
@@ -58,11 +57,6 @@ const navigationItems = [
     title: 'Profile',
     url: '/dashboard/profile',
     icon: User
-  },
-  {
-    title: 'FAQ',
-    url: '/dashboard/faq',
-    icon: HelpCircle
   },
   {
     title: 'Support',

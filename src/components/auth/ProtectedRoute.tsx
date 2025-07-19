@@ -5,10 +5,9 @@ import { Navigate, useLocation } from 'react-router-dom';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAuth?: boolean;
-  requireAdmin?: boolean;
 }
 
-export const ProtectedRoute = ({ children, requireAuth = false, requireAdmin = false }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ children, requireAuth = false }: ProtectedRouteProps) => {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
 
@@ -43,11 +42,6 @@ export const ProtectedRoute = ({ children, requireAuth = false, requireAdmin = f
 
   // If route requires auth but user is not authenticated
   if (requireAuth && !user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  // If route requires admin role but user is not admin
-  if (requireAdmin && (!user || profile?.role !== 'admin')) {
     return <Navigate to="/auth" replace />;
   }
 

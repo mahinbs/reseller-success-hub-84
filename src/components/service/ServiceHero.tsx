@@ -71,7 +71,7 @@ export const ServiceHero = ({ service, onGetStarted }: ServiceHeroProps) => {
             
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-in-delay">
               <Button size="lg" onClick={onGetStarted} className="gradient-primary group">
-                Get Started - ₹{service.price}/{service.billing_period}
+                Get Started - ${service.price}/{service.billing_period}
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button size="lg" variant="outline" className="glass-subtle">

@@ -1,99 +1,164 @@
 
-import React from 'react';
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as Sonner } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from 'next-themes';
-import Index from './pages/Index';
-import Auth from './pages/Auth';
-import CustomerDashboard from './pages/CustomerDashboard';
-import AdminDashboard from './pages/AdminDashboard';
-import { AdminRouter } from './components/admin/AdminRouter';
-import { CustomerRouter } from './components/customer/CustomerRouter';
-import About from './pages/About';
-import Portfolio from './pages/Portfolio';
-import Cart from './pages/Cart';
-import NotFound from './pages/NotFound';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { DashboardLayout } from './components/layout/DashboardLayout';
-import { ChatWidget } from './components/chat/ChatWidget';
-import { ChatWidgetProvider } from './hooks/useChatWidget';
-import { useAuth, AuthProvider } from './hooks/useAuth';
-import { CartProvider } from './hooks/useCart';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
+import { CartProvider } from "@/hooks/useCart";
+import { Header } from "@/components/layout/Header";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import Index from "./pages/Index";
+import AuthPage from "./pages/Auth";
+import ServicesPage from "./pages/Services";
+import ServiceLandingPage from "./pages/ServiceLandingPage";
+import Portfolio from "./pages/Portfolio";
+import Bundles from "./pages/Bundles";
+import BundleDetail from "./pages/BundleDetail";
+import About from "./pages/About";
+import CartPage from "./pages/Cart";
+import CustomerDashboard from "./pages/CustomerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <CartProvider>
         <TooltipProvider>
-          <AuthProvider>
-            <CartProvider>
-              <BrowserRouter>
-                <ChatWidgetProvider>
-                  <div className="min-h-screen bg-background">
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/portfolio" element={<Portfolio />} />
-                    <Route path="/cart" element={<Cart />} />
-                    
-                    {/* Customer Dashboard Routes */}
-                    <Route 
-                      path="/dashboard/*" 
-                      element={
-                        <ProtectedRoute>
-                          <DashboardLayout>
-                            <CustomerRouter />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      } 
-                    />
-                    
-                    {/* Admin Dashboard Routes */}
-                    <Route 
-                      path="/admin/*" 
-                      element={
-                        <ProtectedRoute requireAdmin>
-                          <DashboardLayout>
-                            <AdminRouter />
-                          </DashboardLayout>
-                        </ProtectedRoute>
-                      } 
-                    />
-                    
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                  
-                  {/* Global Chat Widget */}
-                  <AuthenticatedChatWidget />
-                  </div>
-                </ChatWidgetProvider>
-              </BrowserRouter>
-            </CartProvider>
-          </AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="min-h-screen bg-background">
+              <Routes>
+                {/* Public routes with header */}
+                <Route path="/" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <Index />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/auth" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <AuthPage />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/services" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <ServicesPage />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/services/:slug" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <ServiceLandingPage />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/service/:slug" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <ServiceLandingPage />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/portfolio" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <Portfolio />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/bundles" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <Bundles />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/bundles/:id" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <BundleDetail />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/about" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <About />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/cart" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <CartPage />
+                    </ProtectedRoute>
+                  </>
+                } />
+                
+                {/* Protected dashboard routes with sidebar layout */}
+                <Route path="/dashboard/*" element={
+                  <ProtectedRoute requireAuth={true}>
+                    <DashboardLayout>
+                      <Routes>
+                        <Route index element={<CustomerDashboard />} />
+                        <Route path="services" element={<CustomerDashboard activeTab="services" />} />
+                        <Route path="bundles" element={<CustomerDashboard activeTab="bundles" />} />
+                        <Route path="purchases" element={<CustomerDashboard activeTab="purchases" />} />
+                        <Route path="cart" element={<CartPage />} />
+                        <Route path="profile" element={<CustomerDashboard activeTab="profile" />} />
+                        <Route path="support" element={<CustomerDashboard activeTab="support" />} />
+                      </Routes>
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                
+                {/* Protected admin routes with sidebar layout */}
+                <Route path="/admin/*" element={
+                  <ProtectedRoute requireAuth={true}>
+                    <DashboardLayout>
+                      <Routes>
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="services" element={<AdminDashboard activeTab="services" />} />
+                        <Route path="bundles" element={<AdminDashboard activeTab="bundles" />} />
+                        <Route path="users" element={<AdminDashboard activeTab="users" />} />
+                        <Route path="purchases" element={<AdminDashboard activeTab="purchases" />} />
+                        <Route path="analytics" element={<AdminDashboard activeTab="analytics" />} />
+                        <Route path="settings" element={<AdminDashboard activeTab="settings" />} />
+                      </Routes>
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                
+                {/* Catch-all route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </BrowserRouter>
         </TooltipProvider>
-        <Toaster />
-        <Sonner />
-      </ThemeProvider>
-    </QueryClientProvider>
-  );
-}
-
-// Component to conditionally render chat widget for authenticated users
-const AuthenticatedChatWidget: React.FC = () => {
-  const { user, profile } = useAuth();
-  
-  // Only show chat widget for authenticated customers (not admins)
-  if (!user || profile?.role === 'admin') {
-    return null;
-  }
-  
-  return <ChatWidget />;
-};
+      </CartProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;

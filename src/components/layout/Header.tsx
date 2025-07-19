@@ -49,6 +49,12 @@ export const Header = () => {
         {!user && (
           <nav className="hidden md:flex items-center space-x-6">
             <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+              <Link to="/services">Services</Link>
+            </Button>
+            <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+              <Link to="/bundles">Bundles</Link>
+            </Button>
+            <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
               <Link to="/about">About</Link>
             </Button>
           </nav>
