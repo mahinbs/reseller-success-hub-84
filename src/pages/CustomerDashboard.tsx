@@ -811,8 +811,10 @@ const CustomerDashboard = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full glass-button">
-                Contact via Email
+              <Button asChild variant="outline" className="w-full glass-button">
+                <a href="mailto:ceo@boostmysites.com">
+                  Contact via Email
+                </a>
               </Button>
             </CardContent>
           </Card>
