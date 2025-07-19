@@ -24,6 +24,7 @@ import { DeleteConfirmationModal } from '@/components/admin/DeleteConfirmationMo
 import { ServiceFormData } from '@/components/admin/ServiceForm';
 import { BundleFormData } from '@/components/admin/BundleForm';
 import { useToast } from '@/hooks/use-toast';
+import { AdminChatDashboard } from '@/components/chat/AdminChatDashboard';
 
 interface AdminStats {
   totalUsers: number;
@@ -65,7 +66,7 @@ interface User {
 }
 
 interface AdminDashboardProps {
-  activeTab?: 'overview' | 'services' | 'bundles' | 'users' | 'purchases' | 'analytics' | 'settings';
+  activeTab?: 'overview' | 'services' | 'bundles' | 'users' | 'purchases' | 'analytics' | 'settings' | 'chat';
 }
 
 const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
@@ -496,6 +497,8 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         return renderAnalyticsTab();
       case 'settings':
         return renderSettingsTab();
+      case 'chat':
+        return renderChatTab();
       default:
         return renderOverviewTab();
     }
@@ -860,6 +863,17 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
             <p className="text-muted-foreground">System configuration and platform settings will be available here</p>
           </CardContent>
         </Card>
+      </div>
+    </div>
+  );
+
+  const renderChatTab = () => (
+    <div className="py-8 px-4">
+      <div className="container mx-auto max-w-7xl">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent mb-8">
+          Live Chat Management
+        </h1>
+        <AdminChatDashboard />
       </div>
     </div>
   );
