@@ -16,6 +16,7 @@ interface Service {
   price: number;
   billing_period: string;
   features: any;
+  image_url: string;
 }
 
 interface ServicesSectionProps {
@@ -90,10 +91,22 @@ export const ServicesSection = ({ services, loading }: ServicesSectionProps) => 
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               {filteredServices.slice(0, 9).map((service) => (
-                <Card key={service.id} className="glass-subtle hover:scale-105 transition-all-smooth group h-full">
-                  <CardHeader>
+                <Card 
+                  key={service.id} 
+                  className="glass-subtle hover:scale-105 transition-all-smooth group h-full relative overflow-hidden"
+                  style={{
+                    backgroundImage: service.image_url ? `url(${service.image_url})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                  }}
+                >
+                  {/* Dark overlay for better text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60 backdrop-blur-[2px]"></div>
+                  
+                  <CardHeader className="relative z-10">
                     <div className="flex justify-between items-start mb-2">
-                      <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                      <CardTitle className="text-xl group-hover:text-primary transition-colors text-white">
                         <Link to={`/service/${createServiceSlug(service.name)}`} className="hover:text-primary">
                           {service.name}
                         </Link>
@@ -102,23 +115,23 @@ export const ServicesSection = ({ services, loading }: ServicesSectionProps) => 
                         {service.category}
                       </Badge>
                     </div>
-                    <CardDescription className="line-clamp-3 text-base">
+                    <CardDescription className="line-clamp-3 text-base text-gray-200">
                       {service.description}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="flex-1 flex flex-col justify-between">
+                  <CardContent className="flex-1 flex flex-col justify-between relative z-10">
                     <div className="mb-6">
                       <div className="flex items-baseline gap-2 mb-4">
                         <span className="text-3xl font-bold text-primary">₹{service.price}</span>
-                        <span className="text-muted-foreground">/{service.billing_period}</span>
+                        <span className="text-gray-300">/{service.billing_period}</span>
                       </div>
                       
                       {service.features && Array.isArray(service.features) && service.features.length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-sm font-medium text-muted-foreground">Key Features:</p>
+                          <p className="text-sm font-medium text-gray-300">Key Features:</p>
                           <ul className="space-y-1">
                             {service.features.slice(0, 3).map((feature, index) => (
-                              <li key={index} className="text-sm text-muted-foreground flex items-center gap-2">
+                              <li key={index} className="text-sm text-gray-200 flex items-center gap-2">
                                 <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
                                 {feature}
                               </li>

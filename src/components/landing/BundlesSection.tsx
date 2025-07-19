@@ -11,6 +11,7 @@ interface Bundle {
   description: string;
   discount_percentage: number;
   total_price: number;
+  image_url: string;
 }
 
 interface BundlesSectionProps {
@@ -45,9 +46,21 @@ export const BundlesSection = ({ bundles, loading }: BundlesSectionProps) => {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {bundles.map((bundle, index) => (
-              <Card key={bundle.id} className={`glass hover:scale-105 transition-all-smooth group relative ${index === 1 ? 'ring-2 ring-primary' : ''}`}>
+              <Card 
+                key={bundle.id} 
+                className={`glass hover:scale-105 transition-all-smooth group relative overflow-hidden ${index === 1 ? 'ring-2 ring-primary' : ''}`}
+                style={{
+                  backgroundImage: bundle.image_url ? `url(${bundle.image_url})` : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
+              >
+                {/* Dark overlay for better text readability */}
+                <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60 backdrop-blur-[2px]"></div>
+                
                 {index === 1 && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
                     <Badge className="gradient-primary text-white px-4 py-1 flex items-center gap-1">
                       <Star className="h-3 w-3" />
                       Most Popular
@@ -55,26 +68,26 @@ export const BundlesSection = ({ bundles, loading }: BundlesSectionProps) => {
                   </div>
                 )}
                 
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-4 relative z-10">
                   <div className="flex justify-between items-start mb-2">
-                    <CardTitle className="text-2xl font-bold">{bundle.name}</CardTitle>
+                    <CardTitle className="text-2xl font-bold text-white">{bundle.name}</CardTitle>
                     <Badge className="gradient-primary text-white flex items-center gap-1">
                       <Zap className="h-3 w-3" />
                       -{bundle.discount_percentage}%
                     </Badge>
                   </div>
-                  <CardDescription className="text-base leading-relaxed">
+                  <CardDescription className="text-base leading-relaxed text-gray-200">
                     {bundle.description}
                   </CardDescription>
                 </CardHeader>
                 
-                <CardContent>
+                <CardContent className="relative z-10">
                   <div className="mb-6">
                     <div className="flex items-baseline gap-2 mb-2">
                       <span className="text-4xl font-bold text-primary">₹{bundle.total_price}</span>
-                      <span className="text-muted-foreground">/month</span>
+                      <span className="text-gray-300">/month</span>
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-gray-300">
                       Save ₹{Math.round((bundle.total_price * bundle.discount_percentage) / (100 - bundle.discount_percentage))} per month
                     </div>
                   </div>
@@ -82,15 +95,15 @@ export const BundlesSection = ({ bundles, loading }: BundlesSectionProps) => {
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-2 text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span>Multiple premium services included</span>
+                      <span className="text-gray-200">Multiple premium services included</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span>Priority support & faster delivery</span>
+                      <span className="text-gray-200">Priority support & faster delivery</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span>Flexible scaling options</span>
+                      <span className="text-gray-200">Flexible scaling options</span>
                     </div>
                   </div>
                   

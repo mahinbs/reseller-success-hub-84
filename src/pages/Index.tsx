@@ -16,6 +16,7 @@ interface Service {
   price: number;
   billing_period: string;
   features: any;
+  image_url: string;
 }
 
 interface Bundle {
@@ -24,6 +25,7 @@ interface Bundle {
   description: string;
   discount_percentage: number;
   total_price: number;
+  image_url: string;
 }
 
 const Index = () => {
@@ -43,11 +45,18 @@ const Index = () => {
           const formattedServices = servicesResponse.data.map(service => ({
             ...service,
             features: Array.isArray(service.features) ? service.features : 
-                     typeof service.features === 'string' ? JSON.parse(service.features || '[]') : []
+                     typeof service.features === 'string' ? JSON.parse(service.features || '[]') : [],
+            image_url: service.image_url || ''
           }));
           setServices(formattedServices);
         }
-        if (bundlesResponse.data) setBundles(bundlesResponse.data);
+        if (bundlesResponse.data) {
+          const formattedBundles = bundlesResponse.data.map(bundle => ({
+            ...bundle,
+            image_url: bundle.image_url || ''
+          }));
+          setBundles(formattedBundles);
+        }
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
