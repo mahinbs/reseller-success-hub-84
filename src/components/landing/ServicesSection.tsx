@@ -93,7 +93,7 @@ export const ServicesSection = ({ services, loading }: ServicesSectionProps) => 
               {filteredServices.slice(0, 9).map((service) => (
                 <Card 
                   key={service.id} 
-                  className="glass-subtle hover:scale-105 transition-all-smooth group h-full relative overflow-hidden"
+                  className="glass-subtle hover:scale-105 transition-all-smooth group relative overflow-hidden flex flex-col"
                   style={{
                     backgroundImage: service.image_url ? `url(${service.image_url})` : undefined,
                     backgroundSize: 'cover',
@@ -104,7 +104,7 @@ export const ServicesSection = ({ services, loading }: ServicesSectionProps) => 
                   {/* Enhanced dark overlay with stronger blur for better text readability */}
                   <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/70 to-black/85 backdrop-blur-lg"></div>
                   
-                  <CardHeader className="relative z-10">
+                  <CardHeader className="relative z-10 flex-shrink-0">
                     <div className="flex justify-between items-start mb-2">
                       <CardTitle className="text-xl group-hover:text-primary transition-colors text-white font-bold">
                         <Link to={`/service/${createServiceSlug(service.name)}`} className="hover:text-primary">
@@ -119,8 +119,9 @@ export const ServicesSection = ({ services, loading }: ServicesSectionProps) => 
                       {service.description}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="flex-1 flex flex-col justify-between relative z-10">
-                    <div className="mb-6">
+                  
+                  <CardContent className="flex-1 flex flex-col relative z-10">
+                    <div className="flex-1 mb-6">
                       <div className="flex items-baseline gap-2 mb-4">
                         <span className="text-3xl font-bold text-primary">₹{service.price}</span>
                         <span className="text-gray-200 font-medium">/{service.billing_period}</span>
@@ -141,14 +142,16 @@ export const ServicesSection = ({ services, loading }: ServicesSectionProps) => 
                       )}
                     </div>
                     
-                    <Button 
-                      asChild
-                      className="w-full group-hover:scale-105 transition-all-smooth gradient-primary font-semibold"
-                    >
-                      <Link to={`/service/${createServiceSlug(service.name)}`}>
-                        Get Started <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+                    <div className="mt-auto">
+                      <Button 
+                        asChild
+                        className="w-full group-hover:scale-105 transition-all-smooth gradient-primary font-semibold"
+                      >
+                        <Link to={`/service/${createServiceSlug(service.name)}`}>
+                          Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
