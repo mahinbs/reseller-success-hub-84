@@ -50,7 +50,7 @@ const navigationItems = [
   },
   {
     title: 'Cart',
-    url: '/dashboard/cart',
+    url: '/cart',
     icon: ShoppingCart,
     showBadge: true
   },

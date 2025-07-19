@@ -11,6 +11,7 @@ import Auth from './pages/Auth';
 import CustomerDashboard from './pages/CustomerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import { AdminRouter } from './components/admin/AdminRouter';
+import { CustomerRouter } from './components/customer/CustomerRouter';
 import About from './pages/About';
 import Portfolio from './pages/Portfolio';
 import Cart from './pages/Cart';
@@ -43,11 +44,11 @@ function App() {
                     
                     {/* Customer Dashboard Routes */}
                     <Route 
-                      path="/dashboard" 
+                      path="/dashboard/*" 
                       element={
                         <ProtectedRoute>
                           <DashboardLayout>
-                            <CustomerDashboard />
+                            <CustomerRouter />
                           </DashboardLayout>
                         </ProtectedRoute>
                       } 
