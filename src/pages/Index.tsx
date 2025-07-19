@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { Header } from '@/components/layout/Header';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { ServicesSection } from '@/components/landing/ServicesSection';
 import { BundlesSection } from '@/components/landing/BundlesSection';
@@ -69,6 +70,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <Header />
       <HeroSection />
       <ServicesSection services={services} loading={loading} />
       <BundlesSection bundles={bundles} loading={loading} />
