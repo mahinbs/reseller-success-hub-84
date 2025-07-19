@@ -19,7 +19,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { ChatWidget } from './components/chat/ChatWidget';
 import { ChatWidgetProvider } from './hooks/useChatWidget';
-import { useAuth } from './hooks/useAuth';
+import { useAuth, AuthProvider } from './hooks/useAuth';
 
 const queryClient = new QueryClient();
 
@@ -28,48 +28,50 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TooltipProvider>
-          <BrowserRouter>
-            <ChatWidgetProvider>
-              <div className="min-h-screen bg-background">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/portfolio" element={<Portfolio />} />
-                  <Route path="/cart" element={<Cart />} />
+          <AuthProvider>
+            <BrowserRouter>
+              <ChatWidgetProvider>
+                <div className="min-h-screen bg-background">
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/portfolio" element={<Portfolio />} />
+                    <Route path="/cart" element={<Cart />} />
+                    
+                    {/* Customer Dashboard Routes */}
+                    <Route 
+                      path="/dashboard" 
+                      element={
+                        <ProtectedRoute>
+                          <DashboardLayout>
+                            <CustomerDashboard />
+                          </DashboardLayout>
+                        </ProtectedRoute>
+                      } 
+                    />
+                    
+                    {/* Admin Dashboard Routes */}
+                    <Route 
+                      path="/admin/*" 
+                      element={
+                        <ProtectedRoute requireAdmin>
+                          <DashboardLayout>
+                            <AdminRouter />
+                          </DashboardLayout>
+                        </ProtectedRoute>
+                      } 
+                    />
+                    
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
                   
-                  {/* Customer Dashboard Routes */}
-                  <Route 
-                    path="/dashboard" 
-                    element={
-                      <ProtectedRoute>
-                        <DashboardLayout>
-                          <CustomerDashboard />
-                        </DashboardLayout>
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* Admin Dashboard Routes */}
-                  <Route 
-                    path="/admin/*" 
-                    element={
-                      <ProtectedRoute requireAdmin>
-                        <DashboardLayout>
-                          <AdminRouter />
-                        </DashboardLayout>
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-                
-                {/* Global Chat Widget */}
-                <AuthenticatedChatWidget />
-              </div>
-            </ChatWidgetProvider>
-          </BrowserRouter>
+                  {/* Global Chat Widget */}
+                  <AuthenticatedChatWidget />
+                </div>
+              </ChatWidgetProvider>
+            </BrowserRouter>
+          </AuthProvider>
         </TooltipProvider>
         <Toaster />
         <Sonner />
