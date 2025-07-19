@@ -4,20 +4,92 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import CustomerDashboard from '@/pages/CustomerDashboard';
 
 export function CustomerRouter() {
-  console.log('CustomerRouter rendering');
+  console.log('🛣️ CustomerRouter rendering');
   
   return (
     <div className="min-h-screen bg-background">
       <Routes>
-        <Route path="/" element={<CustomerDashboard activeTab="overview" />} />
-        <Route path="/services" element={<CustomerDashboard activeTab="services" />} />
-        <Route path="/bundles" element={<CustomerDashboard activeTab="bundles" />} />
-        <Route path="/purchases" element={<CustomerDashboard activeTab="purchases" />} />
-        <Route path="/cart" element={<Navigate to="/cart" replace />} />
-        <Route path="/profile" element={<CustomerDashboard activeTab="profile" />} />
-        <Route path="/faq" element={<CustomerDashboard activeTab="faq" />} />
-        <Route path="/support" element={<CustomerDashboard activeTab="support" />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route 
+          path="/" 
+          element={
+            <div>
+              {console.log('🏠 Rendering CustomerDashboard with overview tab')}
+              <CustomerDashboard activeTab="overview" />
+            </div>
+          } 
+        />
+        <Route 
+          path="/services" 
+          element={
+            <div>
+              {console.log('🛍️ Rendering CustomerDashboard with services tab')}
+              <CustomerDashboard activeTab="services" />
+            </div>
+          } 
+        />
+        <Route 
+          path="/bundles" 
+          element={
+            <div>
+              {console.log('📦 Rendering CustomerDashboard with bundles tab')}
+              <CustomerDashboard activeTab="bundles" />
+            </div>
+          } 
+        />
+        <Route 
+          path="/purchases" 
+          element={
+            <div>
+              {console.log('💰 Rendering CustomerDashboard with purchases tab')}
+              <CustomerDashboard activeTab="purchases" />
+            </div>
+          } 
+        />
+        <Route 
+          path="/cart" 
+          element={
+            <div>
+              {console.log('🛒 Redirecting /dashboard/cart to /cart')}
+              <Navigate to="/cart" replace />
+            </div>
+          } 
+        />
+        <Route 
+          path="/profile" 
+          element={
+            <div>
+              {console.log('👤 Rendering CustomerDashboard with profile tab')}
+              <CustomerDashboard activeTab="profile" />
+            </div>
+          } 
+        />
+        <Route 
+          path="/faq" 
+          element={
+            <div>
+              {console.log('❓ Rendering CustomerDashboard with faq tab')}
+              <CustomerDashboard activeTab="faq" />
+            </div>
+          } 
+        />
+        <Route 
+          path="/support" 
+          element={
+            <div>
+              {console.log('🆘 Rendering CustomerDashboard with support tab')}
+              <CustomerDashboard activeTab="support" />
+            </div>
+          } 
+        />
+        <Route 
+          path="*" 
+          element={
+            <div>
+              {console.log('🔄 Wildcard route, redirecting to /dashboard')}
+              <Navigate to="/dashboard" replace />
+            </div>
+          } 
+        />
       </Routes>
     </div>
   );

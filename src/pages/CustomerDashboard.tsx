@@ -67,11 +67,20 @@ interface CustomerDashboardProps {
 const CustomerDashboard = ({
   activeTab = 'overview'
 }: CustomerDashboardProps) => {
+  console.log('🚀 CustomerDashboard component rendered with activeTab:', activeTab);
+  
   const {
     user,
     profile,
     loading: authLoading
   } = useAuth();
+  
+  console.log('🔐 Auth state:', { 
+    user: user ? 'present' : 'null',
+    profile: profile ? { role: profile.role, email: profile.email } : 'null',
+    authLoading 
+  });
+
   const {
     addToCart
   } = useCart();
@@ -93,23 +102,20 @@ const CustomerDashboard = ({
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [faqSearchTerm, setFaqSearchTerm] = useState('');
 
-  // Debug logging
-  console.log('CustomerDashboard render:', {
-    activeTab,
-    authLoading,
-    user: user ? 'present' : 'null',
-    profile: profile ? { role: profile.role } : 'null',
-    loading
-  });
-
   useEffect(() => {
-    console.log('CustomerDashboard useEffect triggered:', { user: !!user });
-    if (!user) return;
+    console.log('📊 CustomerDashboard useEffect triggered with user:', !!user);
+    if (!user) {
+      console.log('❌ No user found, skipping data load');
+      return;
+    }
     
     const loadData = async () => {
-      console.log('Loading data for user:', user.id);
+      console.log('📥 Starting data load for user:', user.id);
       try {
-        const [servicesResponse, bundlesResponse, purchasesResponse] = await Promise.all([supabase.from('services').select('*').eq('is_active', true), supabase.from('bundles').select('*').eq('is_active', true), supabase.from('purchases').select(`
+        const [servicesResponse, bundlesResponse, purchasesResponse] = await Promise.all([
+          supabase.from('services').select('*').eq('is_active', true), 
+          supabase.from('bundles').select('*').eq('is_active', true), 
+          supabase.from('purchases').select(`
               id,
               total_amount,
               payment_status,
@@ -117,12 +123,16 @@ const CustomerDashboard = ({
               purchase_items(item_name, item_price)
             `).eq('user_id', user.id).order('created_at', {
           ascending: false
-        }).limit(5)]);
+        }).limit(5)
+        ]);
         
-        console.log('Data loaded:', {
+        console.log('📈 Data responses:', {
           services: servicesResponse.data?.length || 0,
           bundles: bundlesResponse.data?.length || 0,
-          purchases: purchasesResponse.data?.length || 0
+          purchases: purchasesResponse.data?.length || 0,
+          servicesError: servicesResponse.error,
+          bundlesError: bundlesResponse.error,
+          purchasesError: purchasesResponse.error
         });
 
         if (servicesResponse.data) {
@@ -132,6 +142,7 @@ const CustomerDashboard = ({
           }));
           setServices(formattedServices);
         }
+        
         if (bundlesResponse.data) {
           // Fetch services for each bundle
           const bundlesWithServices = await Promise.all(bundlesResponse.data.map(async bundle => {
@@ -166,39 +177,40 @@ const CustomerDashboard = ({
           });
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('❌ Error loading data:', error);
       } finally {
-        console.log('Data loading complete, setting loading to false');
+        console.log('✅ Data loading complete, setting loading to false');
         setLoading(false);
       }
     };
     loadData();
   }, [user]);
 
-  // Show loading spinner with better visibility
+  // Enhanced loading state with better visibility
   if (authLoading) {
-    console.log('Showing auth loading spinner');
+    console.log('⏳ Showing auth loading spinner');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
+        <div className="text-center p-8 rounded-lg border bg-card">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading dashboard...</p>
+          <p className="text-muted-foreground text-lg">Loading dashboard...</p>
+          <p className="text-sm text-muted-foreground mt-2">Authenticating user...</p>
         </div>
       </div>
     );
   }
 
   if (!user) {
-    console.log('No user, redirecting to auth');
+    console.log('🔄 No user, redirecting to auth');
     return <Navigate to="/auth" replace />;
   }
 
   if (profile?.role === 'admin') {
-    console.log('Admin user, redirecting to admin dashboard');
+    console.log('👑 Admin user, redirecting to admin dashboard');
     return <Navigate to="/admin" replace />;
   }
 
-  console.log('Rendering dashboard content for tab:', activeTab);
+  console.log('🎯 Rendering dashboard content for tab:', activeTab);
 
   const categories = ['all', ...Array.from(new Set(services.map(s => s.category)))];
   const filteredServices = services.filter(service => {
@@ -232,7 +244,7 @@ const CustomerDashboard = ({
   };
 
   const renderContent = () => {
-    console.log('Rendering content for activeTab:', activeTab);
+    console.log('🖼️ Rendering content for activeTab:', activeTab);
     switch (activeTab) {
       case 'services':
         return renderServicesTab();
@@ -247,160 +259,163 @@ const CustomerDashboard = ({
       case 'faq':
         return renderFaqTab();
       default:
-        console.log('Rendering overview tab');
+        console.log('🏠 Rendering overview tab (default)');
         return renderOverviewTab();
     }
   };
 
-  const renderOverviewTab = () => (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
-      {/* Profile Dashboard Section */}
-      <div className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5 py-8 px-4">
-        <div className="container mx-auto max-w-7xl">
-          {/* Welcome Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Welcome back, {profile?.full_name || 'Customer'}!
-            </h1>
-            <p className="text-muted-foreground text-lg">Your AI Services Dashboard</p>
-          </div>
+  const renderOverviewTab = () => {
+    console.log('📊 Rendering overview tab with stats:', userStats);
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
+        {/* Profile Dashboard Section */}
+        <div className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5 py-8 px-4">
+          <div className="container mx-auto max-w-7xl">
+            {/* Welcome Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Welcome back, {profile?.full_name || 'Customer'}!
+              </h1>
+              <p className="text-muted-foreground text-lg">Your AI Services Dashboard</p>
+            </div>
 
-          {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="glass-card hover:glow-subtle transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Purchases</p>
-                    <p className="text-3xl font-bold text-primary">{userStats.totalPurchases}</p>
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Card className="glass-card hover:glow-subtle transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Total Purchases</p>
+                      <p className="text-3xl font-bold text-primary">{userStats.totalPurchases}</p>
+                    </div>
+                    <div className="p-3 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-full">
+                      <Package className="h-6 w-6 text-primary" />
+                    </div>
                   </div>
-                  <div className="p-3 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-full">
-                    <Package className="h-6 w-6 text-primary" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card className="glass-card hover:glow-subtle transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
-                    <p className="text-3xl font-bold text-green-500">₹{userStats.totalSpent.toFixed(2)}</p>
+              <Card className="glass-card hover:glow-subtle transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
+                      <p className="text-3xl font-bold text-green-500">₹{userStats.totalSpent.toFixed(2)}</p>
+                    </div>
+                    <div className="p-3 bg-gradient-to-br from-green-500/20 to-emerald-400/20 rounded-full">
+                      <DollarSign className="h-6 w-6 text-green-500" />
+                    </div>
                   </div>
-                  <div className="p-3 bg-gradient-to-br from-green-500/20 to-emerald-400/20 rounded-full">
-                    <DollarSign className="h-6 w-6 text-green-500" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card className="glass-card hover:glow-subtle transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Active Services</p>
-                    <p className="text-3xl font-bold text-purple-500">{userStats.activeServices}</p>
+              <Card className="glass-card hover:glow-subtle transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Active Services</p>
+                      <p className="text-3xl font-bold text-purple-500">{userStats.activeServices}</p>
+                    </div>
+                    <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full">
+                      <TrendingUp className="h-6 w-6 text-purple-500" />
+                    </div>
                   </div>
-                  <div className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full">
-                    <TrendingUp className="h-6 w-6 text-purple-500" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* Profile Information & Purchase History */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Profile Info */}
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
-                  Profile Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-full">
-                    <User className="h-4 w-4 text-primary" />
+            {/* Profile Information & Purchase History */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {/* Profile Info */}
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-primary" />
+                    Profile Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-full">
+                      <User className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{profile?.full_name || 'Not set'}</p>
+                      <p className="text-sm text-muted-foreground">Full Name</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">{profile?.full_name || 'Not set'}</p>
-                    <p className="text-sm text-muted-foreground">Full Name</p>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full">
+                      <Mail className="h-4 w-4 text-blue-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{profile?.email}</p>
+                      <p className="text-sm text-muted-foreground">Email Address</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full">
-                    <Mail className="h-4 w-4 text-blue-500" />
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full">
+                      <Calendar className="h-4 w-4 text-purple-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Customer</p>
+                      <p className="text-sm text-muted-foreground">Account Type</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">{profile?.email}</p>
-                    <p className="text-sm text-muted-foreground">Email Address</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full">
-                    <Calendar className="h-4 w-4 text-purple-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Customer</p>
-                    <p className="text-sm text-muted-foreground">Account Type</p>
-                  </div>
-                </div>
-                <Button variant="outline" className="w-full mt-4 glass-button hover:glow-button transition-all duration-300" onClick={() => setIsProfileModalOpen(true)}>
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Edit Profile
-                </Button>
-              </CardContent>
-            </Card>
+                  <Button variant="outline" className="w-full mt-4 glass-button hover:glow-button transition-all duration-300" onClick={() => setIsProfileModalOpen(true)}>
+                    <Edit3 className="h-4 w-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                </CardContent>
+              </Card>
 
-            {/* Recent Purchases */}
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
-                  Recent Purchases
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {recentPurchases.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                    <p className="text-muted-foreground mb-4">No purchases yet</p>
-                    <Button asChild className="glass-button hover:glow-button transition-all duration-300">
-                      <Link to="/dashboard/services">Browse Services</Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {recentPurchases.slice(0, 3).map(purchase => (
-                      <div key={purchase.id} className="flex items-center justify-between p-3 glass-subtle rounded-lg">
-                        <div>
-                          <p className="font-medium text-sm">
-                            {purchase.purchase_items?.[0]?.item_name || 'Purchase'}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(purchase.created_at).toLocaleDateString()}
-                          </p>
+              {/* Recent Purchases */}
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                    Recent Purchases
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {recentPurchases.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                      <p className="text-muted-foreground mb-4">No purchases yet</p>
+                      <Button asChild className="glass-button hover:glow-button transition-all duration-300">
+                        <Link to="/dashboard/services">Browse Services</Link>
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {recentPurchases.slice(0, 3).map(purchase => (
+                        <div key={purchase.id} className="flex items-center justify-between p-3 glass-subtle rounded-lg">
+                          <div>
+                            <p className="font-medium text-sm">
+                              {purchase.purchase_items?.[0]?.item_name || 'Purchase'}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(purchase.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-sm">₹{purchase.total_amount}</p>
+                            <Badge variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'} className="text-xs">
+                              {purchase.payment_status}
+                            </Badge>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold text-sm">₹{purchase.total_amount}</p>
-                          <Badge variant={purchase.payment_status === 'completed' ? 'default' : 'secondary'} className="text-xs">
-                            {purchase.payment_status}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderServicesTab = () => (
     <div className="py-8 px-4">
@@ -1101,14 +1116,15 @@ const CustomerDashboard = ({
     );
   };
 
+  console.log('🎨 About to render final result');
   const result = (
-    <>
+    <div className="min-h-screen bg-background">
       {renderContent()}
       <ProfileEditModal open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen} />
-    </>
+    </div>
   );
 
-  console.log('CustomerDashboard returning result');
+  console.log('✅ CustomerDashboard returning result');
   return result;
 };
 
