@@ -11,84 +11,66 @@ export function CustomerRouter() {
       <Routes>
         <Route 
           path="/" 
-          element={
-            <div>
-              {console.log('🏠 Rendering CustomerDashboard with overview tab')}
-              <CustomerDashboard activeTab="overview" />
-            </div>
-          } 
+          element={(() => {
+            console.log('🏠 Rendering CustomerDashboard with overview tab');
+            return <CustomerDashboard activeTab="overview" />;
+          })()} 
         />
         <Route 
           path="/services" 
-          element={
-            <div>
-              {console.log('🛍️ Rendering CustomerDashboard with services tab')}
-              <CustomerDashboard activeTab="services" />
-            </div>
-          } 
+          element={(() => {
+            console.log('🛍️ Rendering CustomerDashboard with services tab');
+            return <CustomerDashboard activeTab="services" />;
+          })()} 
         />
         <Route 
           path="/bundles" 
-          element={
-            <div>
-              {console.log('📦 Rendering CustomerDashboard with bundles tab')}
-              <CustomerDashboard activeTab="bundles" />
-            </div>
-          } 
+          element={(() => {
+            console.log('📦 Rendering CustomerDashboard with bundles tab');
+            return <CustomerDashboard activeTab="bundles" />;
+          })()} 
         />
         <Route 
           path="/purchases" 
-          element={
-            <div>
-              {console.log('💰 Rendering CustomerDashboard with purchases tab')}
-              <CustomerDashboard activeTab="purchases" />
-            </div>
-          } 
+          element={(() => {
+            console.log('💰 Rendering CustomerDashboard with purchases tab');
+            return <CustomerDashboard activeTab="purchases" />;
+          })()} 
         />
         <Route 
           path="/cart" 
-          element={
-            <div>
-              {console.log('🛒 Redirecting /dashboard/cart to /cart')}
-              <Navigate to="/cart" replace />
-            </div>
-          } 
+          element={(() => {
+            console.log('🛒 Redirecting /dashboard/cart to /cart');
+            return <Navigate to="/cart" replace />;
+          })()} 
         />
         <Route 
           path="/profile" 
-          element={
-            <div>
-              {console.log('👤 Rendering CustomerDashboard with profile tab')}
-              <CustomerDashboard activeTab="profile" />
-            </div>
-          } 
+          element={(() => {
+            console.log('👤 Rendering CustomerDashboard with profile tab');
+            return <CustomerDashboard activeTab="profile" />;
+          })()} 
         />
         <Route 
           path="/faq" 
-          element={
-            <div>
-              {console.log('❓ Rendering CustomerDashboard with faq tab')}
-              <CustomerDashboard activeTab="faq" />
-            </div>
-          } 
+          element={(() => {
+            console.log('❓ Rendering CustomerDashboard with faq tab');
+            return <CustomerDashboard activeTab="faq" />;
+          })()} 
         />
         <Route 
           path="/support" 
-          element={
-            <div>
-              {console.log('🆘 Rendering CustomerDashboard with support tab')}
-              <CustomerDashboard activeTab="support" />
-            </div>
-          } 
+          element={(() => {
+            console.log('🆘 Rendering CustomerDashboard with support tab');
+            return <CustomerDashboard activeTab="support" />;
+          })()} 
         />
         <Route 
           path="*" 
-          element={
-            <div>
-              {console.log('🔄 Wildcard route, redirecting to /dashboard')}
-              <Navigate to="/dashboard" replace />
-            </div>
-          } 
+          element={(() => {
+            console.log('🔄 Wildcard route, redirecting to /dashboard');
+            return <Navigate to="/dashboard" replace />;
+          })()} 
         />
       </Routes>
     </div>
