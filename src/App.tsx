@@ -20,6 +20,7 @@ import { DashboardLayout } from './components/layout/DashboardLayout';
 import { ChatWidget } from './components/chat/ChatWidget';
 import { ChatWidgetProvider } from './hooks/useChatWidget';
 import { useAuth, AuthProvider } from './hooks/useAuth';
+import { CartProvider } from './hooks/useCart';
 
 const queryClient = new QueryClient();
 
@@ -29,9 +30,10 @@ function App() {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TooltipProvider>
           <AuthProvider>
-            <BrowserRouter>
-              <ChatWidgetProvider>
-                <div className="min-h-screen bg-background">
+            <CartProvider>
+              <BrowserRouter>
+                <ChatWidgetProvider>
+                  <div className="min-h-screen bg-background">
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
@@ -68,9 +70,10 @@ function App() {
                   
                   {/* Global Chat Widget */}
                   <AuthenticatedChatWidget />
-                </div>
-              </ChatWidgetProvider>
-            </BrowserRouter>
+                  </div>
+                </ChatWidgetProvider>
+              </BrowserRouter>
+            </CartProvider>
           </AuthProvider>
         </TooltipProvider>
         <Toaster />
