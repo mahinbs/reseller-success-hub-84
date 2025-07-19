@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, X, Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -5,9 +6,10 @@ import { Card } from '@/components/ui/card';
 import { ChatWindow } from './ChatWindow';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useChatWidget } from '@/hooks/useChatWidget';
 
 export const ChatWidget: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, setIsOpen } = useChatWidget();
   const [isMinimized, setIsMinimized] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useAuth();

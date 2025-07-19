@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
+import { useChatWidget } from '@/hooks/useChatWidget';
 import { Navigate } from 'react-router-dom';
 import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare, Users, Handshake, Building, CreditCard, Settings, Star, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -74,6 +75,7 @@ const CustomerDashboard = ({
   const {
     addToCart
   } = useCart();
+  const { openChat } = useChatWidget();
   const {
     toast
   } = useToast();
@@ -794,7 +796,7 @@ const CustomerDashboard = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full glass-button hover:glow-button">
+              <Button onClick={openChat} className="w-full glass-button hover:glow-button">
                 Start Chat
               </Button>
             </CardContent>
@@ -1050,11 +1052,9 @@ const CustomerDashboard = ({
             </CardHeader>
             <CardContent>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button asChild className="flex-1 glass-button hover:glow-button transition-all duration-300">
-                  <Link to="/dashboard/support">
-                    <HelpCircle className="h-4 w-4 mr-2" />
-                    Contact Support
-                  </Link>
+                <Button onClick={openChat} className="flex-1 glass-button hover:glow-button transition-all duration-300">
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  Contact Support
                 </Button>
                 <Button variant="outline" className="flex-1 glass-button hover:glow-button transition-all duration-300">
                   <Mail className="h-4 w-4 mr-2" />
