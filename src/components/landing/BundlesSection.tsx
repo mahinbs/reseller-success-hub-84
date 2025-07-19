@@ -56,8 +56,8 @@ export const BundlesSection = ({ bundles, loading }: BundlesSectionProps) => {
                   backgroundRepeat: 'no-repeat'
                 }}
               >
-                {/* Dark overlay for better text readability */}
-                <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60 backdrop-blur-[2px]"></div>
+                {/* Enhanced dark overlay with stronger blur for better text readability */}
+                <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/70 to-black/85 backdrop-blur-lg"></div>
                 
                 {index === 1 && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
@@ -76,7 +76,7 @@ export const BundlesSection = ({ bundles, loading }: BundlesSectionProps) => {
                       -{bundle.discount_percentage}%
                     </Badge>
                   </div>
-                  <CardDescription className="text-base leading-relaxed text-gray-200">
+                  <CardDescription className="text-base leading-relaxed text-gray-100 font-medium">
                     {bundle.description}
                   </CardDescription>
                 </CardHeader>
@@ -85,9 +85,9 @@ export const BundlesSection = ({ bundles, loading }: BundlesSectionProps) => {
                   <div className="mb-6">
                     <div className="flex items-baseline gap-2 mb-2">
                       <span className="text-4xl font-bold text-primary">₹{bundle.total_price}</span>
-                      <span className="text-gray-300">/month</span>
+                      <span className="text-gray-200 font-medium">/month</span>
                     </div>
-                    <div className="text-sm text-gray-300">
+                    <div className="text-sm text-gray-100 font-medium">
                       Save ₹{Math.round((bundle.total_price * bundle.discount_percentage) / (100 - bundle.discount_percentage))} per month
                     </div>
                   </div>
@@ -95,19 +95,19 @@ export const BundlesSection = ({ bundles, loading }: BundlesSectionProps) => {
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-2 text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-gray-200">Multiple premium services included</span>
+                      <span className="text-gray-100 font-medium">Multiple premium services included</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-gray-200">Priority support & faster delivery</span>
+                      <span className="text-gray-100 font-medium">Priority support & faster delivery</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-gray-200">Flexible scaling options</span>
+                      <span className="text-gray-100 font-medium">Flexible scaling options</span>
                     </div>
                   </div>
                   
-                  <Button className={`w-full group-hover:scale-105 transition-all-smooth ${index === 1 ? 'gradient-primary' : ''}`}>
+                  <Button className={`w-full group-hover:scale-105 transition-all-smooth font-semibold ${index === 1 ? 'gradient-primary' : ''}`}>
                     Choose Bundle <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </CardContent>

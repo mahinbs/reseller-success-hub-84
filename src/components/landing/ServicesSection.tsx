@@ -101,12 +101,12 @@ export const ServicesSection = ({ services, loading }: ServicesSectionProps) => 
                     backgroundRepeat: 'no-repeat'
                   }}
                 >
-                  {/* Dark overlay for better text readability */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60 backdrop-blur-[2px]"></div>
+                  {/* Enhanced dark overlay with stronger blur for better text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/70 to-black/85 backdrop-blur-lg"></div>
                   
                   <CardHeader className="relative z-10">
                     <div className="flex justify-between items-start mb-2">
-                      <CardTitle className="text-xl group-hover:text-primary transition-colors text-white">
+                      <CardTitle className="text-xl group-hover:text-primary transition-colors text-white font-bold">
                         <Link to={`/service/${createServiceSlug(service.name)}`} className="hover:text-primary">
                           {service.name}
                         </Link>
@@ -115,7 +115,7 @@ export const ServicesSection = ({ services, loading }: ServicesSectionProps) => 
                         {service.category}
                       </Badge>
                     </div>
-                    <CardDescription className="line-clamp-3 text-base text-gray-200">
+                    <CardDescription className="line-clamp-3 text-base text-gray-100 font-medium">
                       {service.description}
                     </CardDescription>
                   </CardHeader>
@@ -123,15 +123,15 @@ export const ServicesSection = ({ services, loading }: ServicesSectionProps) => 
                     <div className="mb-6">
                       <div className="flex items-baseline gap-2 mb-4">
                         <span className="text-3xl font-bold text-primary">₹{service.price}</span>
-                        <span className="text-gray-300">/{service.billing_period}</span>
+                        <span className="text-gray-200 font-medium">/{service.billing_period}</span>
                       </div>
                       
                       {service.features && Array.isArray(service.features) && service.features.length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-sm font-medium text-gray-300">Key Features:</p>
+                          <p className="text-sm font-semibold text-gray-100">Key Features:</p>
                           <ul className="space-y-1">
                             {service.features.slice(0, 3).map((feature, index) => (
-                              <li key={index} className="text-sm text-gray-200 flex items-center gap-2">
+                              <li key={index} className="text-sm text-gray-100 flex items-center gap-2 font-medium">
                                 <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
                                 {feature}
                               </li>
@@ -143,7 +143,7 @@ export const ServicesSection = ({ services, loading }: ServicesSectionProps) => 
                     
                     <Button 
                       asChild
-                      className="w-full group-hover:scale-105 transition-all-smooth gradient-primary"
+                      className="w-full group-hover:scale-105 transition-all-smooth gradient-primary font-semibold"
                     >
                       <Link to={`/service/${createServiceSlug(service.name)}`}>
                         Get Started <ArrowRight className="ml-2 h-4 w-4" />
