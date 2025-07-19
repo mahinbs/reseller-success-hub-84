@@ -93,9 +93,21 @@ const CustomerDashboard = ({
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [faqSearchTerm, setFaqSearchTerm] = useState('');
 
+  // Debug logging
+  console.log('CustomerDashboard render:', {
+    activeTab,
+    authLoading,
+    user: user ? 'present' : 'null',
+    profile: profile ? { role: profile.role } : 'null',
+    loading
+  });
+
   useEffect(() => {
+    console.log('CustomerDashboard useEffect triggered:', { user: !!user });
     if (!user) return;
+    
     const loadData = async () => {
+      console.log('Loading data for user:', user.id);
       try {
         const [servicesResponse, bundlesResponse, purchasesResponse] = await Promise.all([supabase.from('services').select('*').eq('is_active', true), supabase.from('bundles').select('*').eq('is_active', true), supabase.from('purchases').select(`
               id,
@@ -106,6 +118,13 @@ const CustomerDashboard = ({
             `).eq('user_id', user.id).order('created_at', {
           ascending: false
         }).limit(5)]);
+        
+        console.log('Data loaded:', {
+          services: servicesResponse.data?.length || 0,
+          bundles: bundlesResponse.data?.length || 0,
+          purchases: purchasesResponse.data?.length || 0
+        });
+
         if (servicesResponse.data) {
           const formattedServices = servicesResponse.data.map(service => ({
             ...service,
@@ -149,25 +168,37 @@ const CustomerDashboard = ({
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
+        console.log('Data loading complete, setting loading to false');
         setLoading(false);
       }
     };
     loadData();
   }, [user]);
 
+  // Show loading spinner with better visibility
   if (authLoading) {
-    return <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>;
+    console.log('Showing auth loading spinner');
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
+    console.log('No user, redirecting to auth');
     return <Navigate to="/auth" replace />;
   }
 
   if (profile?.role === 'admin') {
+    console.log('Admin user, redirecting to admin dashboard');
     return <Navigate to="/admin" replace />;
   }
+
+  console.log('Rendering dashboard content for tab:', activeTab);
 
   const categories = ['all', ...Array.from(new Set(services.map(s => s.category)))];
   const filteredServices = services.filter(service => {
@@ -201,6 +232,7 @@ const CustomerDashboard = ({
   };
 
   const renderContent = () => {
+    console.log('Rendering content for activeTab:', activeTab);
     switch (activeTab) {
       case 'services':
         return renderServicesTab();
@@ -215,6 +247,7 @@ const CustomerDashboard = ({
       case 'faq':
         return renderFaqTab();
       default:
+        console.log('Rendering overview tab');
         return renderOverviewTab();
     }
   };
@@ -1068,12 +1101,15 @@ const CustomerDashboard = ({
     );
   };
 
-  return (
+  const result = (
     <>
       {renderContent()}
       <ProfileEditModal open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen} />
     </>
   );
+
+  console.log('CustomerDashboard returning result');
+  return result;
 };
 
 export default CustomerDashboard;
