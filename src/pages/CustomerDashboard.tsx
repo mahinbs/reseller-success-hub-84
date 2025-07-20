@@ -699,8 +699,8 @@ const CustomerDashboard = ({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full glass-button">
-                Browse FAQ
+              <Button asChild variant="outline" className="w-full glass-button">
+                <Link to="/#faq">Browse FAQ</Link>
               </Button>
             </CardContent>
           </Card>
