@@ -1,3 +1,4 @@
+
 import { useState, useEffect, createContext, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +9,7 @@ interface Profile {
   full_name: string | null;
   role: 'admin' | 'customer';
   avatar_url: string | null;
+  referral_name: string | null;
 }
 
 interface AuthContextType {
@@ -118,6 +120,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
             full_name: fullName || '',
+            referral_name: referralName || null,
           },
         },
       });
