@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
@@ -6,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+
 export const Header = () => {
   const {
     user,
@@ -27,14 +29,18 @@ export const Header = () => {
   const getDashboardLabel = () => {
     return profile?.role === 'admin' ? 'Admin Dashboard' : 'Dashboard';
   };
-  return <header className="sticky top-0 z-50 w-full border-b glass-subtle">
+  
+  return (
+    <header className="sticky top-0 z-50 w-full border-b glass-subtle">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center text-white font-bold">
-              B
-            </div>
+            <img 
+              src="https://res.cloudinary.com/dknafpppp/image/upload/v1753029599/F8AB7FD9-8833-4CB2-B517-27BE0B1C6BA7_2_copy_bzt39k.png"
+              alt="BoostMySites Logo"
+              className="w-8 h-8 rounded-lg"
+            />
             <span className="text-xl font-bold text-foreground">BoostMySites</span>
           </Link>
         </div>
@@ -47,28 +53,33 @@ export const Header = () => {
               Home
             </Link>
           </Button>
-          {!user && <>
+          {!user && (
+            <>
               <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
-                
+                <Link to="/services">Services</Link>
               </Button>
               <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
-                
+                <Link to="/bundles">Bundles</Link>
               </Button>
               <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
                 <Link to="/about">About</Link>
               </Button>
-            </>}
+            </>
+          )}
         </nav>
 
         {/* User Actions */}
         <div className="flex items-center space-x-4">
-          {user ? <>
+          {user ? (
+            <>
               <Button variant="ghost" size="icon" asChild className="relative hover:scale-110 transition-all-smooth">
                 <Link to="/cart">
                   <ShoppingCart className="h-5 w-5" />
-                  {getCartCount() > 0 && <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                  {getCartCount() > 0 && (
+                    <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
                       {getCartCount()}
-                    </Badge>}
+                    </Badge>
+                  )}
                 </Link>
               </Button>
               
@@ -88,7 +99,9 @@ export const Header = () => {
                     <div className="flex flex-col space-y-1 leading-none">
                       <p className="font-medium">{profile?.full_name || 'User'}</p>
                       <p className="text-xs text-muted-foreground">{profile?.email}</p>
-                      {profile?.role === 'admin' && <Badge variant="secondary" className="text-xs w-fit">Admin</Badge>}
+                      {profile?.role === 'admin' && (
+                        <Badge variant="secondary" className="text-xs w-fit">Admin</Badge>
+                      )}
                     </div>
                   </div>
                   <DropdownMenuSeparator />
@@ -109,15 +122,19 @@ export const Header = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </> : <div className="flex items-center space-x-2">
+            </>
+          ) : (
+            <div className="flex items-center space-x-2">
               <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
                 <a href="/auth">Sign In</a>
               </Button>
               <Button asChild className="gradient-primary hover:scale-105 transition-all-smooth">
                 <a href="/auth">Get Started</a>
               </Button>
-            </div>}
+            </div>
+          )}
         </div>
       </div>
-    </header>;
+    </header>
+  );
 };

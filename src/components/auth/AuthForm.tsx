@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,6 +52,13 @@ export const AuthForm = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-primary-light/10 p-4">
       <Card className="w-full max-w-md glass animate-slide-in">
         <CardHeader className="space-y-1 text-center">
+          <div className="flex items-center justify-center mb-4">
+            <img 
+              src="https://res.cloudinary.com/dknafpppp/image/upload/v1753029599/F8AB7FD9-8833-4CB2-B517-27BE0B1C6BA7_2_copy_bzt39k.png"
+              alt="BoostMySites Logo"
+              className="w-12 h-12 rounded-lg"
+            />
+          </div>
           <CardTitle className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
             {isSignUp ? 'Create Account' : 'Welcome Back'}
           </CardTitle>

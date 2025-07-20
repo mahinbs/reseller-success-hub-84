@@ -1,73 +1,61 @@
-# Welcome to your Lovable project
 
-## Project info
+# BoostMySites - AI-Powered Digital Services
 
-**URL**: https://lovable.dev/projects/5ae9a3af-2d83-49f7-ac01-9b451c6f39be
+## About BoostMySites
 
-## How can I edit this code?
+BoostMySites is a comprehensive platform offering premium AI-powered digital services for businesses. Our services include web development, SEO optimization, content creation, social media management, and more.
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **AI-Powered Services**: Cutting-edge AI technology for superior results
+- **Comprehensive Solutions**: Web development, SEO, content creation, and digital marketing
+- **User-Friendly Dashboard**: Intuitive interface for managing services and purchases
+- **Secure Authentication**: Robust user authentication and profile management
+- **Responsive Design**: Optimized for all devices and screen sizes
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5ae9a3af-2d83-49f7-ac01-9b451c6f39be) and start prompting.
+## Technology Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+This project is built with modern web technologies:
 
-**Use your preferred IDE**
+- **Frontend**: React with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Backend**: Supabase (Database, Authentication, Storage)
+- **Deployment**: Optimized for modern web platforms
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Prerequisites
 
-Follow these steps:
+- Node.js (v16 or higher)
+- npm or yarn package manager
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Installation
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Services Offered
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- **Web Development**: Custom websites and web applications
+- **SEO Services**: Search engine optimization and ranking
+- **Content Creation**: AI-powered content generation
+- **Social Media Management**: Complete social media solutions
+- **Digital Marketing**: Comprehensive marketing campaigns
+- **Analytics & Reporting**: Data-driven insights and reports
 
-**Edit a file directly in GitHub**
+## Support
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+For support and inquiries, please contact our team through the platform's support system.
 
-**Use GitHub Codespaces**
+## License
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/5ae9a3af-2d83-49f7-ac01-9b451c6f39be) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This project is proprietary software. All rights reserved.
