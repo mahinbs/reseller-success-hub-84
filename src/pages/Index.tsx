@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowRight, Zap, Target, Gauge, Shield, Users, Star, Play, CheckCircle, Rocket, Sparkles, TrendingUp, Globe, Code, Database, Cloud } from 'lucide-react';
+import { ArrowRight, Zap, Target, Gauge, Shield, Users, Star, Play, CheckCircle, Rocket, Sparkles, TrendingUp, Globe, Code, Database, Cloud, DollarSign, Briefcase, UserCheck, Building2, Lightbulb, HeartHandshake } from 'lucide-react';
 import { TypewriterText } from '@/components/animations/TypewriterText';
 import { CounterAnimation } from '@/components/animations/CounterAnimation';
 import { FloatingParticles } from '@/components/animations/FloatingParticles';
@@ -14,83 +15,105 @@ import { BaasFaq } from '@/components/BaasFaq';
 const Index = () => {
   const { user } = useAuth();
 
-  const serviceFeatures = [
+  const howItWorksSteps = [
     {
-      title: 'AI-Powered APIs',
-      description: 'Instantly generate APIs with AI, tailored to your data models and workflows.',
-      icon: Zap,
-      color: 'text-primary'
-    },
-    {
-      title: 'Real-Time Database',
-      description: 'Experience lightning-fast data synchronization across all your devices and users.',
-      icon: Database,
-      color: 'text-blue-500'
-    },
-    {
-      title: 'Intelligent Automation',
-      description: 'Automate repetitive tasks and complex workflows with AI-driven automation.',
-      icon: Target,
-      color: 'text-green-500'
-    },
-    {
-      title: 'Scalable Infrastructure',
-      description: 'Scale your backend effortlessly with our fully managed and scalable infrastructure.',
-      icon: Gauge,
-      color: 'text-orange-500'
-    },
-    {
-      title: 'Secure & Compliant',
-      description: 'Ensure the highest level of security and compliance with our enterprise-grade platform.',
-      icon: Shield,
-      color: 'text-red-500'
-    },
-    {
-      title: 'User Management',
-      description: 'Easily manage users, roles, and permissions with our intuitive user management system.',
-      icon: Users,
-      color: 'text-purple-500'
-    },
-  ];
-
-  const whyChooseUs = [
-    {
-      title: 'Unmatched Speed',
-      description: 'Launch your backend in minutes, not months, with our AI-powered platform.',
+      step: '1',
+      title: 'Subscribe to BaaS',
+      description: 'Get instant access to your dashboard, resources, and onboarding process.',
       icon: Rocket,
       color: 'text-primary'
     },
     {
-      title: 'Simplified Complexity',
-      description: 'Skip the complexity of traditional backend development and focus on your core product.',
-      icon: Code,
+      step: '2',
+      title: 'Get Your Company Setup',
+      description: 'We create your website, branding, service packages, and proposal templates.',
+      icon: Building2,
       color: 'text-blue-500'
     },
     {
-      title: 'Cost-Effective',
-      description: 'Reduce your backend costs by up to 80% with our fully managed and automated platform.',
-      icon: Database,
+      step: '3',
+      title: 'Start Selling Services',
+      description: 'Use our lead generation strategies and closers to land your first clients.',
+      icon: Target,
       color: 'text-green-500'
     },
     {
-      title: 'Global Infrastructure',
-      description: 'Deploy your backend globally with our distributed infrastructure and ensure low latency for your users.',
-      icon: Cloud,
+      step: '4',
+      title: 'We Deliver the Projects',
+      description: 'Our developers, designers, and marketers complete client work under your brand.',
+      icon: Users,
+      color: 'text-orange-500'
+    },
+    {
+      step: '5',
+      title: 'You Keep 70% Profit',
+      description: 'You collect the money from clients. Pay us only 30% for fulfillment.',
+      icon: DollarSign,
+      color: 'text-purple-500'
+    },
+  ];
+
+  const includedServices = [
+    'Custom Website & Brand Identity',
+    'Development & Design Teams',
+    'AI/Automation Services to Resell',
+    'Daily Mentorship & Business Tasks',
+    'Ready-to-use Marketing Materials',
+    'SLA, MOU, Proposal & Quotation Templates',
+    'Lead Generation Funnels',
+    'Project & Client Management Tools',
+    'Sales Closing Support',
+    'Full White-Label Delivery'
+  ];
+
+  const profitModelFeatures = [
+    {
+      title: 'You Sell',
+      description: 'Focus on client relationships, sales, and business growth while we handle everything else.',
+      icon: Briefcase,
+      color: 'text-primary'
+    },
+    {
+      title: 'We Deliver',
+      description: 'Our expert teams complete all client projects under your brand with full accountability.',
+      icon: Shield,
+      color: 'text-green-500'
+    },
+    {
+      title: 'Maximum Profit',
+      description: 'Keep 70% of every project while we take care of development, design, and delivery.',
+      icon: TrendingUp,
+      color: 'text-blue-500'
+    },
+    {
+      title: 'Zero Overhead',
+      description: 'No hiring, no infrastructure costs, no burnout - just pure business growth.',
+      icon: Lightbulb,
       color: 'text-orange-500'
     },
   ];
 
+  const targetAudience = [
+    'First-time entrepreneurs ready to launch',
+    'Agency owners who want to scale fast',
+    'Influencers/marketers launching service businesses',
+    'Tech enthusiasts who don\'t want to build from scratch',
+    'Anyone who wants to earn without coding or hiring'
+  ];
+
   const testimonials = [
     {
-      name: 'Alex Johnson',
-      title: 'Founder, StartupX',
-      testimonial: 'BoostMySites has been a game-changer for our startup. We were able to launch our backend in just a few days, and the AI-powered APIs are incredibly powerful.',
+      name: 'Rohit Sharma',
+      title: 'Tech Entrepreneur',
+      company: 'Bangalore',
+      testimonial: 'I launched my AI automation agency in 10 days with BaaS. Already closed ₹3L in client projects! The profit-sharing model is genius.',
       avatar: 'https://images.unsplash.com/photo-1534528741702-a0cfae58b707?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=764&q=80'
     },
     {
-      name: 'Emily Smith',
-      title: 'CTO, TechCorp',
-      testimonial: 'We were struggling to scale our backend, but BoostMySites made it easy. The platform is incredibly scalable, and the support team is always there to help.',
+      name: 'Sneha Patel',
+      title: 'Agency Owner',
+      company: 'Pune',
+      testimonial: 'I used to freelance alone and struggle with delivery. Now I run a full-stack agency with no stress. Boostmysites completely changed the game for me.',
       avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d674c8e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=761&q=80'
     },
   ];
@@ -108,33 +131,33 @@ const Index = () => {
             <div className="mb-6">
               <Badge className="neon-badge animate-float mb-4">
                 <Sparkles className="mr-2 h-4 w-4" />
-                AI-Powered Backend Services
+                Business as a Service
               </Badge>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              <span className="neon-text-primary">Business as a Service</span>
+              <span className="neon-text-primary">Start Your Own Tech Business</span>
               <br />
               <TypewriterText 
-                text="That Actually Works"
+                text="in 7 Days — Without Writing Code"
                 className="neon-text-secondary"
               />
             </h1>
             
             <p className="text-xl md:text-2xl mb-8 text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Skip the complexity. Get production-ready backend infrastructure with AI-powered APIs, 
-              real-time databases, and intelligent automation in minutes, not months.
+              With Boostmysites BaaS, you get a full development team, branding, marketing, and project delivery system — so you focus only on growth. 
+              <span className="text-primary font-semibold"> Keep 70% profit. We do the heavy lifting.</span>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {user ? (
                 <Button size="lg" asChild className="morphing-button neon-glow magnetic-hover">
-                  <Link to="/dashboard/services">Browse Services <ArrowRight className="ml-2 h-5 w-5" /></Link>
+                  <Link to="/dashboard/services">Get Started Now <ArrowRight className="ml-2 h-5 w-5" /></Link>
                 </Button>
               ) : (
                 <>
                   <Button size="lg" asChild className="morphing-button neon-glow magnetic-hover">
-                    <Link to="/auth">Get Started Free <ArrowRight className="ml-2 h-5 w-5" /></Link>
+                    <Link to="/auth">Get Started Now <ArrowRight className="ml-2 h-5 w-5" /></Link>
                   </Button>
                   <Button size="lg" variant="outline" asChild className="glass-button magnetic-hover">
                     <Link to="/about">
@@ -149,21 +172,21 @@ const Index = () => {
             <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div className="glass-card p-4 hover:glow-subtle transition-all duration-300">
                 <div className="text-2xl font-bold neon-text-primary">
-                  <CounterAnimation end={99.9} decimals={1} suffix="%" />
+                  <CounterAnimation end={70} suffix="%" />
                 </div>
-                <div className="text-sm text-muted-foreground">Uptime</div>
+                <div className="text-sm text-muted-foreground">Your Profit Share</div>
               </div>
               <div className="glass-card p-4 hover:glow-subtle transition-all duration-300">
                 <div className="text-2xl font-bold neon-text-primary">
-                  <CounterAnimation end={50} suffix="ms" />
+                  <CounterAnimation end={7} suffix=" Days" />
                 </div>
-                <div className="text-sm text-muted-foreground">Response Time</div>
+                <div className="text-sm text-muted-foreground">To Launch</div>
               </div>
               <div className="glass-card p-4 hover:glow-subtle transition-all duration-300">
                 <div className="text-2xl font-bold neon-text-primary">
-                  <CounterAnimation end={1000} suffix="+" />
+                  <CounterAnimation end={500} suffix="+" />
                 </div>
-                <div className="text-sm text-muted-foreground">Active Projects</div>
+                <div className="text-sm text-muted-foreground">Success Stories</div>
               </div>
               <div className="glass-card p-4 hover:glow-subtle transition-all duration-300">
                 <div className="text-2xl font-bold neon-text-primary">
@@ -176,26 +199,29 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Service Features Section */}
+      {/* How It Works Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 neon-text-primary">
-              AI-Powered Backend Features
+              How It Works
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Unlock the power of AI with our cutting-edge backend features, designed to simplify your development process and accelerate your time to market.
+              Launch your tech business in 5 simple steps. We handle the complexity, you focus on growth and profits.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {serviceFeatures.map((feature, index) => (
-              <Card key={index} className="glass-card hover:glow-subtle transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-3">
-                    <feature.icon className={`h-5 w-5 ${feature.color}`} />
-                    {feature.title}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+            {howItWorksSteps.map((step, index) => (
+              <Card key={index} className="glass-card hover:glow-subtle transition-all duration-300 relative">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-gradient-to-r from-primary/20 to-primary-light/20 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-primary">{step.step}</span>
+                  </div>
+                  <CardTitle className="flex items-center justify-center gap-3 text-lg">
+                    <step.icon className={`h-5 w-5 ${step.color}`} />
+                    {step.title}
                   </CardTitle>
-                  <CardDescription>{feature.description}</CardDescription>
+                  <CardDescription className="text-center">{step.description}</CardDescription>
                 </CardHeader>
               </Card>
             ))}
@@ -203,28 +229,23 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
+      {/* What's Included Section */}
       <section className="py-20 bg-gradient-to-br from-gray-900 to-gray-800">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 neon-text-primary">
-              Why Choose Our BaaS Platform?
+              What's Included in Your BaaS Package
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Discover the benefits of our AI-powered BaaS platform and see how we can help you build better, faster, and cheaper.
+              Everything you need to launch and scale your tech business, delivered white-label under your brand.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {whyChooseUs.map((reason, index) => (
-              <Card key={index} className="glass-card hover:glow-subtle transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-3">
-                    <reason.icon className={`h-5 w-5 ${reason.color}`} />
-                    {reason.title}
-                  </CardTitle>
-                  <CardDescription>{reason.description}</CardDescription>
-                </CardHeader>
-              </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {includedServices.map((service, index) => (
+              <div key={index} className="flex items-center space-x-3 glass-card p-4 hover:glow-subtle transition-all duration-300">
+                <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0" />
+                <span className="text-lg">{service}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -235,10 +256,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 neon-text-primary">
-              What Our Customers Say
+              Real Businesses. Real Profits.
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Read what our customers have to say about our AI-powered BaaS platform and how it has helped them achieve their goals.
+              See how entrepreneurs are building successful tech businesses with our BaaS platform.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -253,15 +274,73 @@ const Index = () => {
                     />
                     <div>
                       <CardTitle>{testimonial.name}</CardTitle>
-                      <CardDescription>{testimonial.title}</CardDescription>
+                      <CardDescription>{testimonial.title}, {testimonial.company}</CardDescription>
                     </div>
                   </div>
-                  <CardDescription>
+                  <CardDescription className="text-base italic">
                     <Star className="inline-block mr-1 h-4 w-4 text-yellow-500" />
-                    {testimonial.testimonial}
+                    "{testimonial.testimonial}"
                   </CardDescription>
                 </CardHeader>
               </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why 70-30 Profit Sharing Section */}
+      <section className="py-20 bg-gradient-to-br from-primary/5 via-purple-500/5 to-blue-500/5">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4 neon-text-primary">
+              Why 70-30 Profit Sharing?
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+              This model ensures you earn maximum profit while we handle 100% of backend execution.
+            </p>
+            <div className="flex items-center justify-center space-x-8 mb-8">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-primary mb-2">70%</div>
+                <div className="text-muted-foreground">You Keep</div>
+              </div>
+              <div className="text-4xl text-muted-foreground">+</div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-blue-500 mb-2">30%</div>
+                <div className="text-muted-foreground">We Take for Delivery</div>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {profitModelFeatures.map((feature, index) => (
+              <Card key={index} className="glass-card hover:glow-subtle transition-all duration-300 text-center">
+                <CardHeader>
+                  <feature.icon className={`h-12 w-12 ${feature.color} mx-auto mb-4`} />
+                  <CardTitle className="mb-2">{feature.title}</CardTitle>
+                  <CardDescription>{feature.description}</CardDescription>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Who This Is For Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4 neon-text-primary">
+              Who This Is For
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Perfect for entrepreneurs who want to build a tech business without the technical complexity.
+            </p>
+          </div>
+          <div className="max-w-3xl mx-auto space-y-4">
+            {targetAudience.map((audience, index) => (
+              <div key={index} className="flex items-center space-x-4 glass-card p-6 hover:glow-subtle transition-all duration-300">
+                <UserCheck className="h-6 w-6 text-green-500 flex-shrink-0" />
+                <span className="text-lg">{audience}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -272,20 +351,21 @@ const Index = () => {
         <div className="container mx-auto text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 neon-text-primary">
-              Ready to Transform Your Backend?
+              Start Your Journey Today
             </h2>
             <p className="text-xl mb-8 text-muted-foreground">
-              Join thousands of developers who've already simplified their infrastructure with our AI-powered BaaS platform.
+              Whether you're looking to build an AI agency, a web development firm, or a branding business — 
+              Boostmysites gives you everything to start strong, grow fast, and scale without limits.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
               {user ? (
                 <Button size="lg" asChild className="morphing-button neon-glow magnetic-hover">
-                  <Link to="/dashboard/services">Browse Services <ArrowRight className="ml-2 h-5 w-5" /></Link>
+                  <Link to="/dashboard/services">Start My Business Now <Rocket className="ml-2 h-5 w-5" /></Link>
                 </Button>
               ) : (
                 <>
                   <Button size="lg" asChild className="morphing-button neon-glow magnetic-hover">
-                    <Link to="/auth">Start Building Now <Rocket className="ml-2 h-5 w-5" /></Link>
+                    <Link to="/auth">Start My Business Now <Rocket className="ml-2 h-5 w-5" /></Link>
                   </Button>
                   <Button size="lg" variant="outline" asChild className="glass-button magnetic-hover">
                     <Link to="/about">Learn More</Link>
@@ -293,6 +373,10 @@ const Index = () => {
                 </>
               )}
             </div>
+            <p className="text-muted-foreground">
+              <HeartHandshake className="inline-block mr-2 h-5 w-5" />
+              No coding. No hiring. Just plug & grow.
+            </p>
           </div>
         </div>
       </section>
