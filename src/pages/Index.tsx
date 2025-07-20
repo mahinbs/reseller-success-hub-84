@@ -344,11 +344,13 @@ const Index = () => {
           </div>
 
           <div className="text-center mt-12">
-            <Button size="lg" className="relative overflow-hidden bg-gradient-to-r from-primary via-blue-500 to-purple-500 hover:from-primary/90 hover:via-blue-500/90 hover:to-purple-500/90 text-white border-0 morphing-button neon-glow magnetic-hover shadow-2xl shadow-primary/30">
-              <span className="relative z-10 flex items-center">
-                Get BaaS Service <ArrowRight className="ml-2 h-5 w-5" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-white/20 -translate-x-full hover:translate-x-full transition-transform duration-1000" />
+            <Button asChild size="lg" className="relative overflow-hidden bg-gradient-to-r from-primary via-blue-500 to-purple-500 hover:from-primary/90 hover:via-blue-500/90 hover:to-purple-500/90 text-white border-0 morphing-button neon-glow magnetic-hover shadow-2xl shadow-primary/30">
+              <Link to="/services">
+                <span className="relative z-10 flex items-center">
+                  Get BaaS Service <ArrowRight className="ml-2 h-5 w-5" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-white/20 -translate-x-full hover:translate-x-full transition-transform duration-1000" />
+              </Link>
             </Button>
           </div>
         </div>
