@@ -206,8 +206,8 @@ const Index = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 {user ? (
-                  <Button size="lg" className="morphing-button neon-glow magnetic-hover">
-                    Browse Services <ArrowRight className="ml-2 h-5 w-5" />
+                  <Button size="lg" asChild className="morphing-button neon-glow magnetic-hover">
+                    <Link to="/customer-dashboard">Browse Services <ArrowRight className="ml-2 h-5 w-5" /></Link>
                   </Button>
                 ) : (
                   <>
