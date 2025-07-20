@@ -6,15 +6,11 @@ import { AdminSidebar } from './AdminSidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, Outlet } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Home } from 'lucide-react';
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
-
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function DashboardLayout() {
   const { profile } = useAuth();
   const location = useLocation();
   const isAdmin = profile?.role === 'admin';
@@ -93,7 +89,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           
           {/* Main content area */}
           <main className="flex-1 overflow-auto">
-            {children}
+            <Outlet />
           </main>
         </SidebarInset>
       </div>

@@ -108,38 +108,34 @@ const App = () => (
                 } />
                 
                 {/* Protected dashboard routes with sidebar layout */}
-                <Route path="/dashboard/*" element={
+                <Route path="/dashboard" element={
                   <ProtectedRoute requireAuth={true}>
-                    <DashboardLayout>
-                      <Routes>
-                        <Route index element={<CustomerDashboard />} />
-                        <Route path="services" element={<CustomerDashboard activeTab="services" />} />
-                        <Route path="bundles" element={<CustomerDashboard activeTab="bundles" />} />
-                        <Route path="purchases" element={<CustomerDashboard activeTab="purchases" />} />
-                        <Route path="cart" element={<CartPage />} />
-                        <Route path="profile" element={<CustomerDashboard activeTab="profile" />} />
-                        <Route path="support" element={<CustomerDashboard activeTab="support" />} />
-                      </Routes>
-                    </DashboardLayout>
+                    <DashboardLayout />
                   </ProtectedRoute>
-                } />
+                }>
+                  <Route index element={<CustomerDashboard />} />
+                  <Route path="services" element={<CustomerDashboard activeTab="services" />} />
+                  <Route path="bundles" element={<CustomerDashboard activeTab="bundles" />} />
+                  <Route path="purchases" element={<CustomerDashboard activeTab="purchases" />} />
+                  <Route path="cart" element={<CartPage />} />
+                  <Route path="profile" element={<CustomerDashboard activeTab="profile" />} />
+                  <Route path="support" element={<CustomerDashboard activeTab="support" />} />
+                </Route>
                 
                 {/* Protected admin routes with sidebar layout */}
-                <Route path="/admin/*" element={
+                <Route path="/admin" element={
                   <ProtectedRoute requireAuth={true}>
-                    <DashboardLayout>
-                      <Routes>
-                        <Route index element={<AdminDashboard />} />
-                        <Route path="services" element={<AdminDashboard activeTab="services" />} />
-                        <Route path="bundles" element={<AdminDashboard activeTab="bundles" />} />
-                        <Route path="users" element={<AdminDashboard activeTab="users" />} />
-                        <Route path="purchases" element={<AdminDashboard activeTab="purchases" />} />
-                        <Route path="analytics" element={<AdminDashboard activeTab="analytics" />} />
-                        <Route path="settings" element={<AdminDashboard activeTab="settings" />} />
-                      </Routes>
-                    </DashboardLayout>
+                    <DashboardLayout />
                   </ProtectedRoute>
-                } />
+                }>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="services" element={<AdminDashboard activeTab="services" />} />
+                  <Route path="bundles" element={<AdminDashboard activeTab="bundles" />} />
+                  <Route path="users" element={<AdminDashboard activeTab="users" />} />
+                  <Route path="purchases" element={<AdminDashboard activeTab="purchases" />} />
+                  <Route path="analytics" element={<AdminDashboard activeTab="analytics" />} />
+                  <Route path="settings" element={<AdminDashboard activeTab="settings" />} />
+                </Route>
                 
                 {/* Catch-all route */}
                 <Route path="*" element={<NotFound />} />
