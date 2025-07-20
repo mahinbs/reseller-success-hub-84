@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowRight, Star, Zap, Shield, Users } from 'lucide-react';
+import { ArrowRight, Star, Zap, Shield, Users, Code, Calendar, Clock, FileText, Palette, Heart, Settings, UserCheck, BarChart, Target, Check } from 'lucide-react';
 import { createServiceSlug } from '@/lib/serviceUtils';
 
 interface Service {
@@ -66,6 +67,64 @@ const Index = () => {
     { icon: Star, label: "Rating", value: "4.9/5" },
   ];
 
+  const baasServices = [
+    {
+      icon: Code,
+      title: "Website & App Development",
+      description: "Complete design and development of your business website or app by our dedicated tech team."
+    },
+    {
+      icon: Calendar,
+      title: "Project Management Support",
+      description: "We assign a project manager who oversees timelines, progress, and task delegation to ensure your project moves smoothly."
+    },
+    {
+      icon: Users,
+      title: "Client Management Team",
+      description: "Our team communicates with your clients on your behalf, handles follow-ups, and ensures no opportunity is missed."
+    },
+    {
+      icon: Clock,
+      title: "SLA-Based Execution",
+      description: "We work with clear Service Level Agreements (SLA) to ensure guaranteed delivery timelines and accountability."
+    },
+    {
+      icon: FileText,
+      title: "Legal Documentation (MOU)",
+      description: "We provide legally binding MoUs between you and your clients for trust, clarity, and security in business dealings."
+    },
+    {
+      icon: Palette,
+      title: "Branding & Marketing",
+      description: "Logo, landing pages, social media branding, Instagram marketing creatives, lead generation assets, and more are all included."
+    },
+    {
+      icon: Heart,
+      title: "Client Satisfaction Handling",
+      description: "A dedicated team monitors client satisfaction and resolves any issues to maintain a high-quality service experience."
+    },
+    {
+      icon: Settings,
+      title: "Daily Operations Team",
+      description: "You get a backend team that supports your business daily — task updates, progress checks, and delivery coordination."
+    },
+    {
+      icon: UserCheck,
+      title: "Developer Follow-up Team",
+      description: "Our internal coordinators ensure your tech tasks are being completed by developers as per priority and deadlines."
+    },
+    {
+      icon: BarChart,
+      title: "Transparent Reporting",
+      description: "Weekly reports and updates so you always know what's happening in your business."
+    },
+    {
+      icon: Target,
+      title: "Lead Nurturing & Closures",
+      description: "If you generate leads, we can help with nurturing, client Zoom calls, and even closing deals (Optional Add-on)."
+    }
+  ];
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -116,6 +175,55 @@ const Index = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* BaaS Benefits Section */}
+      <section className="py-20 px-4 bg-gradient-to-r from-primary/10 via-background to-primary-light/10">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="gradient-primary bg-clip-text text-transparent">BoostMySites BaaS</span>
+            </h2>
+            <h3 className="text-2xl md:text-3xl font-semibold mb-4">Business-as-a-Service</h3>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+              After taking the BoostMySites BaaS subscription, here's everything you get access to. 
+              This plug-and-play system is designed to help you <strong>focus on growing your business while we handle the backend.</strong>
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {baasServices.map((service, index) => (
+              <Card key={index} className="glass hover:scale-105 transition-all-smooth group border-l-4 border-l-primary">
+                <CardHeader className="pb-4">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
+                        <Check className="w-5 h-5 text-primary" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <service.icon className="w-6 h-6 text-primary" />
+                        <CardTitle className="text-lg leading-tight">{service.title}</CardTitle>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <CardDescription className="text-base leading-relaxed">
+                    {service.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Button size="lg" className="gradient-primary hover:scale-105 transition-all-smooth">
+              Get BaaS Service <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
         </div>
       </section>
