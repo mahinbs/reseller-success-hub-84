@@ -421,9 +421,11 @@ const Index = () => {
                       <span className="text-3xl font-bold bg-gradient-to-r from-primary via-blue-500 to-purple-500 bg-clip-text text-transparent">₹{bundle.total_price}</span>
                       <span className="text-muted-foreground">/month</span>
                     </div>
-                    <Button className="w-full relative overflow-hidden bg-gradient-to-r from-primary/80 to-blue-500/80 hover:from-primary hover:to-blue-500 text-white border-0 morphing-button magnetic-hover shadow-lg shadow-primary/30 group-hover:shadow-primary/50 transition-all duration-300">
-                      <span className="relative z-10">Choose Bundle</span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 -translate-x-full hover:translate-x-full transition-transform duration-700" />
+                    <Button asChild className="w-full relative overflow-hidden bg-gradient-to-r from-primary/80 to-blue-500/80 hover:from-primary hover:to-blue-500 text-white border-0 morphing-button magnetic-hover shadow-lg shadow-primary/30 group-hover:shadow-primary/50 transition-all duration-300">
+                      <Link to={`/bundles/${bundle.id}`}>
+                        <span className="relative z-10">Choose Bundle</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 -translate-x-full hover:translate-x-full transition-transform duration-700" />
+                      </Link>
                     </Button>
                   </CardContent>
                 </Card>
