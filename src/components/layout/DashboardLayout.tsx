@@ -6,7 +6,9 @@ import { AdminSidebar } from './AdminSidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Home } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -77,6 +79,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 ))}
               </BreadcrumbList>
             </Breadcrumb>
+            
+            {/* Home button */}
+            <div className="ml-auto">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/">
+                  <Home className="h-4 w-4 mr-2" />
+                  Home
+                </Link>
+              </Button>
+            </div>
           </header>
           
           {/* Main content area */}
