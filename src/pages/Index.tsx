@@ -113,7 +113,7 @@ const Index = () => {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              <span className="neon-text-primary">Backend as a Service</span>
+              <span className="neon-text-primary">Business as a Service</span>
               <br />
               <TypewriterText 
                 text="That Actually Works"
