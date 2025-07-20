@@ -20,19 +20,20 @@ export const ProtectedRoute = ({ children, requireAuth = false }: ProtectedRoute
     );
   }
 
-  // Define service-related routes that authenticated users can access
-  const serviceRoutes = ['/services', '/bundles', '/cart'];
-  const isServiceRoute = serviceRoutes.some(route => location.pathname.startsWith(route)) || 
-                        location.pathname.startsWith('/service/');
+  // Define routes that authenticated users can access
+  const allowedRoutes = ['/services', '/bundles', '/cart', '/'];
+  const isAllowedRoute = allowedRoutes.some(route => 
+    route === '/' ? location.pathname === '/' : location.pathname.startsWith(route)
+  ) || location.pathname.startsWith('/service/');
 
   // If route requires no auth (public routes) but user is authenticated
   if (!requireAuth && user && profile) {
-    // Allow authenticated users to access service-related pages
-    if (isServiceRoute) {
+    // Allow authenticated users to access allowed routes (including home page)
+    if (isAllowedRoute) {
       return <>{children}</>;
     }
     
-    // Redirect authenticated users from marketing pages to their dashboard
+    // Redirect authenticated users from other marketing pages to their dashboard
     if (profile.role === 'admin') {
       return <Navigate to="/admin" replace />;
     } else {
