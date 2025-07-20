@@ -26,7 +26,7 @@ const Index = () => {
     {
       step: '2',
       title: 'Get Your Company Setup',
-      description: 'We create your website, branding, service packages, and proposal templates.',
+      description: 'We create your website, branding, service packages, and proposal templates (additional cost involved).',
       icon: Building2,
       color: 'text-blue-500'
     },
