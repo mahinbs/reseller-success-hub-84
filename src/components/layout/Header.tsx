@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
-import { User, LogOut, Settings, ShoppingCart } from 'lucide-react';
+import { User, LogOut, Settings, ShoppingCart, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { 
   DropdownMenu, 
@@ -45,20 +45,28 @@ export const Header = () => {
           </Link>
         </div>
 
-        {/* Navigation - Only show for non-authenticated users */}
-        {!user && (
-          <nav className="hidden md:flex items-center space-x-6">
-            <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
-              <Link to="/services">Services</Link>
-            </Button>
-            <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
-              <Link to="/bundles">Bundles</Link>
-            </Button>
-            <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
-              <Link to="/about">About</Link>
-            </Button>
-          </nav>
-        )}
+        {/* Navigation */}
+        <nav className="hidden md:flex items-center space-x-6">
+          <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+            <Link to="/">
+              <Home className="h-4 w-4 mr-2" />
+              Home
+            </Link>
+          </Button>
+          {!user && (
+            <>
+              <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+                <Link to="/services">Services</Link>
+              </Button>
+              <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+                <Link to="/bundles">Bundles</Link>
+              </Button>
+              <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+                <Link to="/about">About</Link>
+              </Button>
+            </>
+          )}
+        </nav>
 
         {/* User Actions */}
         <div className="flex items-center space-x-4">
