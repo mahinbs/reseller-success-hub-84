@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +11,7 @@ import { TypewriterText } from '@/components/animations/TypewriterText';
 import { HeroBackground } from '@/components/animations/HeroBackground';
 import { ArrowRight, Star, Zap, Shield, Users, Code, Calendar, Clock, FileText, Palette, Heart, Settings, UserCheck, BarChart, Target, Check, Sparkles, Crown, Diamond } from 'lucide-react';
 import { createServiceSlug } from '@/lib/serviceUtils';
+import { BaasFaq } from '@/components/BaasFaq';
 
 interface Service {
   id: string;
@@ -353,6 +353,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* BaaS FAQ Section */}
+      <BaasFaq />
 
       {/* Enhanced Featured Bundles */}
       <section 
