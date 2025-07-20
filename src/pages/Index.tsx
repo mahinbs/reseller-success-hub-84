@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { CounterAnimation } from '@/components/animations/CounterAnimation';
 import { TypewriterText } from '@/components/animations/TypewriterText';
-import { FloatingParticles } from '@/components/animations/FloatingParticles';
+import { HeroBackground } from '@/components/animations/HeroBackground';
 import { ArrowRight, Star, Zap, Shield, Users, Code, Calendar, Clock, FileText, Palette, Heart, Settings, UserCheck, BarChart, Target, Check } from 'lucide-react';
 import { createServiceSlug } from '@/lib/serviceUtils';
 
@@ -142,11 +142,11 @@ const Index = () => {
       {/* Hero Section */}
       <section 
         ref={heroRef.ref as any}
-        className={`relative py-20 px-4 gradient-shift particle-bg overflow-hidden transition-all duration-1000 ${
+        className={`relative py-20 px-4 overflow-hidden transition-all duration-1000 ${
           heroRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}
       >
-        <FloatingParticles count={8} />
+        <HeroBackground className="absolute inset-0" />
         <div className="container mx-auto text-center relative z-10">
           <div className="max-w-4xl mx-auto">
             <div className="mb-6">
@@ -154,7 +154,7 @@ const Index = () => {
                 <TypewriterText 
                   text="AI Services"
                   speed={150}
-                  className="gradient-primary bg-clip-text text-transparent block"
+                  className="gradient-text block"
                   onComplete={() => setTypewriterComplete(true)}
                 />
                 <br />
@@ -162,7 +162,7 @@ const Index = () => {
                   text="Made Simple"
                   speed={150}
                   delay={typewriterComplete ? 1000 : 0}
-                  className="gradient-primary bg-clip-text text-transparent block"
+                  className="gradient-text block"
                 />
               </h1>
             </div>
@@ -235,7 +235,7 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 animate-fade-in-up">
-              <span className="gradient-primary bg-clip-text text-transparent">BoostMySites BaaS</span>
+              <span className="gradient-text">BoostMySites BaaS</span>
             </h2>
             <h3 className="text-2xl md:text-3xl font-semibold mb-4 animate-fade-in-up">Business-as-a-Service</h3>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 animate-fade-in-up">
@@ -422,11 +422,11 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 gradient-shift text-white relative overflow-hidden">
-        <FloatingParticles count={5} />
+      <section className="py-20 px-4 relative overflow-hidden">
+        <HeroBackground className="absolute inset-0 opacity-80" />
         <div className="container mx-auto text-center relative z-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in-up">Ready to Get Started?</h2>
-          <p className="text-xl mb-8 opacity-90 animate-fade-in-up">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in-up text-white">Ready to Get Started?</h2>
+          <p className="text-xl mb-8 opacity-90 animate-fade-in-up text-white">
             Join thousands of businesses already using our AI services
           </p>
           {user ? (
