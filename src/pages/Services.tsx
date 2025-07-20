@@ -204,12 +204,12 @@ const ServicesPage = () => {
                         >
                           <span className="text-muted-foreground cursor-help">Your Cost:</span>
                         </ResellableTooltip>
-                        <span className="font-semibold">${bundle.total_price.toLocaleString()}</span>
+                        <span className="font-semibold">₹{bundle.total_price.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-green-600">Suggested Resell:</span>
                         <span className="text-green-600 font-semibold">
-                          ${calculateSuggestedPrice(bundle.total_price).toLocaleString()}
+                          ₹{calculateSuggestedPrice(bundle.total_price).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm border-t pt-2">
@@ -223,7 +223,7 @@ const ServicesPage = () => {
                           </span>
                         </ResellableTooltip>
                         <span className="text-purple-500 font-bold">
-                          ${calculateProfit(bundle.total_price).toLocaleString()}
+                          ₹{calculateProfit(bundle.total_price).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -363,12 +363,12 @@ const ServicesPage = () => {
                         >
                           <span className="text-muted-foreground cursor-help">Your Cost:</span>
                         </ResellableTooltip>
-                        <span className="font-semibold">${service.price.toLocaleString()}</span>
+                        <span className="font-semibold">₹{service.price.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-green-600">Suggested Resell:</span>
                         <span className="text-green-600 font-semibold">
-                          ${calculateSuggestedPrice(service.price).toLocaleString()}
+                          ₹{calculateSuggestedPrice(service.price).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm border-t pt-2">
@@ -382,7 +382,7 @@ const ServicesPage = () => {
                           </span>
                         </ResellableTooltip>
                         <span className="text-purple-500 font-bold">
-                          ${calculateProfit(service.price).toLocaleString()}
+                          ₹{calculateProfit(service.price).toLocaleString()}
                         </span>
                       </div>
                     </div>

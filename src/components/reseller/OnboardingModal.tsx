@@ -82,8 +82,8 @@ export const OnboardingModal = () => {
               <span className="font-semibold text-green-400">Success Formula</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              <strong>Typical markup:</strong> 200-400%. If you buy a $1,000 service, sell it for $2,500-$4,000. 
-              With just 5 sales per month, that's $7,500-$15,000 monthly profit!
+              <strong>Typical markup:</strong> 200-400%. If you buy a ₹1,000 service, sell it for ₹2,500-₹4,000. 
+              With just 5 sales per month, that's ₹7,500-₹15,000 monthly profit!
             </p>
           </div>
 

@@ -192,19 +192,19 @@ const BundleDetail = () => {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Original Price:</span>
                   <span className="line-through text-muted-foreground">
-                    ${originalPrice.toLocaleString()}
+                    ₹{originalPrice.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-green-600 font-medium">You Save:</span>
                   <span className="text-green-600 font-medium">
-                    ${savings.toLocaleString()}
+                    ₹{savings.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between text-2xl font-bold border-t pt-2">
                   <span>Bundle Price:</span>
                   <span className="bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
-                    ${bundle.total_price.toLocaleString()}
+                    ₹{bundle.total_price.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -267,7 +267,7 @@ const BundleDetail = () => {
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-muted-foreground">Individual Price</div>
-                        <div className="text-lg font-bold">${service.price}</div>
+                        <div className="text-lg font-bold">₹{service.price}</div>
                       </div>
                     </div>
                   </CardHeader>
@@ -323,7 +323,7 @@ const BundleDetail = () => {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-primary mb-2">
-                    ${savings.toLocaleString()}
+                    ₹{savings.toLocaleString()}
                   </div>
                   <div className="text-sm text-muted-foreground">Total Savings</div>
                 </div>

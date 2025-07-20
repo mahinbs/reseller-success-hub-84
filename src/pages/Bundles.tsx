@@ -227,7 +227,7 @@ export default function Bundles() {
                               </Badge>
                             </div>
                             <span className="text-sm text-muted-foreground">
-                              Individual: ${service.price.toLocaleString()}
+                              Individual: ₹{service.price.toLocaleString()}
                             </span>
                           </div>
                         ))}
@@ -240,7 +240,7 @@ export default function Bundles() {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Services Total Value:</span>
                       <span className="line-through text-muted-foreground">
-                        ${calculateOriginalPrice(bundle).toLocaleString()}
+                        ₹{calculateOriginalPrice(bundle).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
@@ -251,13 +251,13 @@ export default function Bundles() {
                         <span className="text-green-600 font-medium cursor-help">Your Bundle Cost:</span>
                       </ResellableTooltip>
                       <span className="text-green-600 font-bold text-lg">
-                        ${bundle.total_price.toLocaleString()}
+                        ₹{bundle.total_price.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-blue-600">Suggested Resell Price:</span>
                       <span className="text-blue-600 font-semibold">
-                        ${calculateSuggestedPrice(bundle.total_price).toLocaleString()}
+                        ₹{calculateSuggestedPrice(bundle.total_price).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm border-t pt-2">
@@ -271,12 +271,12 @@ export default function Bundles() {
                         </span>
                       </ResellableTooltip>
                       <span className="text-purple-500 font-bold text-lg">
-                        ${calculateProfit(bundle.total_price).toLocaleString()}
+                        ₹{calculateProfit(bundle.total_price).toLocaleString()}
                       </span>
                     </div>
                     <div className="text-center pt-2">
                       <span className="text-xs text-muted-foreground">
-                        Bundle savings: ${calculateSavings(bundle).toLocaleString()} + Higher profit margins
+                        Bundle savings: ₹{calculateSavings(bundle).toLocaleString()} + Higher profit margins
                       </span>
                     </div>
                   </div>

@@ -97,10 +97,10 @@ export const ConsultationForm = ({ serviceName }: ConsultationFormProps) => {
                         <SelectValue placeholder="Select budget" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="5k-10k">$5,000 - $10,000</SelectItem>
-                        <SelectItem value="10k-25k">$10,000 - $25,000</SelectItem>
-                        <SelectItem value="25k-50k">$25,000 - $50,000</SelectItem>
-                        <SelectItem value="50k+">$50,000+</SelectItem>
+                        <SelectItem value="5k-10k">₹5,000 - ₹10,000</SelectItem>
+                        <SelectItem value="10k-25k">₹10,000 - ₹25,000</SelectItem>
+                        <SelectItem value="25k-50k">₹25,000 - ₹50,000</SelectItem>
+                        <SelectItem value="50k+">₹50,000+</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

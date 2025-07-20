@@ -318,7 +318,7 @@ export const BundleForm: React.FC<BundleFormProps> = ({
                               {service.name}
                             </FormLabel>
                             <FormDescription>
-                              {service.category} - ${Number(service.price).toFixed(2)}
+                              {service.category} - ₹{Number(service.price).toFixed(2)}
                             </FormDescription>
                           </div>
                         </FormItem>

@@ -170,14 +170,14 @@ const CartPage = () => {
                         ID: {item.id}
                       </div>
                       <div className="text-muted-foreground">
-                        ${item.price}{item.billing_period && `/${item.billing_period}`}
+                        ₹{item.price}{item.billing_period && `/${item.billing_period}`}
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <div className="text-xl font-bold text-primary">
-                          ${item.price}
+                          ₹{item.price}
                         </div>
                       </div>
                       
@@ -227,7 +227,7 @@ const CartPage = () => {
                   {cart.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm">
                       <span className="truncate mr-2">{item.name}</span>
-                      <span>${item.price}</span>
+                      <span>₹{item.price}</span>
                     </div>
                   ))}
                 </div>
@@ -236,7 +236,7 @@ const CartPage = () => {
                 
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span className="text-primary">${getCartTotal().toFixed(2)}</span>
+                  <span className="text-primary">₹{getCartTotal().toFixed(2)}</span>
                 </div>
                 
                 <div className="space-y-3 pt-4">

@@ -157,13 +157,13 @@ const ServiceDetail = () => {
                     <span className="text-muted-foreground cursor-help">Your Cost:</span>
                   </ResellableTooltip>
                   <span className="font-bold text-lg">
-                    ${service.price.toLocaleString()}/{service.billing_period}
+                    ₹{service.price.toLocaleString()}/{service.billing_period}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-green-600">Suggested Resell Price:</span>
                   <span className="text-green-600 font-semibold">
-                    ${(service.price * 2.5).toLocaleString()}/{service.billing_period}
+                    ₹{(service.price * 2.5).toLocaleString()}/{service.billing_period}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm border-t pt-2">
@@ -177,7 +177,7 @@ const ServiceDetail = () => {
                     </span>
                   </ResellableTooltip>
                   <span className="text-purple-500 font-bold text-lg">
-                    ${(service.price * 1.5).toLocaleString()}/{service.billing_period}
+                    ₹{(service.price * 1.5).toLocaleString()}/{service.billing_period}
                   </span>
                 </div>
               </div>

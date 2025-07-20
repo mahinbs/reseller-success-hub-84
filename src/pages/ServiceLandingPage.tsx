@@ -236,7 +236,7 @@ const ServiceLandingPage = () => {
             <CardContent className="space-y-6">
               <div className="text-center">
                 <div className="text-4xl font-bold text-primary mb-2">
-                  ${service.price}
+                  ₹{service.price}
                 </div>
                 <div className="text-muted-foreground">
                   per {service.billing_period}

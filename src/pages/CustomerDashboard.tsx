@@ -232,7 +232,7 @@ const CustomerDashboard = ({
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
-                    <p className="text-3xl font-bold text-green-500">${userStats.totalSpent.toFixed(2)}</p>
+                    <p className="text-3xl font-bold text-green-500">₹{userStats.totalSpent.toFixed(2)}</p>
                   </div>
                   <div className="p-3 bg-gradient-to-br from-green-500/20 to-emerald-400/20 rounded-full">
                     <DollarSign className="h-6 w-6 text-green-500" />
@@ -452,7 +452,7 @@ const CustomerDashboard = ({
                       </Badge>
                       <div className="text-right">
                         <div className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-                          ${service.price}
+                          ₹{service.price}
                         </div>
                         <div className="text-xs text-muted-foreground">/{service.billing_period}</div>
                       </div>
@@ -549,7 +549,7 @@ const CustomerDashboard = ({
                           {bundle.services.slice(0, 3).map(service => <div key={service.id} className="flex items-center justify-between text-sm glass-subtle p-2 rounded-lg backdrop-blur-sm">
                               <span className="text-white">{service.name}</span>
                               <Badge variant="outline" className="text-xs border-white/30 text-white">
-                                ${service.price}
+                                ₹{service.price}
                               </Badge>
                             </div>)}
                           {bundle.services.length > 3 && <div className="text-xs text-gray-300 text-center py-1">
@@ -563,13 +563,13 @@ const CustomerDashboard = ({
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-300">Original Price:</span>
                         <span className="line-through text-gray-300">
-                          ${calculateOriginalPrice(bundle).toLocaleString()}
+                          ₹{calculateOriginalPrice(bundle).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between text-lg font-bold">
                         <span className="text-white">Bundle Price:</span>
                         <span className="bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
-                          ${bundle.total_price.toLocaleString()}
+                          ₹{bundle.total_price.toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -630,7 +630,7 @@ const CustomerDashboard = ({
                       <h4 className="font-medium text-sm text-muted-foreground">Items:</h4>
                       {purchase.purchase_items.map((item, index) => <div key={index} className="flex justify-between text-sm">
                           <span>{item.item_name}</span>
-                          <span>${item.item_price}</span>
+                          <span>₹{item.item_price}</span>
                         </div>)}
                     </div>}
                 </CardContent>
