@@ -3,6 +3,7 @@ import React, { useState, createContext, useContext, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { calculateGST, getPriceWithGST } from '@/lib/gstUtils';
 
 interface CartItem {
   id: string;
@@ -19,6 +20,8 @@ interface CartContextType {
   clearCart: () => void;
   getCartTotal: () => number;
   getCartCount: () => number;
+  getGSTAmount: () => number;
+  getCartTotalWithGST: () => number;
   isLoading: boolean;
 }
 
@@ -332,6 +335,20 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const getCartCount = () => cart.length;
 
+  const getGSTAmount = () => {
+    const total = getCartTotal();
+    const gstAmount = calculateGST(total);
+    logCartAction('GET_GST', { total, gstAmount });
+    return gstAmount;
+  };
+
+  const getCartTotalWithGST = () => {
+    const total = getCartTotal();
+    const totalWithGST = getPriceWithGST(total);
+    logCartAction('GET_TOTAL_WITH_GST', { total, totalWithGST });
+    return totalWithGST;
+  };
+
   return (
     <CartContext.Provider value={{
       cart,
@@ -340,6 +357,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       clearCart,
       getCartTotal,
       getCartCount,
+      getGSTAmount,
+      getCartTotalWithGST,
       isLoading
     }}>
       {children}

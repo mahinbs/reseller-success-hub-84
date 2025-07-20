@@ -14,6 +14,7 @@ import { ServicePortfolio } from '@/components/service/ServicePortfolio';
 import { ServiceComparison } from '@/components/service/ServiceComparison';
 import { ConsultationForm } from '@/components/service/ConsultationForm';
 import { createServiceSlug, getServiceNameFromSlug } from '@/lib/serviceUtils';
+import { formatPriceWithGST } from '@/lib/gstUtils';
 
 interface Service {
   id: string;
@@ -145,6 +146,8 @@ const ServiceLandingPage = () => {
     );
   }
 
+  const priceInfo = formatPriceWithGST(service.price);
+
   return (
     <div className="min-h-screen">
       {/* Breadcrumb */}
@@ -238,8 +241,14 @@ const ServiceLandingPage = () => {
                 <div className="text-4xl font-bold text-primary mb-2">
                   ₹{service.price}
                 </div>
-                <div className="text-muted-foreground">
+                <div className="text-sm text-muted-foreground mb-1">
                   per {service.billing_period}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  + 18% GST applicable
+                </div>
+                <div className="text-sm font-medium text-primary mt-2">
+                  Total: ₹{priceInfo.totalPrice} (incl. GST)
                 </div>
               </div>
 

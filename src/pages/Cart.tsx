@@ -8,6 +8,7 @@ import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { Trash2, ShoppingBag, CreditCard, RefreshCw, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { calculateGST, getPriceWithGST } from '@/lib/gstUtils';
 
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, getCartTotal, isLoading } = useCart();
@@ -19,6 +20,11 @@ const CartPage = () => {
   // Check if we're in dashboard layout
   const isInDashboard = location.pathname.startsWith('/dashboard');
 
+  // Calculate GST amounts
+  const subtotal = getCartTotal();
+  const gstAmount = calculateGST(subtotal);
+  const totalWithGST = getPriceWithGST(subtotal);
+
   // Debug function to help troubleshoot cart issues
   const handleDebugInfo = () => {
     console.log('=== CART DEBUG INFO ===');
@@ -26,6 +32,9 @@ const CartPage = () => {
     console.log('Cart items:', cart);
     console.log('Cart count:', cart.length);
     console.log('Is loading:', isLoading);
+    console.log('Subtotal:', subtotal);
+    console.log('GST Amount:', gstAmount);
+    console.log('Total with GST:', totalWithGST);
     console.log('LocalStorage cart:', localStorage.getItem('cart'));
     console.log('Location:', location.pathname);
     console.log('=====================');
@@ -172,12 +181,18 @@ const CartPage = () => {
                       <div className="text-muted-foreground">
                         ₹{item.price}{item.billing_period && `/${item.billing_period}`}
                       </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        + 18% GST applicable
+                      </div>
                     </div>
                     
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <div className="text-xl font-bold text-primary">
                           ₹{item.price}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          + ₹{calculateGST(item.price)} GST
                         </div>
                       </div>
                       
@@ -234,9 +249,22 @@ const CartPage = () => {
                 
                 <hr className="border-border" />
                 
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal</span>
+                    <span>₹{subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>GST (18%)</span>
+                    <span>₹{gstAmount.toFixed(2)}</span>
+                  </div>
+                </div>
+                
+                <hr className="border-border" />
+                
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span className="text-primary">₹{getCartTotal().toFixed(2)}</span>
+                  <span className="text-primary">₹{totalWithGST.toFixed(2)}</span>
                 </div>
                 
                 <div className="space-y-3 pt-4">

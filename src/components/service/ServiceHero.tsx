@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Star } from 'lucide-react';
+import { formatPriceWithGST } from '@/lib/gstUtils';
 
 interface ServiceHeroProps {
   service: {
@@ -49,6 +50,7 @@ export const ServiceHero = ({ service, onGetStarted }: ServiceHeroProps) => {
 
   const serviceIcon = getServiceIcon(service.name);
   const gradientClass = getServiceGradient(service.category);
+  const priceInfo = formatPriceWithGST(service.price);
 
   return (
     <section className={`py-20 px-4 bg-gradient-to-br ${gradientClass}`}>
@@ -70,10 +72,15 @@ export const ServiceHero = ({ service, onGetStarted }: ServiceHeroProps) => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-in-delay">
-              <Button size="lg" onClick={onGetStarted} className="gradient-primary group">
-                Get Started - ₹{service.price}/{service.billing_period}
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <div className="flex flex-col">
+                <Button size="lg" onClick={onGetStarted} className="gradient-primary group">
+                  Get Started - ₹{service.price}/{service.billing_period}
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <div className="text-xs text-muted-foreground mt-1 ml-1">
+                  + 18% GST applicable (Total: ₹{priceInfo.totalPrice})
+                </div>
+              </div>
               <Button size="lg" variant="outline" className="glass-subtle">
                 Schedule Consultation
               </Button>
