@@ -2,49 +2,112 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, HelpCircle, Clock, Users, Shield, Zap, Target, Settings } from 'lucide-react';
+import { ChevronDown, HelpCircle, Clock, Users, Shield, Zap, Target, Settings, Briefcase, Code, DollarSign, TrendingUp, PiggyBank, Calculator, Handshake, BarChart3, Building, Rocket, CheckCircle } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const faqData = [
+  // General BaaS Questions (1-10)
   {
     icon: HelpCircle,
-    question: "What exactly is included in the BaaS subscription?",
-    answer: "Our BaaS subscription includes a complete backend team: dedicated project manager, client management team, tech developers, legal documentation (MOU), branding & marketing support, daily operations team, and transparent weekly reporting. Everything you need to run your business smoothly."
+    question: "What is BaaS (Business as a Service)?",
+    answer: "BaaS is a complete business infrastructure solution provided by Boostmysites, allowing you to launch your own software or service business with zero technical background."
+  },
+  {
+    icon: Briefcase,
+    question: "What does Boostmysites offer under the BaaS subscription?",
+    answer: "We offer development, client management systems, sales scripts, quotation tools, MOU/SLA creation, project management tools, branding support, client satisfaction tracking, and full execution teams."
+  },
+  {
+    icon: Users,
+    question: "Who is BaaS for?",
+    answer: "Entrepreneurs, marketers, influencers, or professionals who want to start their own tech or agency business without hiring developers or designers."
+  },
+  {
+    icon: Code,
+    question: "Do I need coding skills to run the business?",
+    answer: "No. Boostmysites handles all technical development. You focus on sales and client relationships."
   },
   {
     icon: Clock,
-    question: "How quickly can you get started with my business?",
-    answer: "We can typically onboard your business within 5-7 working days. This includes initial consultation, team assignment, SLA setup, and beginning work on your first projects. Our streamlined process ensures rapid deployment."
-  },
-  {
-    icon: Users,
-    question: "How does the team structure work?",
-    answer: "You get a dedicated team including: 1 Project Manager for oversight, 2-3 developers for tech work, 1 client manager for customer relations, 1 operations coordinator, and access to our branding/marketing specialists. All team members work exclusively on your projects during allocated hours."
+    question: "How quickly can I start?",
+    answer: "You can launch your business in 7–14 days with full access to your services, tools, and branding."
   },
   {
     icon: Shield,
-    question: "What are the SLA guarantees?",
-    answer: "We provide clear Service Level Agreements with guaranteed delivery timelines, 99.5% uptime for services, 24-hour response time for urgent issues, and weekly progress reports. All commitments are legally binding through our MOU process."
-  },
-  {
-    icon: Zap,
-    question: "Can you handle both technical and non-technical tasks?",
-    answer: "Absolutely! We handle website/app development, project management, client communication, lead nurturing, legal documentation, branding, marketing creatives, social media management, and daily business operations. It's a complete business solution."
-  },
-  {
-    icon: Target,
-    question: "How do you ensure quality and client satisfaction?",
-    answer: "We have a dedicated client satisfaction team that monitors all projects, conducts regular feedback sessions, and resolves issues promptly. Plus, our transparent reporting system keeps you informed about all activities and progress."
+    question: "Is this a white-label model?",
+    answer: "Yes. Everything is branded under your company name. Clients will never see Boostmysites in the backend."
   },
   {
     icon: Settings,
-    question: "What happens if I need to scale up or down?",
-    answer: "Our BaaS service is flexible. You can scale your team size, add new services, or adjust the scope based on your business growth. We accommodate changes with just 7 days notice and adjust pricing accordingly."
+    question: "What services can I sell to my clients?",
+    answer: "Web development, app development, AI solutions, automation tools, digital marketing, and more. All services are fulfilled by Boostmysites teams."
+  },
+  {
+    icon: Target,
+    question: "How do I get clients?",
+    answer: "We provide proven lead generation methods, ad templates, branding materials, and even done-for-you influencer marketing ideas."
+  },
+  {
+    icon: Building,
+    question: "Can I use my own domain and branding?",
+    answer: "Yes, you'll get a full website under your brand, with your logo, domain, email, and identity."
+  },
+  {
+    icon: Handshake,
+    question: "Do I get help closing deals?",
+    answer: "Yes. You can bring in our expert closers to help you on calls and Zoom meetings to convert leads into clients."
+  },
+  
+  // Profit Sharing & Earning Questions (11-20)
+  {
+    icon: DollarSign,
+    question: "How does the 70-30 profit sharing model work?",
+    answer: "You keep 70% of the profit from any client project. Boostmysites receives 30% as a service fulfillment partner."
+  },
+  {
+    icon: PiggyBank,
+    question: "Who collects the payment from clients?",
+    answer: "You collect the full payment from your clients. After deducting your 70%, you pay Boostmysites the 30% for service delivery."
+  },
+  {
+    icon: Calculator,
+    question: "Do I need to pay Boostmysites upfront per project?",
+    answer: "No. You only pay 30% of the project value once the client has paid you and the work is confirmed."
+  },
+  {
+    icon: TrendingUp,
+    question: "Can I set my own pricing for clients?",
+    answer: "Yes. You are free to price your services based on your target audience and market. You can sell at any margin."
+  },
+  {
+    icon: BarChart3,
+    question: "Is the 70-30 model negotiable?",
+    answer: "No. This is a standard model to ensure fair profit for you and consistent service quality from our team."
+  },
+  {
+    icon: Rocket,
+    question: "What happens if I don't get clients?",
+    answer: "We provide daily support, tasks, mentorship, and guidance. But consistent effort is required from your side to build pipelines."
+  },
+  {
+    icon: Zap,
+    question: "Can I earn recurring income?",
+    answer: "Yes. You can offer monthly services like SEO, maintenance, automation, or branding with recurring billing. Profit sharing applies."
   },
   {
     icon: Users,
-    question: "Do you provide training for using your systems?",
-    answer: "Yes, we provide comprehensive onboarding training for you and your team. This includes training on our project management tools, communication systems, reporting dashboards, and best practices for working with our backend team."
+    question: "Is there a limit to how many clients I can take?",
+    answer: "No limit. You can scale as big as you want. Boostmysites will support the delivery backend regardless of volume."
+  },
+  {
+    icon: CheckCircle,
+    question: "How do I track client satisfaction and project status?",
+    answer: "You'll get a client dashboard, ticketing system, project tracker, and SLA reports to monitor all activities."
+  },
+  {
+    icon: Target,
+    question: "Can I upsell or bundle services?",
+    answer: "Absolutely. You can create bundles, special offers, or premium packages using Boostmysites' ready-to-use resources and upsell frameworks."
   }
 ];
 
@@ -62,6 +125,7 @@ export const BaasFaq = () => {
 
   return (
     <section 
+      id="faq"
       ref={faqRef.ref as any}
       className={`py-20 px-4 bg-gradient-to-r from-primary/3 via-background to-primary-light/3 transition-all duration-1000 ${
         faqRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
@@ -73,7 +137,7 @@ export const BaasFaq = () => {
             <span className="gradient-text">BaaS FAQ</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 animate-fade-in-up">
-            Everything you need to know about our Business-as-a-Service offering
+            Everything you need to know about our Business-as-a-Service offering and profit sharing model
           </p>
         </div>
 
