@@ -535,8 +535,8 @@ const Index = () => {
             Join thousands of businesses already using our AI services
           </p>
           {user ? (
-            <Button size="lg" variant="secondary" className="morphing-button neon-glow magnetic-hover">
-              Browse All Services <ArrowRight className="ml-2 h-5 w-5" />
+            <Button size="lg" variant="secondary" asChild className="morphing-button neon-glow magnetic-hover">
+              <Link to="/services">Browse All Services <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
           ) : (
             <Button size="lg" variant="secondary" asChild className="morphing-button neon-glow magnetic-hover">
