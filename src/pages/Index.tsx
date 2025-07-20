@@ -6,6 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { CounterAnimation } from '@/components/animations/CounterAnimation';
+import { TypewriterText } from '@/components/animations/TypewriterText';
+import { FloatingParticles } from '@/components/animations/FloatingParticles';
 import { ArrowRight, Star, Zap, Shield, Users, Code, Calendar, Clock, FileText, Palette, Heart, Settings, UserCheck, BarChart, Target, Check } from 'lucide-react';
 import { createServiceSlug } from '@/lib/serviceUtils';
 
@@ -31,7 +35,15 @@ const Index = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [typewriterComplete, setTypewriterComplete] = useState(false);
   const { user } = useAuth();
+
+  // Scroll animation hooks
+  const heroRef = useScrollAnimation({ threshold: 0.2 });
+  const statsRef = useScrollAnimation({ threshold: 0.3 });
+  const baasRef = useScrollAnimation({ threshold: 0.2 });
+  const bundlesRef = useScrollAnimation({ threshold: 0.2 });
+  const servicesRef = useScrollAnimation({ threshold: 0.2 });
 
   useEffect(() => {
     const loadData = async () => {
@@ -61,10 +73,10 @@ const Index = () => {
   }, []);
 
   const stats = [
-    { icon: Users, label: "Active Users", value: "10,000+" },
-    { icon: Zap, label: "AI Services", value: "50+" },
-    { icon: Shield, label: "Uptime", value: "99.9%" },
-    { icon: Star, label: "Rating", value: "4.9/5" },
+    { icon: Users, label: "Active Users", value: 10000, suffix: "+" },
+    { icon: Zap, label: "AI Services", value: 50, suffix: "+" },
+    { icon: Shield, label: "Uptime", value: 99.9, suffix: "%" },
+    { icon: Star, label: "Rating", value: 4.9, suffix: "/5" },
   ];
 
   const baasServices = [
@@ -128,49 +140,83 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 bg-gradient-to-br from-primary/5 via-background to-primary-light/5">
-        <div className="container mx-auto text-center">
+      <section 
+        ref={heroRef.ref as any}
+        className={`relative py-20 px-4 gradient-shift particle-bg overflow-hidden transition-all duration-1000 ${
+          heroRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
+        <FloatingParticles count={8} />
+        <div className="container mx-auto text-center relative z-10">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-slide-in">
-              <span className="gradient-primary bg-clip-text text-transparent">
-                AI Services
-              </span>
-              <br />
-              Made Simple
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 animate-slide-in-delay">
-              Access premium AI tools and SaaS services with enterprise-grade reliability.
-              Boost your business with cutting-edge technology.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-in-delay">
-              {user ? (
-                <Button size="lg" className="gradient-primary hover:scale-105 transition-all-smooth">
-                  Browse Services <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              ) : (
-                <>
-                  <Button size="lg" asChild className="gradient-primary hover:scale-105 transition-all-smooth">
-                    <a href="/auth">Get Started <ArrowRight className="ml-2 h-5 w-5" /></a>
+            <div className="mb-6">
+              <h1 className="text-5xl md:text-7xl font-bold">
+                <TypewriterText 
+                  text="AI Services"
+                  speed={150}
+                  className="gradient-primary bg-clip-text text-transparent block"
+                  onComplete={() => setTypewriterComplete(true)}
+                />
+                <br />
+                <TypewriterText 
+                  text="Made Simple"
+                  speed={150}
+                  delay={typewriterComplete ? 1000 : 0}
+                  className="gradient-primary bg-clip-text text-transparent block"
+                />
+              </h1>
+            </div>
+            <div className={`transition-all duration-1000 delay-3000 ${typewriterComplete ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+              <p className="text-xl md:text-2xl text-muted-foreground mb-8 animate-fade-in-up">
+                Access premium AI tools and SaaS services with enterprise-grade reliability.
+                Boost your business with cutting-edge technology.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {user ? (
+                  <Button size="lg" className="morphing-button neon-glow magnetic-hover">
+                    Browse Services <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
-                  <Button size="lg" variant="outline" className="hover:scale-105 transition-all-smooth">
-                    Learn More
-                  </Button>
-                </>
-              )}
+                ) : (
+                  <>
+                    <Button size="lg" asChild className="morphing-button neon-glow magnetic-hover">
+                      <a href="/auth">Get Started <ArrowRight className="ml-2 h-5 w-5" /></a>
+                    </Button>
+                    <Button size="lg" variant="outline" className="morphing-button magnetic-hover">
+                      Learn More
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-4">
+      <section 
+        ref={statsRef.ref as any}
+        className={`py-16 px-4 transition-all duration-1000 ${
+          statsRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="container mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
-              <Card key={index} className="glass-subtle text-center hover:scale-105 transition-all-smooth">
+              <Card 
+                key={index} 
+                className={`glass-card text-center tilt-card animate-bounce-in ${
+                  statsRef.isVisible ? `animate-stagger-${Math.min(index + 1, 5)}` : ''
+                }`}
+              >
                 <CardContent className="pt-6">
-                  <stat.icon className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                  <stat.icon className="h-8 w-8 mx-auto mb-2 text-primary icon-breathe" />
+                  <p className="text-2xl font-bold text-foreground">
+                    <CounterAnimation 
+                      end={stat.value} 
+                      suffix={stat.suffix}
+                      isVisible={statsRef.isVisible}
+                    />
+                  </p>
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
                 </CardContent>
               </Card>
@@ -180,14 +226,19 @@ const Index = () => {
       </section>
 
       {/* BaaS Benefits Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-primary/10 via-background to-primary-light/10">
+      <section 
+        ref={baasRef.ref as any}
+        className={`py-20 px-4 bg-gradient-to-r from-primary/10 via-background to-primary-light/10 transition-all duration-1000 ${
+          baasRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 animate-fade-in-up">
               <span className="gradient-primary bg-clip-text text-transparent">BoostMySites BaaS</span>
             </h2>
-            <h3 className="text-2xl md:text-3xl font-semibold mb-4">Business-as-a-Service</h3>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            <h3 className="text-2xl md:text-3xl font-semibold mb-4 animate-fade-in-up">Business-as-a-Service</h3>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 animate-fade-in-up">
               After taking the BoostMySites BaaS subscription, here's everything you get access to. 
               This plug-and-play system is designed to help you <strong>focus on growing your business while we handle the backend.</strong>
             </p>
@@ -195,17 +246,23 @@ const Index = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {baasServices.map((service, index) => (
-              <Card key={index} className="glass hover:scale-105 transition-all-smooth group border-l-4 border-l-primary">
+              <Card 
+                key={index} 
+                className={`glass-card group border-l-4 border-l-primary tilt-card wave-entrance ${
+                  baasRef.isVisible ? `animate-stagger-${Math.min((index % 5) + 1, 5)}` : ''
+                }`}
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
                 <CardHeader className="pb-4">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 magnetic-hover">
                         <Check className="w-5 h-5 text-primary" />
                       </div>
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <service.icon className="w-6 h-6 text-primary" />
+                        <service.icon className="w-6 h-6 text-primary icon-breathe" />
                         <CardTitle className="text-lg leading-tight">{service.title}</CardTitle>
                       </div>
                     </div>
@@ -221,7 +278,7 @@ const Index = () => {
           </div>
 
           <div className="text-center mt-12">
-            <Button size="lg" className="gradient-primary hover:scale-105 transition-all-smooth">
+            <Button size="lg" className="morphing-button neon-glow magnetic-hover">
               Get BaaS Service <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -229,11 +286,16 @@ const Index = () => {
       </section>
 
       {/* Featured Bundles */}
-      <section className="py-16 px-4 bg-gradient-to-r from-primary/5 to-primary-light/5">
+      <section 
+        ref={bundlesRef.ref as any}
+        className={`py-16 px-4 bg-gradient-to-r from-primary/5 to-primary-light/5 transition-all duration-1000 ${
+          bundlesRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Bundles</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in-up">Featured Bundles</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in-up">
               Save more with our carefully curated service bundles
             </p>
           </div>
@@ -252,12 +314,17 @@ const Index = () => {
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
-              {bundles.map((bundle) => (
-                <Card key={bundle.id} className="glass hover:scale-105 transition-all-smooth group">
+              {bundles.map((bundle, index) => (
+                <Card 
+                  key={bundle.id} 
+                  className={`glass-card group tilt-card wave-entrance ${
+                    bundlesRef.isVisible ? `animate-stagger-${Math.min(index + 1, 5)}` : ''
+                  }`}
+                >
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-xl">{bundle.name}</CardTitle>
-                      <Badge className="gradient-primary text-white">
+                      <Badge className="gradient-primary text-white animate-pulse-scale">
                         -{bundle.discount_percentage}%
                       </Badge>
                     </div>
@@ -268,7 +335,7 @@ const Index = () => {
                       <span className="text-3xl font-bold text-primary">${bundle.total_price}</span>
                       <span className="text-muted-foreground">/month</span>
                     </div>
-                    <Button className="w-full gradient-primary group-hover:scale-105 transition-all-smooth">
+                    <Button className="w-full morphing-button magnetic-hover">
                       Choose Bundle
                     </Button>
                   </CardContent>
@@ -280,11 +347,16 @@ const Index = () => {
       </section>
 
       {/* Popular Services */}
-      <section className="py-16 px-4">
+      <section 
+        ref={servicesRef.ref as any}
+        className={`py-16 px-4 transition-all duration-1000 ${
+          servicesRef.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Popular Services</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in-up">Popular Services</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto animate-fade-in-up">
               Individual AI services and tools to supercharge your workflow
             </p>
           </div>
@@ -303,8 +375,14 @@ const Index = () => {
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
-              {services.map((service) => (
-                <Card key={service.id} className="glass-subtle hover:scale-105 transition-all-smooth group">
+              {services.map((service, index) => (
+                <Card 
+                  key={service.id} 
+                  className={`glass-card group tilt-card wave-entrance ${
+                    servicesRef.isVisible ? `animate-stagger-${Math.min((index % 5) + 1, 5)}` : ''
+                  }`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg">
@@ -315,7 +393,7 @@ const Index = () => {
                           {service.name}
                         </Link>
                       </CardTitle>
-                      <Badge variant="secondary">{service.category}</Badge>
+                      <Badge variant="secondary" className="animate-pulse-scale">{service.category}</Badge>
                     </div>
                     <CardDescription className="line-clamp-2">
                       {service.description}
@@ -328,7 +406,7 @@ const Index = () => {
                     </div>
                     <Button 
                       asChild
-                      className="w-full group-hover:scale-105 transition-all-smooth" 
+                      className="w-full morphing-button magnetic-hover" 
                       variant="outline"
                     >
                       <Link to={`/service/${createServiceSlug(service.name)}`}>
@@ -344,18 +422,19 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-primary to-primary-light text-white">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-xl mb-8 opacity-90">
+      <section className="py-20 px-4 gradient-shift text-white relative overflow-hidden">
+        <FloatingParticles count={5} />
+        <div className="container mx-auto text-center relative z-10">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in-up">Ready to Get Started?</h2>
+          <p className="text-xl mb-8 opacity-90 animate-fade-in-up">
             Join thousands of businesses already using our AI services
           </p>
           {user ? (
-            <Button size="lg" variant="secondary" className="hover:scale-105 transition-all-smooth">
+            <Button size="lg" variant="secondary" className="morphing-button neon-glow magnetic-hover">
               Browse All Services <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           ) : (
-            <Button size="lg" variant="secondary" asChild className="hover:scale-105 transition-all-smooth">
+            <Button size="lg" variant="secondary" asChild className="morphing-button neon-glow magnetic-hover">
               <a href="/auth">Start Free Trial <ArrowRight className="ml-2 h-5 w-5" /></a>
             </Button>
           )}
