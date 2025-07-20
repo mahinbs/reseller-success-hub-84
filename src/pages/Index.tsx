@@ -332,7 +332,7 @@ const Index = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="mb-4">
-                      <span className="text-3xl font-bold text-primary">${bundle.total_price}</span>
+                      <span className="text-3xl font-bold text-primary">₹{bundle.total_price}</span>
                       <span className="text-muted-foreground">/month</span>
                     </div>
                     <Button className="w-full morphing-button magnetic-hover">
@@ -401,7 +401,7 @@ const Index = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="mb-4">
-                      <span className="text-2xl font-bold text-primary">${service.price}</span>
+                      <span className="text-2xl font-bold text-primary">₹{service.price}</span>
                       <span className="text-muted-foreground">/{service.billing_period}</span>
                     </div>
                     <Button 
