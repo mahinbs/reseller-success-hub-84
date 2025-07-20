@@ -11,7 +11,6 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
-import ServicesPage from "./pages/Services";
 import ServiceLandingPage from "./pages/ServiceLandingPage";
 import Portfolio from "./pages/Portfolio";
 import Bundles from "./pages/Bundles";
@@ -48,14 +47,6 @@ const App = () => (
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <AuthPage />
-                    </ProtectedRoute>
-                  </>
-                } />
-                <Route path="/services" element={
-                  <>
-                    <Header />
-                    <ProtectedRoute requireAuth={false}>
-                      <ServicesPage />
                     </ProtectedRoute>
                   </>
                 } />

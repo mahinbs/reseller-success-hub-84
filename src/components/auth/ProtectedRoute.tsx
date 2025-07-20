@@ -21,7 +21,7 @@ export const ProtectedRoute = ({ children, requireAuth = false }: ProtectedRoute
   }
 
   // Define routes that authenticated users can access
-  const allowedRoutes = ['/services', '/bundles', '/cart', '/'];
+  const allowedRoutes = ['/bundles', '/cart', '/'];
   const isAllowedRoute = allowedRoutes.some(route => 
     route === '/' ? location.pathname === '/' : location.pathname.startsWith(route)
   ) || location.pathname.startsWith('/service/');
