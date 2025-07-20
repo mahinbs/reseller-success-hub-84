@@ -33,11 +33,6 @@ const faqData = [
     answer: "You can launch your business in 7–14 days with full access to your services, tools, and branding."
   },
   {
-    icon: Shield,
-    question: "Is this a white-label model?",
-    answer: "Yes. Everything is branded under your company name. Clients will never see Boostmysites in the backend."
-  },
-  {
     icon: Settings,
     question: "What services can I sell to my clients?",
     answer: "Web development, app development, AI solutions, automation tools, digital marketing, and more. All services are fulfilled by Boostmysites teams."
@@ -46,11 +41,6 @@ const faqData = [
     icon: Target,
     question: "How do I get clients?",
     answer: "We provide proven lead generation methods, ad templates, branding materials, and even done-for-you influencer marketing ideas."
-  },
-  {
-    icon: Building,
-    question: "Can I use my own domain and branding?",
-    answer: "Yes, you'll get a full website under your brand, with your logo, domain, email, and identity."
   },
   {
     icon: Handshake,
