@@ -9,6 +9,7 @@ interface CounterAnimationProps {
   prefix?: string;
   className?: string;
   isVisible?: boolean;
+  decimals?: number;
 }
 
 export const CounterAnimation = ({ 
@@ -18,7 +19,8 @@ export const CounterAnimation = ({
   suffix = '', 
   prefix = '',
   className = '',
-  isVisible = true
+  isVisible = true,
+  decimals = 0
 }: CounterAnimationProps) => {
   const [count, setCount] = useState(start);
 
@@ -33,7 +35,9 @@ export const CounterAnimation = ({
       const progress = Math.min((timestamp - startTime) / duration, 1);
       
       const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-      const currentCount = Math.floor(easeOutCubic * (end - start) + start);
+      const currentCount = decimals > 0 
+        ? Math.round((easeOutCubic * (end - start) + start) * Math.pow(10, decimals)) / Math.pow(10, decimals)
+        : Math.floor(easeOutCubic * (end - start) + start);
       
       setCount(currentCount);
 
