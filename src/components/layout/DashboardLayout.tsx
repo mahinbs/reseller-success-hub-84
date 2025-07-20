@@ -83,7 +83,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             {/* Home button */}
             <div className="ml-auto">
               <Button variant="ghost" size="sm" asChild>
-                <Link to="/">
+                <Link to="/" replace>
                   <Home className="h-4 w-4 mr-2" />
                   Home
                 </Link>
