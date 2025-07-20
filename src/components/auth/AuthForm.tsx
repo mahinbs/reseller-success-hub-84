@@ -12,6 +12,7 @@ export const AuthForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [referralName, setReferralName] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { signUp, signIn } = useAuth();
@@ -23,7 +24,7 @@ export const AuthForm = () => {
 
     try {
       if (isSignUp) {
-        await signUp(email, password, fullName);
+        await signUp(email, password, fullName, referralName);
         toast({
           title: "Account created successfully!",
           description: "Welcome to BoostMySites AI Services",
@@ -63,18 +64,32 @@ export const AuthForm = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required={isSignUp}
-                  className="transition-all-smooth focus:scale-[1.02]"
-                />
-              </div>
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required={isSignUp}
+                    className="transition-all-smooth focus:scale-[1.02]"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="referralName">Referral Name (Optional)</Label>
+                  <Input
+                    id="referralName"
+                    type="text"
+                    placeholder="Who referred you?"
+                    value={referralName}
+                    onChange={(e) => setReferralName(e.target.value)}
+                    className="transition-all-smooth focus:scale-[1.02]"
+                  />
+                </div>
+              </>
             )}
             
             <div className="space-y-2">

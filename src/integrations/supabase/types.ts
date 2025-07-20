@@ -137,6 +137,80 @@ export type Database = {
           },
         ]
       }
+      chat_conversations: {
+        Row: {
+          admin_id: string | null
+          closed_at: string | null
+          created_at: string
+          id: string
+          status: string
+          subject: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          subject?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          subject?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          file_url: string | null
+          id: string
+          is_read: boolean
+          message: string
+          message_type: string
+          sender_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          is_read?: boolean
+          message: string
+          message_type?: string
+          sender_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          is_read?: boolean
+          message?: string
+          message_type?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           bundle_id: string | null
@@ -226,6 +300,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          referral_name: string | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
         }
@@ -235,6 +310,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          referral_name?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }
@@ -244,6 +320,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          referral_name?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }

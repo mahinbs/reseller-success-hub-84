@@ -62,6 +62,7 @@ interface User {
   full_name: string | null;
   role: string;
   created_at: string;
+  referral_name?: string | null;
 }
 
 interface AdminDashboardProps {
@@ -775,6 +776,11 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                           >
                             {user.role}
                           </Badge>
+                          {user.referral_name && (
+                            <span className="text-xs text-muted-foreground bg-muted/20 px-2 py-1 rounded-full">
+                              Referred by: {user.referral_name}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
