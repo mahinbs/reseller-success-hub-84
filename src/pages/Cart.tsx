@@ -38,7 +38,7 @@ const CartPage = () => {
     console.log('LocalStorage cart:', localStorage.getItem('cart'));
     console.log('Location:', location.pathname);
     console.log('=====================');
-    
+
     toast({
       title: "Debug Info",
       description: "Cart debug information logged to console. Check browser dev tools.",
@@ -71,7 +71,7 @@ const CartPage = () => {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
-    
+
     // Navigate to checkout page
     navigate('/checkout');
   };
@@ -97,37 +97,10 @@ const CartPage = () => {
           <CardContent className="pt-6">
             <ShoppingBag className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-muted-foreground mb-6">
               Discover our amazing AI services and add them to your cart
             </p>
-            
-            {/* Troubleshooting section for empty cart */}
-            <div className="mb-4 p-3 bg-muted/30 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="h-4 w-4 text-orange-500" />
-                <span className="text-sm font-medium">Cart Issues?</span>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRefreshCart}
-                  className="text-xs"
-                >
-                  <RefreshCw className="h-3 w-3 mr-1" />
-                  Refresh
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDebugInfo}
-                  className="text-xs"
-                >
-                  Debug Info
-                </Button>
-              </div>
-            </div>
-            
+
             <Button asChild className="gradient-primary">
               <a href={isInDashboard ? "/dashboard/services" : "/services"}>
                 Browse Services
@@ -183,7 +156,7 @@ const CartPage = () => {
                         + 18% GST applicable
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <div className="text-xl font-bold text-primary">
@@ -193,7 +166,7 @@ const CartPage = () => {
                           + ₹{calculateGST(item.price)} GST
                         </div>
                       </div>
-                      
+
                       <Button
                         variant="outline"
                         size="icon"
@@ -216,7 +189,7 @@ const CartPage = () => {
               >
                 Clear Cart
               </Button>
-              
+
               <Button
                 variant="ghost"
                 asChild
@@ -244,9 +217,9 @@ const CartPage = () => {
                     </div>
                   ))}
                 </div>
-                
+
                 <hr className="border-border" />
-                
+
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal</span>
@@ -257,14 +230,14 @@ const CartPage = () => {
                     <span>₹{gstAmount.toFixed(2)}</span>
                   </div>
                 </div>
-                
+
                 <hr className="border-border" />
-                
+
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
                   <span className="text-primary">₹{totalWithGST.toFixed(2)}</span>
                 </div>
-                
+
                 <div className="space-y-3 pt-4">
                   <Button
                     onClick={handleCheckout}
@@ -273,13 +246,46 @@ const CartPage = () => {
                     <CreditCard className="mr-2 h-4 w-4" />
                     Proceed to Checkout
                   </Button>
-                  
+
                   <div className="text-xs text-center text-muted-foreground">
                     Secure checkout • SSL encrypted • Money-back guarantee
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Debug Section - Only visible in development when cart has items */}
+            {import.meta.env.DEV && (
+              <Card className="mt-4 opacity-60 hover:opacity-100 transition-opacity">
+                <CardContent className="p-3">
+                  <details className="group">
+                    <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground flex items-center gap-2">
+                      <AlertCircle className="h-3 w-3" />
+                      Cart Debug Tools (Dev)
+                    </summary>
+                    <div className="mt-2 flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRefreshCart}
+                        className="text-xs h-7"
+                      >
+                        <RefreshCw className="h-3 w-3 mr-1" />
+                        Refresh
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDebugInfo}
+                        className="text-xs h-7"
+                      >
+                        Debug Info
+                      </Button>
+                    </div>
+                  </details>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
