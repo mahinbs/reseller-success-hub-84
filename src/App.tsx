@@ -17,6 +17,9 @@ import Bundles from "./pages/Bundles";
 import BundleDetail from "./pages/BundleDetail";
 import About from "./pages/About";
 import CartPage from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentFailure";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -103,6 +106,32 @@ const App = () => (
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <CartPage />
+                    </ProtectedRoute>
+                  </>
+                } />
+                
+                {/* Checkout and Payment routes */}
+                <Route path="/checkout" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={true}>
+                      <Checkout />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/payment/success" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={true}>
+                      <PaymentSuccess />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/payment/failure" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={true}>
+                      <PaymentFailure />
                     </ProtectedRoute>
                   </>
                 } />

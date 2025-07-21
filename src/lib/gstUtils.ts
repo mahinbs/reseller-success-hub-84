@@ -26,7 +26,7 @@ export const getPriceWithGST = (amount: number): number => {
 export const formatPriceWithGST = (amount: number): { basePrice: number; gstAmount: number; totalPrice: number } => {
   const gstAmount = calculateGST(amount);
   const totalPrice = getPriceWithGST(amount);
-  
+
   return {
     basePrice: amount,
     gstAmount,
@@ -41,3 +41,14 @@ export const getGSTDisplayProps = () => ({
   className: "text-xs text-muted-foreground mt-1",
   text: "+ 18% GST applicable"
 });
+
+/**
+ * Format currency for display
+ */
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 2,
+  }).format(amount);
+};

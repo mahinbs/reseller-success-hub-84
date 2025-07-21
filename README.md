@@ -12,6 +12,10 @@ BoostMySites is a comprehensive platform offering premium AI-powered digital ser
 - **User-Friendly Dashboard**: Intuitive interface for managing services and purchases
 - **Secure Authentication**: Robust user authentication and profile management
 - **Responsive Design**: Optimized for all devices and screen sizes
+- **🚀 Complete Payment Integration**: Secure Razorpay checkout with real-time processing
+- **💳 Multiple Payment Methods**: Cards, UPI, Net Banking, Wallets, EMI
+- **🛡️ Server-side Security**: HMAC verification and secure order management
+- **📱 Mobile-First Design**: Optimized checkout experience for all devices
 
 ## Technology Stack
 
@@ -30,18 +34,48 @@ This project is built with modern web technologies:
 
 - Node.js (v16 or higher)
 - npm or yarn package manager
+- Supabase account and project
+- Razorpay account (for payments)
 
-### Installation
+### Quick Start
 
-1. Clone the repository
-2. Install dependencies:
+1. **Clone and Install**:
    ```bash
+   git clone <repository-url>
+   cd reseller-success-hub-84
    npm install
    ```
-3. Start the development server:
+
+2. **Setup Environment**:
+   ```bash
+   # Create .env.local
+   VITE_RAZORPAY_KEY_ID=rzp_test_your_key_here
+   ```
+
+3. **Deploy Payment Functions** (5 minutes):
+   ```bash
+   # Link to your Supabase project
+   supabase link --project-ref YOUR_PROJECT_REF
+   
+   # Deploy payment functions
+   ./deploy-functions-simple.sh
+   ```
+
+4. **Set Supabase Environment Variables**:
+   - Go to Supabase Dashboard → Settings → Environment Variables
+   - Add: `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`
+
+5. **Start Development**:
    ```bash
    npm run dev
    ```
+
+🎉 **Your complete payment system is now ready!**
+
+### 📚 Setup Guides
+- **Quick Setup**: See `SIMPLE_SETUP.md` for 5-minute payment integration
+- **Full Features**: See `SUPABASE_SETUP.md` for webhooks and advanced features
+- **Client Setup**: See `CHECKOUT_SETUP.md` for frontend configuration
 
 ## Services Offered
 
@@ -51,6 +85,16 @@ This project is built with modern web technologies:
 - **Social Media Management**: Complete social media solutions
 - **Digital Marketing**: Comprehensive marketing campaigns
 - **Analytics & Reporting**: Data-driven insights and reports
+
+## 💳 Payment System Features
+
+- **🔒 Secure Checkout**: Server-side order creation and verification
+- **💰 Multiple Payment Methods**: Cards, UPI, Net Banking, Wallets, EMI
+- **📊 GST Calculations**: Automatic 18% GST handling
+- **📱 Mobile Optimized**: Responsive payment forms
+- **⚡ Real-time Updates**: Live payment status tracking
+- **🛡️ Production Ready**: HMAC signature verification
+- **🎯 Easy Integration**: 5-minute setup with Razorpay
 
 ## Support
 

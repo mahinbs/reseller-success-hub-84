@@ -72,10 +72,8 @@ const CartPage = () => {
   const handleCheckout = () => {
     if (cart.length === 0) return;
     
-    toast({
-      title: "Checkout Coming Soon!",
-      description: "Payment integration will be available soon. Your cart items have been saved.",
-    });
+    // Navigate to checkout page
+    navigate('/checkout');
   };
 
   if (isLoading) {
