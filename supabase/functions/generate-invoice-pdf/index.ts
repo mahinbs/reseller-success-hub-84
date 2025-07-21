@@ -139,6 +139,9 @@ async function generateInvoicePDF(purchase: any, subtotal: number, gstAmount: nu
 INVOICE - BoostMySites
 AI-Powered Digital Services
 
+
+
+
 Invoice #: ${purchase.id.slice(-8).toUpperCase()}
 Date: ${orderDate}
 Customer: ${purchase.profiles.full_name || 'Valued Customer'}
