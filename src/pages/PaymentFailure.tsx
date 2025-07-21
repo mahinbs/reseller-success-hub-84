@@ -4,10 +4,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  XCircle, 
-  RefreshCw, 
-  ArrowLeft, 
+import {
+  XCircle,
+  RefreshCw,
+  ArrowLeft,
   CreditCard,
   Phone,
   Mail,
@@ -18,7 +18,7 @@ const PaymentFailurePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
-  
+
   const [error, setError] = useState<string>('');
   const [isRetrying, setIsRetrying] = useState(false);
 
@@ -50,7 +50,7 @@ const PaymentFailurePage = () => {
 
   const handleContactSupport = () => {
     // TODO: Implement support contact functionality
-    navigate('/support');
+    navigate('/dashboard/support');
   };
 
   const getErrorMessage = (errorText: string) => {
@@ -93,8 +93,8 @@ const PaymentFailurePage = () => {
     };
 
     // Try to match error text with known error types
-    const errorKey = Object.keys(commonErrors).find(key => 
-      errorText.toLowerCase().includes(key.replace('_', ' ')) || 
+    const errorKey = Object.keys(commonErrors).find(key =>
+      errorText.toLowerCase().includes(key.replace('_', ' ')) ||
       errorText.toLowerCase().includes(key)
     );
 
@@ -279,7 +279,7 @@ const PaymentFailurePage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button 
+                <Button
                   onClick={handleRetryPayment}
                   disabled={isRetrying}
                   className="w-full gradient-primary"
@@ -297,7 +297,7 @@ const PaymentFailurePage = () => {
                   )}
                 </Button>
 
-                <Button 
+                <Button
                   onClick={handleBackToCart}
                   variant="outline"
                   className="w-full"
@@ -306,7 +306,7 @@ const PaymentFailurePage = () => {
                   Back to Cart
                 </Button>
 
-                <Button 
+                <Button
                   onClick={handleContactSupport}
                   variant="ghost"
                   className="w-full"
@@ -357,7 +357,7 @@ const PaymentFailurePage = () => {
                   <p className="text-sm text-muted-foreground mb-4">
                     Our payment support team is available 24/7 to help you complete your purchase.
                   </p>
-                  
+
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-center gap-2">
                       <Phone className="h-4 w-4" />

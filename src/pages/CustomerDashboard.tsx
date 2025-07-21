@@ -90,11 +90,11 @@ const CustomerDashboard = ({
           supabase.from('services').select('*').eq('is_active', true),
           supabase.from('bundles').select('*').eq('is_active', true),
           supabase.from('purchases').select(`
-            id,
-            total_amount,
-            payment_status,
-            created_at,
-            purchase_items(item_name, item_price)
+              id,
+              total_amount,
+              payment_status,
+              created_at,
+              purchase_items(item_name, item_price)
           `)
             .eq('user_id', user.id)
             .in('payment_status', ['completed', 'cancelled', 'failed']) // Only final statuses
@@ -335,7 +335,7 @@ const CustomerDashboard = ({
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-sm">${purchase.total_amount}</p>
+                    <p className="font-bold text-sm">₹{purchase.total_amount}</p>
                     <Badge
                       variant={
                         purchase.payment_status === 'completed' ? 'default' :
@@ -634,7 +634,7 @@ const CustomerDashboard = ({
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-bold text-primary">${purchase.total_amount}</p>
+                <p className="text-2xl font-bold text-primary">₹{purchase.total_amount}</p>
                 <Badge
                   variant={
                     purchase.payment_status === 'completed' ? 'default' :

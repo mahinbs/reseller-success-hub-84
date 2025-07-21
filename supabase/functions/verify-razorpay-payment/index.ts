@@ -29,9 +29,9 @@ async function verifyRazorpaySignature(
       { name: "HMAC", hash: "SHA-256" },
       false,
       ["sign"]
-    ).then(key => 
+    ).then(key =>
       crypto.subtle.sign("HMAC", key, new TextEncoder().encode(body))
-    ).then(signature => 
+    ).then(signature =>
       Array.from(new Uint8Array(signature))
         .map(b => b.toString(16).padStart(2, '0'))
         .join('')
@@ -75,27 +75,27 @@ serve(async (req) => {
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
 
     // Parse request body
-    const { 
-      razorpay_payment_id, 
-      razorpay_order_id, 
-      razorpay_signature, 
-      purchase_id 
+    const {
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature,
+      purchase_id
     }: PaymentVerificationRequest = await req.json()
 
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature || !purchase_id) {
       return new Response(
         JSON.stringify({ error: 'Missing required payment verification data' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
@@ -111,9 +111,9 @@ serve(async (req) => {
     if (purchaseError || !purchase) {
       return new Response(
         JSON.stringify({ error: 'Purchase not found' }),
-        { 
-          status: 404, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
@@ -121,15 +121,15 @@ serve(async (req) => {
     // Check if purchase is already completed
     if (purchase.payment_status === 'completed') {
       return new Response(
-        JSON.stringify({ 
-          success: true, 
+        JSON.stringify({
+          success: true,
           message: 'Payment already verified',
           purchase_id: purchase.id,
           payment_status: 'completed'
         }),
-        { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
@@ -138,9 +138,9 @@ serve(async (req) => {
     if (purchase.razorpay_order_id !== razorpay_order_id) {
       return new Response(
         JSON.stringify({ error: 'Order ID mismatch' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
@@ -157,7 +157,7 @@ serve(async (req) => {
       // Update purchase status to failed
       await supabase
         .from('purchases')
-        .update({ 
+        .update({
           payment_status: 'failed',
           updated_at: new Date().toISOString()
         })
@@ -165,9 +165,9 @@ serve(async (req) => {
 
       return new Response(
         JSON.stringify({ error: 'Payment signature verification failed' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
@@ -175,7 +175,7 @@ serve(async (req) => {
     // Fetch payment details from Razorpay to double-check
     const RAZORPAY_KEY_ID = Deno.env.get('RAZORPAY_KEY_ID')
     const razorpayAuth = btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`)
-    
+
     const paymentResponse = await fetch(`https://api.razorpay.com/v1/payments/${razorpay_payment_id}`, {
       headers: {
         'Authorization': `Basic ${razorpayAuth}`,
@@ -186,9 +186,9 @@ serve(async (req) => {
       console.error('Failed to fetch payment from Razorpay')
       return new Response(
         JSON.stringify({ error: 'Failed to verify payment with Razorpay' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
@@ -199,9 +199,9 @@ serve(async (req) => {
     if (paymentData.status !== 'captured' && paymentData.status !== 'authorized') {
       return new Response(
         JSON.stringify({ error: 'Payment not successful' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
@@ -211,9 +211,9 @@ serve(async (req) => {
     if (paymentData.amount !== expectedAmount) {
       return new Response(
         JSON.stringify({ error: 'Payment amount mismatch' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
@@ -233,21 +233,41 @@ serve(async (req) => {
       console.error('Error updating purchase status:', updateError)
       return new Response(
         JSON.stringify({ error: 'Failed to update purchase status' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
 
-    // TODO: Clear user's cart items here
+    // Clear user's cart items
     await supabase
       .from('cart_items')
       .delete()
       .eq('user_id', user.id)
 
-    // TODO: Send confirmation email here
-    // TODO: Trigger any post-purchase workflows
+    // Send confirmation email automatically (optional - won't break payment if fails)
+    try {
+      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-invoice-email', {
+        body: {
+          purchase_id: purchase.id,
+          email_type: 'confirmation'
+        },
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (emailError) {
+        console.error('Error sending confirmation email:', emailError)
+        // Don't fail the payment verification if email fails
+      } else if (emailData && emailData.success) {
+        console.log('Confirmation email sent successfully for purchase:', purchase.id)
+      } else {
+        console.log('Email service not configured - skipping confirmation email for purchase:', purchase.id)
+      }
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError)
+      // Don't fail the payment verification if email fails
+    }
 
     return new Response(
       JSON.stringify({
@@ -257,22 +277,22 @@ serve(async (req) => {
         payment_status: 'completed',
         payment_id: razorpay_payment_id
       }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     )
 
   } catch (error) {
     console.error('Error in verify-razorpay-payment function:', error)
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: 'Internal server error',
-        message: error.message 
+        message: error.message
       }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     )
   }
