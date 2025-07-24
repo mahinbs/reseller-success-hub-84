@@ -21,8 +21,8 @@ export const ProtectedRoute = ({ children, requireAuth = false }: ProtectedRoute
   }
 
   // Define routes that authenticated users can access
-  const allowedRoutes = ['/bundles', '/cart', '/'];
-  const isAllowedRoute = allowedRoutes.some(route => 
+  const allowedRoutes = ['/bundles', '/cart', '/', '/reset-password', '/auth'];
+  const isAllowedRoute = allowedRoutes.some(route =>
     route === '/' ? location.pathname === '/' : location.pathname.startsWith(route)
   ) || location.pathname.startsWith('/service/');
 
@@ -32,7 +32,7 @@ export const ProtectedRoute = ({ children, requireAuth = false }: ProtectedRoute
     if (isAllowedRoute) {
       return <>{children}</>;
     }
-    
+
     // Redirect authenticated users from other marketing pages to their dashboard
     if (profile.role === 'admin') {
       return <Navigate to="/admin" replace />;

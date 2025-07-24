@@ -29,10 +29,14 @@ const ResetPassword = () => {
         const refreshToken = urlParams.get('refresh_token');
         const type = urlParams.get('type');
 
-        if (session || (accessToken && type === 'recovery')) {
+        // Always set valid session if we have URL params indicating password reset
+        if (type === 'recovery' || accessToken || session) {
             setIsValidSession(true);
-        } else {
-            // If no session and no reset tokens, redirect to auth page after a brief delay
+            return; // Don't set any redirect timer
+        }
+
+        // Only redirect if we have neither session nor reset tokens
+        if (!session && !accessToken && type !== 'recovery') {
             const timer = setTimeout(() => {
                 toast({
                     title: "Invalid Reset Link",
