@@ -23,10 +23,16 @@ const ResetPassword = () => {
 
     useEffect(() => {
         // Check if we have a valid session (user clicked reset link)
-        if (session) {
+        // Also check URL params for access_token which indicates password reset flow
+        const urlParams = new URLSearchParams(window.location.search);
+        const accessToken = urlParams.get('access_token');
+        const refreshToken = urlParams.get('refresh_token');
+        const type = urlParams.get('type');
+
+        if (session || (accessToken && type === 'recovery')) {
             setIsValidSession(true);
         } else {
-            // If no session, redirect to auth page after a brief delay
+            // If no session and no reset tokens, redirect to auth page after a brief delay
             const timer = setTimeout(() => {
                 toast({
                     title: "Invalid Reset Link",

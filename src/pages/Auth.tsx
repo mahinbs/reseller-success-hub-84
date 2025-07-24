@@ -1,23 +1,34 @@
 
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { useAuth } from '@/hooks/useAuth';
 
 const AuthPage = () => {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (user && profile && !loading) {
-      // Redirect to appropriate dashboard based on role
+      // Check if user came from a password reset link
+      const urlParams = new URLSearchParams(location.search);
+      const type = urlParams.get('type');
+
+      // If it's a password recovery flow, redirect to reset password page
+      if (type === 'recovery') {
+        navigate('/reset-password' + location.search, { replace: true });
+        return;
+      }
+
+      // Otherwise, redirect to appropriate dashboard based on role
       if (profile.role === 'admin') {
         navigate('/admin', { replace: true });
       } else {
         navigate('/dashboard', { replace: true });
       }
     }
-  }, [user, profile, loading, navigate]);
+  }, [user, profile, loading, navigate, location]);
 
   if (loading) {
     return (
