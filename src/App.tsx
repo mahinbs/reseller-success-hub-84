@@ -11,6 +11,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import ServiceLandingPage from "./pages/ServiceLandingPage";
 import Portfolio from "./pages/Portfolio";
 import Bundles from "./pages/Bundles";
@@ -50,6 +51,14 @@ const App = () => (
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <AuthPage />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/reset-password" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <ResetPassword />
                     </ProtectedRoute>
                   </>
                 } />
@@ -109,7 +118,7 @@ const App = () => (
                     </ProtectedRoute>
                   </>
                 } />
-                
+
                 {/* Checkout and Payment routes */}
                 <Route path="/checkout" element={
                   <>
@@ -135,7 +144,7 @@ const App = () => (
                     </ProtectedRoute>
                   </>
                 } />
-                
+
                 {/* Protected dashboard routes with sidebar layout */}
                 <Route path="/dashboard" element={
                   <ProtectedRoute requireAuth={true}>
@@ -150,7 +159,7 @@ const App = () => (
                   <Route path="profile" element={<CustomerDashboard activeTab="profile" />} />
                   <Route path="support" element={<CustomerDashboard activeTab="support" />} />
                 </Route>
-                
+
                 {/* Protected admin routes with sidebar layout */}
                 <Route path="/admin" element={
                   <ProtectedRoute requireAuth={true}>
@@ -165,7 +174,7 @@ const App = () => (
                   <Route path="analytics" element={<AdminDashboard activeTab="analytics" />} />
                   <Route path="settings" element={<AdminDashboard activeTab="settings" />} />
                 </Route>
-                
+
                 {/* Catch-all route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

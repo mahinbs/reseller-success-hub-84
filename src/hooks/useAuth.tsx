@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
         if (event === 'SIGNED_IN') {
           // Defer profile loading to prevent potential deadlocks
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         localStorage.removeItem(key);
       }
     });
-    
+
     // Remove from sessionStorage if in use
     Object.keys(sessionStorage || {}).forEach((key) => {
       if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
@@ -112,7 +112,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string, fullName?: string, referralName?: string) => {
     try {
       cleanupAuthState();
-      
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -126,7 +126,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) throw error;
-      
+
       // Don't redirect immediately for email confirmation flow
       console.log('Sign up successful');
     } catch (error) {
@@ -137,7 +137,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     try {
       cleanupAuthState();
-      
+
       // Attempt global sign out first
       try {
         await supabase.auth.signOut({ scope: 'global' });
@@ -151,7 +151,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) throw error;
-      
+
       if (data.user) {
         // Redirect to dashboard instead of homepage
         window.location.href = '/dashboard';
@@ -164,15 +164,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       cleanupAuthState();
-      
+
       try {
         await supabase.auth.signOut({ scope: 'global' });
       } catch (err) {
         // Ignore errors
       }
-      
+
       // Force page reload for clean state
       window.location.href = '/';
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const updatePassword = async (newPassword: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
     } catch (error) {
       throw error;
     }
@@ -188,7 +212,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .eq('id', user.id);
 
       if (error) throw error;
-      
+
       // Reload profile
       await loadProfile(user.id);
     } catch (error) {
@@ -204,6 +228,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signUp,
     signIn,
     signOut,
+    resetPassword,
+    updatePassword,
     updateProfile,
   };
 
