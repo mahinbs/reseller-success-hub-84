@@ -11,6 +11,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
+import ForgotPasswordPage from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ServiceLandingPage from "./pages/ServiceLandingPage";
 import Portfolio from "./pages/Portfolio";
@@ -52,6 +53,12 @@ const App = () => (
                     <ProtectedRoute requireAuth={false}>
                       <AuthPage />
                     </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/forgot-password" element={
+                  <>
+                    <Header />
+                    <ForgotPasswordPage />
                   </>
                 } />
                 <Route path="/reset-password" element={
