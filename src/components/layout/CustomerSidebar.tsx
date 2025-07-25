@@ -8,7 +8,8 @@ import {
   User, 
   FileText,
   HelpCircle,
-  LogOut
+  LogOut,
+  Puzzle
 } from 'lucide-react';
 import {
   Sidebar,
@@ -41,6 +42,11 @@ const navigationItems = [
     title: 'Bundles',
     url: '/dashboard/bundles',
     icon: ShoppingBag
+  },
+  {
+    title: 'Add-ons',
+    url: '/dashboard/addons',
+    icon: Puzzle
   },
   {
     title: 'My Purchases',
@@ -83,9 +89,8 @@ export function CustomerSidebar() {
 
   return (
     <Sidebar 
-      className={`glass-sidebar transition-all duration-300 ease-out ${
-        isCollapsed ? 'w-20' : 'w-72'
-      }`}
+      className="glass-sidebar"
+      collapsible="icon"
     >
       <SidebarContent className="overflow-hidden">
         <SidebarGroup>

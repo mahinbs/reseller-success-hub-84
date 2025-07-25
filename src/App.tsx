@@ -159,6 +159,7 @@ const App = () => (
                   <Route index element={<CustomerDashboard />} />
                   <Route path="services" element={<CustomerDashboard activeTab="services" />} />
                   <Route path="bundles" element={<CustomerDashboard activeTab="bundles" />} />
+                  <Route path="addons" element={<CustomerDashboard activeTab="addons" />} />
                   <Route path="purchases" element={<CustomerDashboard activeTab="purchases" />} />
                   <Route path="cart" element={<CartPage />} />
                   <Route path="profile" element={<CustomerDashboard activeTab="profile" />} />

@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { Navigate } from 'react-router-dom';
-import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare, Users, Handshake } from 'lucide-react';
+import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare, Users, Handshake, ShoppingBag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal';
 interface Service {
@@ -54,7 +54,7 @@ interface Purchase {
   }[];
 }
 interface CustomerDashboardProps {
-  activeTab?: 'overview' | 'services' | 'bundles' | 'purchases' | 'profile' | 'support';
+  activeTab?: 'overview' | 'services' | 'bundles' | 'addons' | 'purchases' | 'profile' | 'support';
 }
 const CustomerDashboard = ({
   activeTab = 'overview'
@@ -197,6 +197,8 @@ const CustomerDashboard = ({
         return renderServicesTab();
       case 'bundles':
         return renderBundlesTab();
+      case 'addons':
+        return renderAddonsTab();
       case 'purchases':
         return renderPurchasesTab();
       case 'profile':
@@ -506,159 +508,241 @@ const CustomerDashboard = ({
         Bundles
       </h1>
 
-      {/* Search */}
-      <div className="relative mb-8">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input placeholder="Search bundles..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10 glass-input hover:glow-subtle transition-all duration-300" />
+      {/* Search and Filter */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search bundles..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </div>
 
       {/* Bundles Grid */}
-      {loading ? <div className="grid md:grid-cols-2 gap-6">
-        {[1, 2, 3, 4].map(i => <Card key={i} className="glass-card animate-pulse">
-          <CardContent className="p-6">
-            <div className="h-4 bg-muted/30 rounded mb-4"></div>
-            <div className="h-16 bg-muted/30 rounded mb-4"></div>
-            <div className="h-32 bg-muted/30 rounded"></div>
-          </CardContent>
-        </Card>)}
-      </div> : filteredBundles.length === 0 ? <div className="text-center py-12">
-        <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-        <h3 className="text-xl font-semibold mb-2">No bundles found</h3>
-        <p className="text-muted-foreground">Try adjusting your search criteria</p>
-      </div> : <div className="grid md:grid-cols-2 gap-6">
-        {filteredBundles.map(bundle => <Card key={bundle.id} className="glass-card hover:glow-subtle hover:scale-[1.02] transition-all duration-300 group relative overflow-hidden flex flex-col min-h-[500px]">
-          {/* Background Image with Overlay */}
-          {bundle.image_url && <div className="absolute inset-0 bg-cover bg-center" style={{
-            backgroundImage: `url(${bundle.image_url})`
-          }}>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
-          </div>}
-
-          {/* Content */}
-          <div className="relative z-10 flex flex-col h-full">
-            <div className="absolute top-4 right-4 z-20">
-              <Badge className="bg-gradient-to-r from-green-500 to-emerald-400 text-white shadow-lg backdrop-blur-sm">
-                {bundle.discount_percentage}% OFF
-              </Badge>
-            </div>
-
-            <CardHeader className="flex-shrink-0">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-primary/30 to-purple-500/30 backdrop-blur-sm">
-                  <Package className="h-6 w-6 text-white" />
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <div className="animate-pulse">
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full"></div>
                 </div>
-                <div className="flex-1">
-                  <CardTitle className="text-xl mb-2 group-hover:text-primary transition-colors text-white">
-                    {bundle.name}
-                  </CardTitle>
-                  <CardDescription className="text-gray-200">{bundle.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
                 </div>
-              </div>
-            </CardHeader>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : filteredBundles.length === 0 ? (
+        <div className="text-center py-12">
+          <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No bundles found</h3>
+          <p className="text-muted-foreground">Try adjusting your search terms.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredBundles.map((bundle) => (
+            <Card key={bundle.id} className="glass-card hover:glow-subtle transition-all duration-300">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <ShoppingBag className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{bundle.name}</CardTitle>
+                      <Badge className="mt-1 bg-blue-500 text-white">
+                        {bundle.discount_percentage}% OFF
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-sm">{bundle.description}</p>
+              </CardHeader>
 
-            <div className="flex-1 px-6 space-y-4">
-              {/* Included Services */}
-              {bundle.services && bundle.services.length > 0 && <div className="space-y-2">
-                <h4 className="font-semibold text-sm text-gray-300">Included Services:</h4>
-                <div className="space-y-1">
-                  {bundle.services.slice(0, 3).map(service => <div key={service.id} className="flex items-center justify-between text-sm glass-subtle p-2 rounded-lg backdrop-blur-sm">
-                    <span className="text-white">{service.name}</span>
-                    <Badge variant="outline" className="text-xs border-white/30 text-white">
-                      ₹{service.price}
-                    </Badge>
-                  </div>)}
-                  {bundle.services.length > 3 && <div className="text-xs text-gray-300 text-center py-1">
-                    +{bundle.services.length - 3} more services
-                  </div>}
-                </div>
-              </div>}
+              <CardContent className="space-y-4">
+                {/* Services in Bundle */}
+                {bundle.services && bundle.services.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Included Services:</h4>
+                    <div className="space-y-1">
+                      {bundle.services.map((service) => (
+                        <div key={service.id} className="flex items-center justify-between text-sm">
+                          <span>{service.name}</span>
+                          <Badge variant="outline">{service.category}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-              {/* Pricing */}
-              <div className="space-y-2 pt-2 border-t border-white/20">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300">Original Price:</span>
-                  <span className="line-through text-gray-300">
-                    ₹{calculateOriginalPrice(bundle).toLocaleString()}
-                  </span>
+                {/* Pricing */}
+                <div className="space-y-2 p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Original Total:</span>
+                    <span className="line-through">₹{calculateOriginalPrice(bundle).toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">Bundle Price:</span>
+                    <span className="text-lg font-bold text-primary">₹{bundle.total_price.toLocaleString()}</span>
+                  </div>
+                  <div className="text-center text-sm text-green-600">
+                    You save ₹{(calculateOriginalPrice(bundle) - bundle.total_price).toLocaleString()}!
+                  </div>
                 </div>
-                <div className="flex justify-between text-lg font-bold">
-                  <span className="text-white">Bundle Price:</span>
-                  <span className="bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
-                    ₹{bundle.total_price.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
 
-            {/* Action Buttons - Fixed at bottom */}
-            <CardContent className="pt-0 mt-auto">
-              <div className="flex gap-2">
-                <Button asChild className="flex-1 glass-button hover:glow-button transition-all duration-300 backdrop-blur-sm">
-                  <Link to={`/bundles/${bundle.id}`}>
-                    View Details
-                  </Link>
+                <Button 
+                  onClick={() => handleAddToCart(bundle, 'bundle')}
+                  className="w-full glass-button hover:glow-button transition-all duration-300"
+                >
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  Add to Cart
                 </Button>
-                <Button size="icon" onClick={() => handleAddToCart(bundle, 'bundle')} className="glass-button hover:glow-button transition-all duration-300 shrink-0 backdrop-blur-sm">
-                  <ShoppingCart className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </div>
-        </Card>)}
-      </div>}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   </div>;
+
+  const renderAddonsTab = () => <div className="py-8 px-4">
+    <div className="container mx-auto max-w-7xl">
+      <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
+        Add-ons
+      </h1>
+
+      {/* Profit-Sharing Information Section */}
+      <div className="mb-8 p-6 bg-gradient-to-br from-primary/10 via-green-500/10 to-blue-500/10 rounded-xl border border-primary/20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-green-500/5 animate-pulse" />
+
+        <div className="relative">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-primary/20">
+              <Handshake className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-xl font-bold">How Our Partnership Works</h3>
+            <Badge className="bg-green-500/20 text-green-600 border-green-500/30">
+              Win-Win Partnership
+            </Badge>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-6">
+            <div className="text-center p-4 rounded-lg bg-white/50 border border-green-500/20">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Users className="h-5 w-5 text-green-600" />
+                <span className="text-2xl font-bold text-gray-800">70%</span>
+              </div>
+              <h4 className="font-semibold mb-1 text-green-700">Your Profit</h4>
+              <p className="text-sm text-gray-700">Keep 70% of every sale you make to your clients</p>
+            </div>
+
+            <div className="text-center p-4 rounded-lg bg-white/50 border border-primary/20">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <DollarSign className="h-5 w-5 text-primary" />
+                <span className="text-2xl font-bold text-gray-950">30%</span>
+              </div>
+              <h4 className="font-semibold mb-1">BoostMySites</h4>
+              <p className="text-sm text-gray-700">We handle fulfillment and support for this share</p>
+            </div>
+
+            <div className="text-center p-4 rounded-lg bg-white/50 border border-blue-500/20">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <TrendingUp className="h-5 w-5 text-blue-600" />
+                <span className="text-lg font-bold text-blue-700">100%</span>
+              </div>
+              <h4 className="font-semibold mb-1 text-blue-700">You Set Prices</h4>
+              <p className="text-sm text-gray-700">Complete control over your pricing strategy</p>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-muted-foreground mb-2">
+              <strong>Sell these add-ons to your clients and keep 70% profit!</strong>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              You focus on sales and client relationships → We handle all delivery, fulfillment, and technical support
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-center text-muted-foreground">Add-ons functionality coming soon!</p>
+    </div>
+  </div>;
+
   const renderPurchasesTab = () => <div className="py-8 px-4">
     <div className="container mx-auto max-w-7xl">
       <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
         My Purchases
       </h1>
 
-      {recentPurchases.length === 0 ? <div className="text-center py-12">
-        <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-        <h3 className="text-xl font-semibold mb-2">No purchases yet</h3>
-        <p className="text-muted-foreground mb-4">Start exploring our services and bundles</p>
-        <Button asChild className="glass-button hover:glow-button transition-all duration-300">
-          <Link to="/dashboard/services">Browse Services</Link>
-        </Button>
-      </div> : <div className="space-y-6">
-        {recentPurchases.map(purchase => <Card key={purchase.id} className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="font-semibold text-lg">
-                  {purchase.purchase_items?.[0]?.item_name || 'Purchase'}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {new Date(purchase.created_at).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-primary">₹{purchase.total_amount}</p>
-                <Badge
-                  variant={
-                    purchase.payment_status === 'completed' ? 'default' :
-                      purchase.payment_status === 'failed' ? 'destructive' :
-                        'secondary'
-                  }
-                >
-                  {purchase.payment_status}
-                </Badge>
-              </div>
-            </div>
+      {recentPurchases.length === 0 ? (
+        <div className="text-center py-12">
+          <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No purchases yet</h3>
+          <p className="text-muted-foreground mb-4">Start browsing our services to make your first purchase.</p>
+          <Button asChild className="glass-button hover:glow-button transition-all duration-300">
+            <Link to="/dashboard/services">Browse Services</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-6">
+          {recentPurchases.map((purchase) => (
+            <Card key={purchase.id} className="glass-card">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-lg">
+                      Purchase #{purchase.id.slice(-8)}
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(purchase.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold">₹{purchase.total_amount}</p>
+                    <Badge
+                      variant={
+                        purchase.payment_status === 'completed' ? 'default' :
+                          purchase.payment_status === 'failed' ? 'destructive' :
+                            'secondary'
+                      }
+                    >
+                      {purchase.payment_status}
+                    </Badge>
+                  </div>
+                </div>
+              </CardHeader>
 
-            {purchase.purchase_items && purchase.purchase_items.length > 0 && <div className="space-y-2">
-              <h4 className="font-medium text-sm text-muted-foreground">Items:</h4>
-              {purchase.purchase_items.map((item, index) => <div key={index} className="flex justify-between text-sm">
-                <span>{item.item_name}</span>
-                <span>₹{item.item_price}</span>
-              </div>)}
-            </div>}
-          </CardContent>
-        </Card>)}
-      </div>}
+              <CardContent>
+                {purchase.purchase_items && purchase.purchase_items.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-muted-foreground">Items:</h4>
+                    {purchase.purchase_items.map((item, index) => (
+                      <div key={index} className="flex justify-between text-sm">
+                        <span>{item.item_name}</span>
+                        <span>₹{item.item_price}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   </div>;
+
   const renderProfileTab = () => <div className="py-8 px-4">
     <div className="container mx-auto max-w-4xl">
       <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -694,7 +778,10 @@ const CustomerDashboard = ({
             </div>
           </div>
 
-          <Button className="glass-button hover:glow-button transition-all duration-300">
+          <Button 
+            className="glass-button hover:glow-button transition-all duration-300"
+            onClick={() => setIsProfileModalOpen(true)}
+          >
             <Edit3 className="h-4 w-4 mr-2" />
             Update Profile
           </Button>
@@ -702,6 +789,7 @@ const CustomerDashboard = ({
       </Card>
     </div>
   </div>;
+
   const renderSupportTab = () => <div className="py-8 px-4">
     <div className="container mx-auto max-w-4xl">
       <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
