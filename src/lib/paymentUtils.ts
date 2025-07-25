@@ -31,6 +31,7 @@ export interface OrderCreationResponse {
     purchase_id?: string;
     razorpay_order_id?: string;
     amount?: number;
+    key?: string; // Razorpay key ID for frontend initialization
     error?: string;
 }
 
@@ -83,6 +84,7 @@ export const createPurchaseOrder = async (
             purchase_id: data.purchase_id,
             razorpay_order_id: data.razorpay_order_id,
             amount: data.amount,
+            key: data.key, // Include the Razorpay key from backend response
         };
     } catch (error) {
         console.error('Error in createPurchaseOrder:', error);

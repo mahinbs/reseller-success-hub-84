@@ -121,7 +121,7 @@ export const usePayment = (options: PaymentOptions = {}) => {
             setState(prev => ({ ...prev, paymentStatus: 'processing' }));
 
             const razorpayOptions = {
-                key: RAZORPAY_CONFIG.key,
+                key: orderData.key || RAZORPAY_CONFIG.key, // Use key from order response or fallback to config
                 amount: orderData.amount,
                 currency: RAZORPAY_CONFIG.currency,
                 name: RAZORPAY_CONFIG.name,
