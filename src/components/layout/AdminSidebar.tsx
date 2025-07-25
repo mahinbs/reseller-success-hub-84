@@ -8,7 +8,8 @@ import {
   FileText,
   BarChart3,
   Settings,
-  LogOut
+  LogOut,
+  Puzzle
 } from 'lucide-react';
 import {
   Sidebar,
@@ -40,6 +41,11 @@ const navigationItems = [
     title: 'Bundles',
     url: '/admin/bundles',
     icon: ShoppingBag
+  },
+  {
+    title: 'Add-ons',
+    url: '/admin/addons',
+    icon: Puzzle
   },
   {
     title: 'Users',

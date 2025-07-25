@@ -24,6 +24,7 @@ import { DeleteConfirmationModal } from '@/components/admin/DeleteConfirmationMo
 import { ServiceFormData } from '@/components/admin/ServiceForm';
 import { BundleFormData } from '@/components/admin/BundleForm';
 import { useToast } from '@/hooks/use-toast';
+import { AdminAddons } from './AdminAddons';
 
 interface AdminStats {
   totalUsers: number;
@@ -66,7 +67,7 @@ interface User {
 }
 
 interface AdminDashboardProps {
-  activeTab?: 'overview' | 'services' | 'bundles' | 'users' | 'purchases' | 'analytics' | 'settings';
+  activeTab?: 'overview' | 'services' | 'bundles' | 'addons' | 'users' | 'purchases' | 'analytics' | 'settings';
 }
 
 const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
@@ -482,13 +483,14 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     }
   ];
 
-  // Render different content based on activeTab
   const renderContent = () => {
     switch (activeTab) {
       case 'services':
         return renderServicesTab();
       case 'bundles':
         return renderBundlesTab();
+      case 'addons':
+        return <AdminAddons />;
       case 'users':
         return renderUsersTab();
       case 'purchases':

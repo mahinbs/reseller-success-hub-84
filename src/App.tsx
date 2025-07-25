@@ -174,6 +174,7 @@ const App = () => (
                   <Route index element={<AdminDashboard />} />
                   <Route path="services" element={<AdminDashboard activeTab="services" />} />
                   <Route path="bundles" element={<AdminDashboard activeTab="bundles" />} />
+                  <Route path="addons" element={<AdminDashboard activeTab="addons" />} />
                   <Route path="users" element={<AdminDashboard activeTab="users" />} />
                   <Route path="purchases" element={<AdminDashboard activeTab="purchases" />} />
                   <Route path="analytics" element={<AdminDashboard activeTab="analytics" />} />
