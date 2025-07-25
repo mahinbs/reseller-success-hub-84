@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ShoppingCart, Puzzle, Check, TrendingUp, Search, Filter, Handshake, Users, DollarSign } from "lucide-react";
+import { ShoppingCart, Puzzle, Check, Search, Filter, Handshake, Users, DollarSign, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
@@ -97,8 +97,6 @@ export default function CustomerAddons() {
     return matchesSearch && matchesCategory;
   });
 
-  const calculateSuggestedPrice = (cost: number) => cost * 2.5;
-  const calculateProfit = (cost: number) => calculateSuggestedPrice(cost) - cost;
 
   if (loading) {
     return (
@@ -276,26 +274,11 @@ export default function CustomerAddons() {
                   )}
 
                   {/* Pricing */}
-                  <div className="space-y-3 bg-gradient-to-r from-muted/50 to-muted/30 p-4 rounded-lg">
-                    <div className="flex items-center justify-between text-sm">
+                  <div className="bg-gradient-to-r from-muted/50 to-muted/30 p-4 rounded-lg">
+                    <div className="flex items-center justify-between">
                       <span className="text-green-600 font-medium">Your Cost:</span>
-                      <span className="text-green-600 font-bold text-lg">
+                      <span className="text-green-600 font-bold text-xl">
                         ₹{addon.price.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-blue-600">Suggested Resell Price:</span>
-                      <span className="text-blue-600 font-semibold">
-                        ₹{calculateSuggestedPrice(addon.price).toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm border-t pt-2">
-                      <span className="text-purple-500 font-medium flex items-center gap-1">
-                        <TrendingUp className="h-4 w-4" />
-                        Potential Profit:
-                      </span>
-                      <span className="text-purple-500 font-bold">
-                        ₹{calculateProfit(addon.price).toLocaleString()}
                       </span>
                     </div>
                   </div>
