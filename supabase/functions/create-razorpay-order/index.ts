@@ -11,7 +11,7 @@ interface OrderRequest {
         id: string;
         name: string;
         price: number;
-        type: 'service' | 'bundle';
+        type: 'service' | 'bundle' | 'addon';
         billing_period?: string;
     }>;
 }
@@ -114,6 +114,7 @@ serve(async (req) => {
             purchase_id: purchase.id,
             service_id: item.type === 'service' ? item.id : null,
             bundle_id: item.type === 'bundle' ? item.id : null,
+            addon_id: item.type === 'addon' ? item.id : null,
             item_name: item.name,
             item_price: item.price,
             billing_period: item.billing_period || null,
