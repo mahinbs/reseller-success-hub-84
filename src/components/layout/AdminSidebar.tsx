@@ -84,9 +84,8 @@ export function AdminSidebar() {
 
   return (
     <Sidebar 
-      className={`glass-sidebar transition-all duration-300 ease-out ${
-        isCollapsed ? 'w-20' : 'w-72'
-      }`}
+      className="glass-sidebar"
+      collapsible="icon"
     >
       <SidebarContent className="overflow-hidden">
         <SidebarGroup>
