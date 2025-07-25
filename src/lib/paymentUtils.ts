@@ -173,7 +173,7 @@ export const getPurchaseDetails = async (purchaseId: string): Promise<Purchase |
             id: purchase.id,
             user_id: purchase.user_id,
             total_amount: purchase.total_amount,
-            payment_status: purchase.payment_status,
+            payment_status: purchase.payment_status as PaymentStatus,
             payment_method: purchase.payment_method,
             razorpay_order_id: purchase.razorpay_order_id,
             razorpay_payment_id: purchase.razorpay_payment_id,

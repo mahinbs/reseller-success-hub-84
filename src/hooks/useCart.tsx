@@ -5,11 +5,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { calculateGST, getPriceWithGST } from '@/lib/gstUtils';
 
-interface CartItem {
+export interface CartItem {
   id: string;
   name: string;
   price: number;
-  type: 'service' | 'bundle';
+  type: 'service' | 'bundle' | 'addon';
   billing_period?: string;
 }
 
