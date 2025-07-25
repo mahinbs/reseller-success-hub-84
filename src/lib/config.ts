@@ -7,7 +7,7 @@
 export const RAZORPAY_CONFIG = {
     // Replace with your actual Razorpay Key ID
     // You can get this from your Razorpay Dashboard > Account & Settings > API Keys
-    key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_your_key_here',
+    key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_ZTeC47Wo0uNJmC',
 
     // Currency configuration
     currency: 'INR',
