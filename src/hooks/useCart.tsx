@@ -96,7 +96,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const cartItems = data?.map(item => ({
-        id: item.service_id || item.bundle_id || item.service_id || '',
+        id: (item.item_type === 'service' || item.item_type === 'addon') ? (item.service_id || '') : (item.bundle_id || ''),
         name: item.item_name,
         price: Number(item.item_price),
         type: item.item_type as 'service' | 'bundle' | 'addon',
