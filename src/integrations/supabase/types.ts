@@ -127,6 +127,7 @@ export type Database = {
       }
       cart_items: {
         Row: {
+          addon_id: string | null
           billing_period: string | null
           bundle_id: string | null
           created_at: string
@@ -139,6 +140,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          addon_id?: string | null
           billing_period?: string | null
           bundle_id?: string | null
           created_at?: string
@@ -151,6 +153,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          addon_id?: string | null
           billing_period?: string | null
           bundle_id?: string | null
           created_at?: string
@@ -163,6 +166,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "cart_items_addon_id_fkey"
+            columns: ["addon_id"]
+            isOneToOne: false
+            referencedRelation: "addons"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "cart_items_bundle_id_fkey"
             columns: ["bundle_id"]
