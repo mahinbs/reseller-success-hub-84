@@ -96,10 +96,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const cartItems = data?.map(item => ({
-        id: item.service_id || item.bundle_id || '',
+        id: item.service_id || item.bundle_id || item.service_id || '',
         name: item.item_name,
         price: Number(item.item_price),
-        type: item.item_type as 'service' | 'bundle',
+        type: item.item_type as 'service' | 'bundle' | 'addon',
         billing_period: item.billing_period || undefined
       })) || [];
 
@@ -142,7 +142,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (cartItems.length > 0) {
         const dbItems = cartItems.map(item => ({
           user_id: user.id,
-          service_id: item.type === 'service' ? item.id : null,
+          service_id: item.type === 'service' ? item.id : (item.type === 'addon' ? item.id : null),
           bundle_id: item.type === 'bundle' ? item.id : null,
           item_name: item.name,
           item_price: item.price,
