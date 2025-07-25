@@ -14,6 +14,7 @@ import { Navigate } from 'react-router-dom';
 import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Mail, Calendar, Edit3, HelpCircle, Phone, MessageSquare, Users, Handshake, ShoppingBag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal';
+import CustomerAddons from '@/pages/CustomerAddons';
 interface Service {
   id: string;
   name: string;
@@ -614,70 +615,7 @@ const CustomerDashboard = ({
     </div>
   </div>;
 
-  const renderAddonsTab = () => <div className="py-8 px-4">
-    <div className="container mx-auto max-w-7xl">
-      <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
-        Add-ons
-      </h1>
-
-      {/* Profit-Sharing Information Section */}
-      <div className="mb-8 p-6 bg-gradient-to-br from-primary/10 via-green-500/10 to-blue-500/10 rounded-xl border border-primary/20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-green-500/5 animate-pulse" />
-
-        <div className="relative">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-primary/20">
-              <Handshake className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="text-xl font-bold">How Our Partnership Works</h3>
-            <Badge className="bg-green-500/20 text-green-600 border-green-500/30">
-              Win-Win Partnership
-            </Badge>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 mb-6">
-            <div className="text-center p-4 rounded-lg bg-white/50 border border-green-500/20">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Users className="h-5 w-5 text-green-600" />
-                <span className="text-2xl font-bold text-gray-800">70%</span>
-              </div>
-              <h4 className="font-semibold mb-1 text-green-700">Your Profit</h4>
-              <p className="text-sm text-gray-700">Keep 70% of every sale you make to your clients</p>
-            </div>
-
-            <div className="text-center p-4 rounded-lg bg-white/50 border border-primary/20">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <DollarSign className="h-5 w-5 text-primary" />
-                <span className="text-2xl font-bold text-gray-950">30%</span>
-              </div>
-              <h4 className="font-semibold mb-1">BoostMySites</h4>
-              <p className="text-sm text-gray-700">We handle fulfillment and support for this share</p>
-            </div>
-
-            <div className="text-center p-4 rounded-lg bg-white/50 border border-blue-500/20">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
-                <span className="text-lg font-bold text-blue-700">100%</span>
-              </div>
-              <h4 className="font-semibold mb-1 text-blue-700">You Set Prices</h4>
-              <p className="text-sm text-gray-700">Complete control over your pricing strategy</p>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <p className="text-muted-foreground mb-2">
-              <strong>Sell these add-ons to your clients and keep 70% profit!</strong>
-            </p>
-            <p className="text-sm text-muted-foreground">
-              You focus on sales and client relationships → We handle all delivery, fulfillment, and technical support
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <p className="text-center text-muted-foreground">Add-ons functionality coming soon!</p>
-    </div>
-  </div>;
+  const renderAddonsTab = () => <CustomerAddons />;
 
   const renderPurchasesTab = () => <div className="py-8 px-4">
     <div className="container mx-auto max-w-7xl">
