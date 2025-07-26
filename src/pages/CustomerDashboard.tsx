@@ -83,10 +83,14 @@ const CustomerDashboard = ({
   });
   const [recentPurchases, setRecentPurchases] = useState<Purchase[]>([]);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     if (!user) return;
     const loadData = async () => {
       try {
+        setError(null);
+        console.log('🔍 Loading data for user:', user.id);
+        
         const [servicesResponse, bundlesResponse, purchasesResponse] = await Promise.all([
           supabase.from('services').select('*').eq('is_active', true),
           supabase.from('bundles').select('*').eq('is_active', true),
@@ -98,10 +102,29 @@ const CustomerDashboard = ({
               purchase_items(item_name, item_price)
           `)
             .eq('user_id', user.id)
-            .in('payment_status', ['completed', 'cancelled', 'failed']) // Only final statuses
             .order('created_at', { ascending: false })
-            .limit(10) // Increased limit since we're filtering
         ]);
+
+        // Check for errors in each response
+        if (servicesResponse.error) {
+          console.error('❌ Services query error:', servicesResponse.error);
+          setError(`Failed to load services: ${servicesResponse.error.message}`);
+        }
+        if (bundlesResponse.error) {
+          console.error('❌ Bundles query error:', bundlesResponse.error);
+          setError(`Failed to load bundles: ${bundlesResponse.error.message}`);
+        }
+        if (purchasesResponse.error) {
+          console.error('❌ Purchases query error:', purchasesResponse.error);
+          setError(`Failed to load purchases: ${purchasesResponse.error.message}`);
+        }
+
+        console.log('📊 Query results:');
+        console.log('- Services:', servicesResponse.data?.length || 0);
+        console.log('- Bundles:', bundlesResponse.data?.length || 0);
+        console.log('- Purchases:', purchasesResponse.data?.length || 0);
+        console.log('- Purchase data:', purchasesResponse.data);
+
         if (servicesResponse.data) {
           const formattedServices = servicesResponse.data.map(service => ({
             ...service,
@@ -109,11 +132,13 @@ const CustomerDashboard = ({
           }));
           setServices(formattedServices);
         }
+
         if (bundlesResponse.data) {
           // Fetch services for each bundle
           const bundlesWithServices = await Promise.all(bundlesResponse.data.map(async bundle => {
             const {
-              data: servicesData
+              data: servicesData,
+              error: bundleServicesError
             } = await supabase.from('bundle_services').select(`
                   services:service_id (
                     id,
@@ -122,6 +147,11 @@ const CustomerDashboard = ({
                     price
                   )
                 `).eq('bundle_id', bundle.id);
+            
+            if (bundleServicesError) {
+              console.error('❌ Bundle services query error:', bundleServicesError);
+            }
+            
             return {
               ...bundle,
               services: servicesData?.map(item => item.services).filter(Boolean) || []
@@ -132,20 +162,33 @@ const CustomerDashboard = ({
 
         // Load user statistics
         if (purchasesResponse.data) {
-          // Data is already filtered at database level to only include final statuses
+          console.log('💰 Processing purchases data:', purchasesResponse.data);
           setRecentPurchases(purchasesResponse.data);
 
+          // Filter for completed purchases only for stats
           const completedPurchases = purchasesResponse.data.filter(p => p.payment_status === 'completed');
+          console.log('✅ Completed purchases:', completedPurchases);
+          
           const totalSpent = completedPurchases.reduce((sum, p) => sum + Number(p.total_amount), 0);
           const activeServicesCount = completedPurchases.reduce((sum, p) => sum + (p.purchase_items?.length || 0), 0);
+          
+          console.log('📈 Stats calculated:', {
+            totalPurchases: completedPurchases.length,
+            totalSpent,
+            activeServices: activeServicesCount
+          });
+          
           setUserStats({
             totalPurchases: completedPurchases.length,
             totalSpent,
             activeServices: activeServicesCount
           });
+        } else {
+          console.log('❓ No purchases data received');
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('❌ Error loading data:', error);
+        setError(`Failed to load dashboard data: ${error instanceof Error ? error.message : 'Unknown error'}`);
       } finally {
         setLoading(false);
       }
@@ -214,6 +257,13 @@ const CustomerDashboard = ({
     {/* Profile Dashboard Section */}
     <div className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5 py-8 px-4">
       <div className="container mx-auto max-w-7xl">
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <p className="text-destructive font-medium">⚠️ {error}</p>
+          </div>
+        )}
+
         {/* Welcome Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
