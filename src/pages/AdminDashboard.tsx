@@ -4,6 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import { 
@@ -16,7 +19,10 @@ import {
   Eye,
   Edit,
   Trash2,
-  BarChart3
+  BarChart3,
+  Search,
+  Calendar,
+  CreditCard
 } from 'lucide-react';
 import { ServiceModal } from '@/components/admin/ServiceModal';
 import { BundleModal } from '@/components/admin/BundleModal';
@@ -66,6 +72,29 @@ interface User {
   referral_name?: string | null;
 }
 
+interface Purchase {
+  id: string;
+  user_id: string;
+  total_amount: number;
+  payment_status: string;
+  payment_method?: string;
+  razorpay_order_id?: string;
+  razorpay_payment_id?: string;
+  created_at: string;
+  updated_at: string;
+  expires_at?: string;
+  profiles?: {
+    email: string;
+    full_name: string;
+  } | null;
+  purchase_items?: Array<{
+    id: string;
+    item_name: string;
+    item_price: number;
+    billing_period?: string;
+  }> | null;
+}
+
 interface AdminDashboardProps {
   activeTab?: 'overview' | 'services' | 'bundles' | 'addons' | 'users' | 'purchases' | 'analytics' | 'settings';
 }
@@ -83,7 +112,13 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
   const [services, setServices] = useState<Service[]>([]);
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [filteredPurchases, setFilteredPurchases] = useState<Purchase[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
+  const [purchaseDetailsOpen, setPurchaseDetailsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [purchasesLoading, setPurchasesLoading] = useState(false);
 
   // Modal states
   const [serviceModal, setServiceModal] = useState<{
@@ -123,6 +158,9 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
           supabase.from('purchases').select('total_amount, payment_status')
         ]);
 
+        // Load full purchase data separately
+        await loadPurchases();
+
         if (usersResponse.data) setUsers(usersResponse.data);
         if (servicesResponse.data) setServices(servicesResponse.data);
         if (bundlesResponse.data) setBundles(bundlesResponse.data);
@@ -151,6 +189,59 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
 
     loadAdminData();
   }, [user, profile, toast]);
+
+  // Load purchases with full details
+  const loadPurchases = async () => {
+    setPurchasesLoading(true);
+    try {
+      const { data: purchasesData, error } = await supabase
+        .from('purchases')
+        .select(`
+          *,
+          profiles (
+            email,
+            full_name
+          ),
+          purchase_items (
+            id,
+            item_name,
+            item_price,
+            billing_period
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      console.log('Loaded purchases:', purchasesData);
+      setPurchases((purchasesData as unknown as Purchase[]) || []);
+      setFilteredPurchases((purchasesData as unknown as Purchase[]) || []);
+    } catch (error) {
+      console.error('Error loading purchases:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load purchases',
+        variant: 'destructive',
+      });
+    } finally {
+      setPurchasesLoading(false);
+    }
+  };
+
+  // Filter purchases based on search term
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredPurchases(purchases);
+    } else {
+      const filtered = purchases.filter(purchase => 
+        purchase.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        purchase.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        purchase.payment_status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        purchase.razorpay_order_id?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredPurchases(filtered);
+    }
+  }, [searchTerm, purchases]);
 
   // Service CRUD operations
   const handleCreateService = async (data: ServiceFormData) => {
@@ -818,20 +909,329 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     </div>
   );
 
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      completed: { variant: 'default' as const, className: 'bg-green-500/10 text-green-500 border-green-500/20' },
+      pending: { variant: 'secondary' as const, className: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' },
+      processing: { variant: 'outline' as const, className: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
+      failed: { variant: 'destructive' as const, className: 'bg-red-500/10 text-red-500 border-red-500/20' },
+      cancelled: { variant: 'outline' as const, className: 'bg-gray-500/10 text-gray-500 border-gray-500/20' }
+    };
+    
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    return (
+      <Badge variant={config.variant} className={config.className}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </Badge>
+    );
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getPurchaseAnalytics = () => {
+    const completed = purchases.filter(p => p.payment_status === 'completed');
+    const totalRevenue = completed.reduce((sum, p) => sum + Number(p.total_amount), 0);
+    const avgOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0;
+    
+    return {
+      totalRevenue,
+      completedPurchases: completed.length,
+      totalPurchases: purchases.length,
+      avgOrderValue,
+      pendingRevenue: purchases
+        .filter(p => p.payment_status === 'pending')
+        .reduce((sum, p) => sum + Number(p.total_amount), 0)
+    };
+  };
+
+  const analytics = getPurchaseAnalytics();
+
   const renderPurchasesTab = () => (
     <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent mb-8">
-          Purchase Management
-        </h1>
-        
-        <Card className="glass-card border-0 rounded-2xl">
-          <CardContent className="p-12 text-center">
-            <ShoppingCart className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-semibold mb-2">Purchase Analytics Coming Soon</h3>
-            <p className="text-muted-foreground">Advanced purchase tracking and analytics will be available here</p>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
+            Purchase Management
+          </h1>
+          <Button onClick={loadPurchases} disabled={purchasesLoading}>
+            {purchasesLoading ? 'Refreshing...' : 'Refresh'}
+          </Button>
+        </div>
+
+        {/* Analytics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="glass-card border-0 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Revenue</p>
+                  <p className="text-2xl font-bold text-green-500">{formatCurrency(analytics.totalRevenue)}</p>
+                </div>
+                <DollarSign className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-0 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Completed Orders</p>
+                  <p className="text-2xl font-bold text-blue-500">{analytics.completedPurchases}</p>
+                </div>
+                <ShoppingCart className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-0 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Average Order</p>
+                  <p className="text-2xl font-bold text-purple-500">{formatCurrency(analytics.avgOrderValue)}</p>
+                </div>
+                <BarChart3 className="h-8 w-8 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-0 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Pending Revenue</p>
+                  <p className="text-2xl font-bold text-yellow-500">{formatCurrency(analytics.pendingRevenue)}</p>
+                </div>
+                <Calendar className="h-8 w-8 text-yellow-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Search and Filters */}
+        <Card className="glass-card border-0 rounded-2xl mb-6">
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  placeholder="Search by customer email, name, or order ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
+
+        {/* Purchases Table */}
+        <Card className="glass-card border-0 rounded-2xl">
+          <CardHeader>
+            <CardTitle>All Purchases ({filteredPurchases.length})</CardTitle>
+            <CardDescription>
+              Manage and track all customer purchases
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {purchasesLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : filteredPurchases.length === 0 ? (
+              <div className="text-center py-12">
+                <ShoppingCart className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-semibold mb-2">No purchases found</h3>
+                <p className="text-muted-foreground">
+                  {searchTerm ? 'Try adjusting your search criteria' : 'No purchases have been made yet'}
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Items</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Payment Method</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredPurchases.map((purchase) => (
+                      <TableRow key={purchase.id}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{purchase.profiles?.full_name || 'Unknown'}</p>
+                            <p className="text-sm text-muted-foreground">{purchase.profiles?.email}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{purchase.purchase_items?.length || 0} items</p>
+                            {purchase.purchase_items?.[0] && (
+                              <p className="text-sm text-muted-foreground">{purchase.purchase_items[0].item_name}
+                                {purchase.purchase_items.length > 1 && ` +${purchase.purchase_items.length - 1} more`}
+                              </p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {formatCurrency(Number(purchase.total_amount))}
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(purchase.payment_status)}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="h-4 w-4 text-muted-foreground" />
+                            {purchase.payment_method || 'Razorpay'}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {formatDate(purchase.created_at)}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedPurchase(purchase);
+                              setPurchaseDetailsOpen(true);
+                            }}
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Purchase Details Modal */}
+        <Dialog open={purchaseDetailsOpen} onOpenChange={setPurchaseDetailsOpen}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Purchase Details</DialogTitle>
+              <DialogDescription>
+                Complete information about this purchase
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedPurchase && (
+              <div className="space-y-6">
+                {/* Purchase Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">Purchase Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Order ID:</span>
+                        <span className="font-mono text-sm">{selectedPurchase.id.slice(0, 8)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Status:</span>
+                        {getStatusBadge(selectedPurchase.payment_status)}
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Total Amount:</span>
+                        <span className="font-semibold">{formatCurrency(Number(selectedPurchase.total_amount))}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Payment Method:</span>
+                        <span>{selectedPurchase.payment_method || 'Razorpay'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Created:</span>
+                        <span>{formatDate(selectedPurchase.created_at)}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-sm">Customer Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Name:</span>
+                        <span>{selectedPurchase.profiles?.full_name || 'Unknown'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Email:</span>
+                        <span>{selectedPurchase.profiles?.email}</span>
+                      </div>
+                      {selectedPurchase.razorpay_order_id && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Razorpay Order:</span>
+                          <span className="font-mono text-sm">{selectedPurchase.razorpay_order_id}</span>
+                        </div>
+                      )}
+                      {selectedPurchase.razorpay_payment_id && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Payment ID:</span>
+                          <span className="font-mono text-sm">{selectedPurchase.razorpay_payment_id}</span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Purchase Items */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Purchased Items</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {selectedPurchase.purchase_items?.length ? (
+                      <div className="space-y-2">
+                        {selectedPurchase.purchase_items.map((item) => (
+                          <div key={item.id} className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
+                            <div>
+                              <p className="font-medium">{item.item_name}</p>
+                              {item.billing_period && (
+                                <p className="text-sm text-muted-foreground">Billing: {item.billing_period}</p>
+                              )}
+                            </div>
+                            <span className="font-semibold">{formatCurrency(Number(item.item_price))}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">No items found</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
