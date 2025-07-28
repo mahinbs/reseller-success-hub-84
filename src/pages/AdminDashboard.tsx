@@ -9,12 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
-import { 
-  Users, 
-  DollarSign, 
-  Package, 
-  ShoppingCart, 
-  Settings, 
+import {
+  Users,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  Settings,
   Plus,
   Eye,
   Edit,
@@ -164,7 +164,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         if (usersResponse.data) setUsers(usersResponse.data);
         if (servicesResponse.data) setServices(servicesResponse.data);
         if (bundlesResponse.data) setBundles(bundlesResponse.data);
-        
+
         const completedPurchases = purchasesResponse.data?.filter(p => p.payment_status === 'completed') || [];
         const totalRevenue = completedPurchases.reduce((sum, p) => sum + Number(p.total_amount), 0);
 
@@ -194,14 +194,11 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
   const loadPurchases = async () => {
     setPurchasesLoading(true);
     try {
-      const { data: purchasesData, error } = await supabase
+      // Fetch purchases with purchase items
+      const { data: purchasesData, error: purchasesError } = await supabase
         .from('purchases')
         .select(`
           *,
-          profiles (
-            email,
-            full_name
-          ),
           purchase_items (
             id,
             item_name,
@@ -211,11 +208,30 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      
-      console.log('Loaded purchases:', purchasesData);
-      setPurchases((purchasesData as unknown as Purchase[]) || []);
-      setFilteredPurchases((purchasesData as unknown as Purchase[]) || []);
+      if (purchasesError) throw purchasesError;
+
+      // Fetch profiles separately
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, full_name');
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of profiles by user_id for quick lookup
+      const profilesMap = new Map();
+      profilesData?.forEach(profile => {
+        profilesMap.set(profile.id, profile);
+      });
+
+      // Join purchases with profiles
+      const enrichedPurchases = purchasesData?.map(purchase => ({
+        ...purchase,
+        profiles: profilesMap.get(purchase.user_id) || null
+      })) || [];
+
+      console.log('Loaded purchases:', enrichedPurchases);
+      setPurchases((enrichedPurchases as unknown as Purchase[]) || []);
+      setFilteredPurchases((enrichedPurchases as unknown as Purchase[]) || []);
     } catch (error) {
       console.error('Error loading purchases:', error);
       toast({
@@ -233,7 +249,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     if (!searchTerm) {
       setFilteredPurchases(purchases);
     } else {
-      const filtered = purchases.filter(purchase => 
+      const filtered = purchases.filter(purchase =>
         purchase.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         purchase.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         purchase.payment_status.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -286,7 +302,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
 
   const handleEditService = async (data: ServiceFormData) => {
     if (!serviceModal.service) return;
-    
+
     setOperationLoading(true);
     try {
       const serviceData = {
@@ -421,7 +437,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
 
   const handleEditBundle = async (data: BundleFormData) => {
     if (!bundleModal.bundle) return;
-    
+
     setOperationLoading(true);
     try {
       const { error: bundleError } = await supabase
@@ -661,7 +677,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
             Service Management
           </h1>
-          <Button 
+          <Button
             className="gradient-primary hover-lift hover-glow"
             onClick={() => setServiceModal({ isOpen: true, mode: 'create' })}
           >
@@ -697,7 +713,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                           <span className="text-sm font-medium text-accent-green">
                             ₹{service.price}
                           </span>
-                          <Badge 
+                          <Badge
                             variant={service.is_active ? 'default' : 'secondary'}
                             className={service.is_active ? 'gradient-success' : 'glass-subtle'}
                           >
@@ -706,27 +722,27 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         size="sm"
                         className="hover:bg-primary/20 hover:text-primary"
                         onClick={() => setServiceModal({ isOpen: true, mode: 'view', service })}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         size="sm"
                         className="hover:bg-accent-purple/20 hover:text-accent-purple"
                         onClick={() => setServiceModal({ isOpen: true, mode: 'edit', service })}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         className="hover:bg-destructive/20 hover:text-destructive"
                         onClick={() => setDeleteModal({ isOpen: true, type: 'service', item: service })}
                       >
@@ -750,7 +766,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
             Bundle Management
           </h1>
-          <Button 
+          <Button
             className="gradient-primary hover-lift hover-glow"
             onClick={() => setBundleModal({ isOpen: true, mode: 'create' })}
           >
@@ -786,7 +802,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                           <Badge variant="outline" className="glass-subtle border-accent-orange/30 text-accent-orange">
                             {bundle.discount_percentage}% off
                           </Badge>
-                          <Badge 
+                          <Badge
                             variant={bundle.is_active ? 'default' : 'secondary'}
                             className={bundle.is_active ? 'gradient-success' : 'glass-subtle'}
                           >
@@ -795,27 +811,27 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         size="sm"
                         className="hover:bg-primary/20 hover:text-primary"
                         onClick={() => setBundleModal({ isOpen: true, mode: 'view', bundle })}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         size="sm"
                         className="hover:bg-accent-purple/20 hover:text-accent-purple"
                         onClick={() => setBundleModal({ isOpen: true, mode: 'edit', bundle })}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         className="hover:bg-destructive/20 hover:text-destructive"
                         onClick={() => setDeleteModal({ isOpen: true, type: 'bundle', item: bundle })}
                       >
@@ -863,7 +879,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                         </h3>
                         <div className="flex items-center gap-3 mt-2">
                           <span className="text-sm text-muted-foreground">{user.email}</span>
-                          <Badge 
+                          <Badge
                             variant={user.role === 'admin' ? 'default' : 'secondary'}
                             className={user.role === 'admin' ? 'gradient-primary' : 'glass-subtle'}
                           >
@@ -877,21 +893,21 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground mb-2">
                         Joined {new Date(user.created_at).toLocaleDateString()}
                       </p>
                       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="sm"
                           className="hover:bg-primary/20 hover:text-primary"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="sm"
                           className="hover:bg-accent-purple/20 hover:text-accent-purple"
                         >
@@ -917,7 +933,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
       failed: { variant: 'destructive' as const, className: 'bg-red-500/10 text-red-500 border-red-500/20' },
       cancelled: { variant: 'outline' as const, className: 'bg-gray-500/10 text-gray-500 border-gray-500/20' }
     };
-    
+
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
     return (
       <Badge variant={config.variant} className={config.className}>
@@ -947,7 +963,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     const completed = purchases.filter(p => p.payment_status === 'completed');
     const totalRevenue = completed.reduce((sum, p) => sum + Number(p.total_amount), 0);
     const avgOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0;
-    
+
     return {
       totalRevenue,
       completedPurchases: completed.length,
@@ -1141,7 +1157,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                 Complete information about this purchase
               </DialogDescription>
             </DialogHeader>
-            
+
             {selectedPurchase && (
               <div className="space-y-6">
                 {/* Purchase Info */}
@@ -1242,7 +1258,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent mb-8">
           Analytics & Reports
         </h1>
-        
+
         <Card className="glass-card border-0 rounded-2xl">
           <CardContent className="p-12 text-center">
             <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
@@ -1260,7 +1276,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent mb-8">
           System Settings
         </h1>
-        
+
         <Card className="glass-card border-0 rounded-2xl">
           <CardContent className="p-12 text-center">
             <Settings className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
@@ -1275,7 +1291,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
   return (
     <>
       {renderContent()}
-      
+
       {/* Keep existing modals */}
       <ServiceModal
         isOpen={serviceModal.isOpen}
@@ -1283,17 +1299,17 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         onSubmit={serviceModal.mode === 'edit' ? handleEditService : handleCreateService}
         initialData={serviceModal.service ? {
           ...serviceModal.service,
-          features: Array.isArray(serviceModal.service.features) 
+          features: Array.isArray(serviceModal.service.features)
             ? serviceModal.service.features.join(', ')
             : serviceModal.service.features || ''
         } : undefined}
         title={
           serviceModal.mode === 'create' ? 'Add New Service' :
-          serviceModal.mode === 'edit' ? 'Edit Service' : 'View Service'
+            serviceModal.mode === 'edit' ? 'Edit Service' : 'View Service'
         }
         description={
           serviceModal.mode === 'create' ? 'Create a new service for your platform' :
-          serviceModal.mode === 'edit' ? 'Update service information' : 'Service details'
+            serviceModal.mode === 'edit' ? 'Update service information' : 'Service details'
         }
         isLoading={operationLoading}
       />
@@ -1305,11 +1321,11 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         initialData={bundleModal.bundle}
         title={
           bundleModal.mode === 'create' ? 'Add New Bundle' :
-          bundleModal.mode === 'edit' ? 'Edit Bundle' : 'View Bundle'
+            bundleModal.mode === 'edit' ? 'Edit Bundle' : 'View Bundle'
         }
         description={
           bundleModal.mode === 'create' ? 'Create a new service bundle' :
-          bundleModal.mode === 'edit' ? 'Update bundle information' : 'Bundle details'
+            bundleModal.mode === 'edit' ? 'Update bundle information' : 'Bundle details'
         }
         isLoading={operationLoading}
       />
