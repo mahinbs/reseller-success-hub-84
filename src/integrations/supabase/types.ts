@@ -539,6 +539,25 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      get_users_with_purchase_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          email: string
+          full_name: string
+          role: Database["public"]["Enums"]["app_role"]
+          referral_name: string
+          avatar_url: string
+          created_at: string
+          updated_at: string
+          total_purchases: number
+          completed_purchases: number
+          pending_purchases: number
+          processing_purchases: number
+          total_spent: number
+          last_purchase_date: string
+        }[]
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean

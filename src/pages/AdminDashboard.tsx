@@ -71,11 +71,11 @@ interface User {
   role: string;
   created_at: string;
   referral_name?: string | null;
-  total_purchases?: number;
-  completed_purchases?: number;
-  pending_purchases?: number;
-  processing_purchases?: number;
-  total_spent?: number;
+  total_purchases: number;
+  completed_purchases: number;
+  pending_purchases: number;
+  processing_purchases: number;
+  total_spent: number;
   last_purchase_date?: string;
 }
 
@@ -170,12 +170,22 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         await loadPurchases();
 
         // Set users data with purchase stats
-        if (usersWithStatsResponse.data) {
-          setUsers(usersWithStatsResponse.data);
+        if (usersWithStatsResponse.data && Array.isArray(usersWithStatsResponse.data)) {
+          setUsers(usersWithStatsResponse.data as User[]);
         } else {
           // Fallback to basic user data if RPC fails
           const basicUsersResponse = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
-          if (basicUsersResponse.data) setUsers(basicUsersResponse.data);
+          if (basicUsersResponse.data) {
+            const basicUsers = basicUsersResponse.data.map(user => ({
+              ...user,
+              total_purchases: 0,
+              completed_purchases: 0,
+              pending_purchases: 0,
+              processing_purchases: 0,
+              total_spent: 0
+            }));
+            setUsers(basicUsers as User[]);
+          }
         }
         
         if (servicesResponse.data) setServices(servicesResponse.data);
@@ -187,7 +197,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         const pendingRevenue = pendingPurchases.reduce((sum, p) => sum + Number(p.total_amount), 0);
 
         setStats({
-          totalUsers: (usersWithStatsResponse.data || []).length,
+          totalUsers: Array.isArray(usersWithStatsResponse.data) ? usersWithStatsResponse.data.length : users.length,
           totalRevenue,
           pendingRevenue,
           totalServices: servicesResponse.data?.length || 0,
