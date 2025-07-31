@@ -27,6 +27,7 @@ import {
 import { ServiceModal } from '@/components/admin/ServiceModal';
 import { BundleModal } from '@/components/admin/BundleModal';
 import { DeleteConfirmationModal } from '@/components/admin/DeleteConfirmationModal';
+import { UserModal } from '@/components/admin/UserModal';
 import { ServiceFormData } from '@/components/admin/ServiceForm';
 import { BundleFormData } from '@/components/admin/BundleForm';
 import { useToast } from '@/hooks/use-toast';
@@ -70,6 +71,7 @@ interface User {
   full_name: string | null;
   role: string;
   created_at: string;
+  updated_at: string;
   referral_name?: string | null;
   total_purchases: number;
   completed_purchases: number;
@@ -146,6 +148,11 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     type: 'service' | 'bundle';
     item?: Service | Bundle;
   }>({ isOpen: false, type: 'service' });
+
+  const [userModal, setUserModal] = useState<{
+    isOpen: boolean;
+    user?: User;
+  }>({ isOpen: false });
 
   const [operationLoading, setOperationLoading] = useState(false);
 
@@ -964,6 +971,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                           variant="ghost"
                           size="sm"
                           className="hover:bg-primary/20 hover:text-primary"
+                          onClick={() => setUserModal({ isOpen: true, user })}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -1405,6 +1413,12 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         description={`Are you sure you want to delete this ${deleteModal.type}? This action cannot be undone.`}
         itemName={deleteModal.item?.name || ''}
         isLoading={operationLoading}
+      />
+
+      <UserModal
+        user={userModal.user || null}
+        isOpen={userModal.isOpen}
+        onClose={() => setUserModal({ isOpen: false })}
       />
     </>
   );
