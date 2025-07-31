@@ -32,8 +32,10 @@ const ServiceDetail = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('🔍 ServiceDetail mounted with id:', id);
     const loadService = async () => {
       if (!id) {
+        console.log('❌ No service ID provided');
         setError('Service ID not provided');
         setLoading(false);
         return;

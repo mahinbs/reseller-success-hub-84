@@ -68,6 +68,14 @@ const App = () => (
                     <ResetPassword />
                   </>
                 } />
+                <Route path="/services/detail/:id" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <ServiceDetail />
+                    </ProtectedRoute>
+                  </>
+                } />
                 <Route path="/services/:slug" element={
                   <>
                     <Header />
@@ -81,14 +89,6 @@ const App = () => (
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <ServiceLandingPage />
-                    </ProtectedRoute>
-                  </>
-                } />
-                <Route path="/services/detail/:id" element={
-                  <>
-                    <Header />
-                    <ProtectedRoute requireAuth={false}>
-                      <ServiceDetail />
                     </ProtectedRoute>
                   </>
                 } />
