@@ -95,8 +95,8 @@ export function CustomerSidebar() {
       <SidebarContent className="overflow-hidden">
         <SidebarGroup>
           <SidebarGroupLabel 
-            className={`text-sm font-semibold gradient-text transition-all duration-300 ${
-              isCollapsed ? 'opacity-0 h-0 py-0 overflow-hidden' : 'opacity-100 px-4 py-4 animate-fade-in-scale'
+            className={`text-sm font-semibold gradient-text px-4 py-4 transition-all duration-300 ${
+              isCollapsed ? 'invisible' : 'animate-fade-in-scale'
             }`}
           >
             Customer Portal
