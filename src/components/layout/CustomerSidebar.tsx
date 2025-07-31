@@ -89,20 +89,20 @@ export function CustomerSidebar() {
 
   return (
     <Sidebar 
-      className="glass-sidebar"
+      className={`glass-sidebar transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}
       collapsible="icon"
     >
       <SidebarContent className="overflow-hidden">
         <SidebarGroup>
-          {!isCollapsed && (
-            <SidebarGroupLabel 
-              className="text-sm font-semibold gradient-text px-4 py-4 transition-all duration-300 animate-fade-in-scale"
-            >
-              Customer Portal
-            </SidebarGroupLabel>
-          )}
+          <SidebarGroupLabel 
+            className={`text-sm font-semibold gradient-text transition-all duration-300 ${
+              isCollapsed ? 'opacity-0 h-0 py-0 overflow-hidden' : 'opacity-100 px-4 py-4 animate-fade-in-scale'
+            }`}
+          >
+            Customer Portal
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className={`space-y-2 ${isCollapsed ? 'px-2' : 'px-3'}`}>
+            <SidebarMenu className={`space-y-2 transition-all duration-300 ${isCollapsed ? 'px-2' : 'px-3'}`}>
               {navigationItems.map((item, index) => (
                 <SidebarMenuItem 
                   key={item.title}
