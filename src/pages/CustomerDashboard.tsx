@@ -539,7 +539,7 @@ const CustomerDashboard = ({
             <CardContent className="pt-0 mt-auto">
               <div className="flex gap-2">
                 <Button asChild className="flex-1 glass-button hover:glow-button transition-all duration-300 backdrop-blur-sm">
-                  <Link to={`/services/${service.id}`}>
+                  <Link to={`/services/detail/${service.id}`}>
                     View Details
                   </Link>
                 </Button>

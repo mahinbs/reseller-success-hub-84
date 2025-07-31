@@ -14,6 +14,7 @@ import AuthPage from "./pages/Auth";
 import ForgotPasswordPage from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ServiceLandingPage from "./pages/ServiceLandingPage";
+import ServiceDetail from "./pages/ServiceDetail";
 import Portfolio from "./pages/Portfolio";
 import Bundles from "./pages/Bundles";
 import BundleDetail from "./pages/BundleDetail";
@@ -80,6 +81,14 @@ const App = () => (
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <ServiceLandingPage />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/services/detail/:id" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <ServiceDetail />
                     </ProtectedRoute>
                   </>
                 } />
