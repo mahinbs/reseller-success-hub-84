@@ -35,6 +35,7 @@ import { AdminAddons } from './AdminAddons';
 interface AdminStats {
   totalUsers: number;
   totalRevenue: number;
+  pendingRevenue: number;
   totalServices: number;
   totalPurchases: number;
   totalBundles: number;
@@ -70,6 +71,12 @@ interface User {
   role: string;
   created_at: string;
   referral_name?: string | null;
+  total_purchases?: number;
+  completed_purchases?: number;
+  pending_purchases?: number;
+  processing_purchases?: number;
+  total_spent?: number;
+  last_purchase_date?: string;
 }
 
 interface Purchase {
@@ -105,6 +112,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
   const [stats, setStats] = useState<AdminStats>({
     totalUsers: 0,
     totalRevenue: 0,
+    pendingRevenue: 0,
     totalServices: 0,
     totalPurchases: 0,
     totalBundles: 0
@@ -147,30 +155,41 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     const loadAdminData = async () => {
       try {
         const [
-          usersResponse,
           servicesResponse,
           bundlesResponse,
-          purchasesResponse
+          purchasesResponse,
+          usersWithStatsResponse
         ] = await Promise.all([
-          supabase.from('profiles').select('*').order('created_at', { ascending: false }),
           supabase.from('services').select('*').order('created_at', { ascending: false }),
           supabase.from('bundles').select('*').order('created_at', { ascending: false }),
-          supabase.from('purchases').select('total_amount, payment_status')
+          supabase.from('purchases').select('total_amount, payment_status'),
+          supabase.rpc('get_users_with_purchase_stats')
         ]);
 
         // Load full purchase data separately
         await loadPurchases();
 
-        if (usersResponse.data) setUsers(usersResponse.data);
+        // Set users data with purchase stats
+        if (usersWithStatsResponse.data) {
+          setUsers(usersWithStatsResponse.data);
+        } else {
+          // Fallback to basic user data if RPC fails
+          const basicUsersResponse = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+          if (basicUsersResponse.data) setUsers(basicUsersResponse.data);
+        }
+        
         if (servicesResponse.data) setServices(servicesResponse.data);
         if (bundlesResponse.data) setBundles(bundlesResponse.data);
 
         const completedPurchases = purchasesResponse.data?.filter(p => p.payment_status === 'completed') || [];
+        const pendingPurchases = purchasesResponse.data?.filter(p => ['pending', 'processing'].includes(p.payment_status)) || [];
         const totalRevenue = completedPurchases.reduce((sum, p) => sum + Number(p.total_amount), 0);
+        const pendingRevenue = pendingPurchases.reduce((sum, p) => sum + Number(p.total_amount), 0);
 
         setStats({
-          totalUsers: usersResponse.data?.length || 0,
+          totalUsers: (usersWithStatsResponse.data || []).length,
           totalRevenue,
+          pendingRevenue,
           totalServices: servicesResponse.data?.length || 0,
           totalPurchases: purchasesResponse.data?.length || 0,
           totalBundles: bundlesResponse.data?.length || 0
@@ -848,6 +867,25 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     </div>
   );
 
+  const getPaymentStatusBadge = (user: User) => {
+    const totalPurchases = user.total_purchases || 0;
+    const completedPurchases = user.completed_purchases || 0;
+    const pendingPurchases = (user.pending_purchases || 0) + (user.processing_purchases || 0);
+    const totalSpent = user.total_spent || 0;
+
+    if (completedPurchases > 0 && totalSpent > 50000) {
+      return <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0">Premium User</Badge>;
+    } else if (completedPurchases > 0) {
+      return <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0">Active Customer</Badge>;
+    } else if (pendingPurchases > 0) {
+      return <Badge className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-0">Pending Payment</Badge>;
+    } else if (totalPurchases > 0) {
+      return <Badge variant="outline" className="border-red-500/30 text-red-500">Payment Failed</Badge>;
+    } else {
+      return <Badge variant="secondary" className="glass-subtle">No Purchases</Badge>;
+    }
+  };
+
   const renderUsersTab = () => (
     <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -885,6 +923,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                           >
                             {user.role}
                           </Badge>
+                          {getPaymentStatusBadge(user)}
                           {user.referral_name && (
                             <span className="text-xs text-muted-foreground bg-muted/20 px-2 py-1 rounded-full">
                               Referred by: {user.referral_name}
@@ -895,6 +934,18 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                     </div>
 
                     <div className="text-right">
+                      <div className="mb-2">
+                        {user.total_spent && user.total_spent > 0 ? (
+                          <p className="text-sm font-semibold text-green-500">
+                            ₹{user.total_spent.toLocaleString()}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">₹0</p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          {user.total_purchases || 0} purchases
+                        </p>
+                      </div>
                       <p className="text-sm text-muted-foreground mb-2">
                         Joined {new Date(user.created_at).toLocaleDateString()}
                       </p>
@@ -961,17 +1012,23 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
 
   const getPurchaseAnalytics = () => {
     const completed = purchases.filter(p => p.payment_status === 'completed');
+    const pending = purchases.filter(p => ['pending', 'processing'].includes(p.payment_status));
+    const failed = purchases.filter(p => ['failed', 'cancelled'].includes(p.payment_status));
+    
     const totalRevenue = completed.reduce((sum, p) => sum + Number(p.total_amount), 0);
     const avgOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0;
+    const pendingRevenue = pending.reduce((sum, p) => sum + Number(p.total_amount), 0);
+    const failedRevenue = failed.reduce((sum, p) => sum + Number(p.total_amount), 0);
 
     return {
       totalRevenue,
       completedPurchases: completed.length,
       totalPurchases: purchases.length,
       avgOrderValue,
-      pendingRevenue: purchases
-        .filter(p => p.payment_status === 'pending')
-        .reduce((sum, p) => sum + Number(p.total_amount), 0)
+      pendingRevenue,
+      failedRevenue,
+      pendingOrders: pending.length,
+      failedOrders: failed.length
     };
   };
 
