@@ -126,8 +126,8 @@ export function CustomerSidebar() {
                         {isActive(item.url, item.exact) && (
                           <div className="absolute inset-0 bg-primary/20 rounded-full blur-md animate-pulse-glow" />
                         )}
-                        {item.showBadge && cartItemsCount > 0 && (
-                          <div className="sidebar-badge">
+                        {item.showBadge && cartItemsCount > 0 && isCollapsed && (
+                          <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center shadow-lg animate-pulse-glow">
                             {cartItemsCount > 99 ? '99+' : cartItemsCount}
                           </div>
                         )}
