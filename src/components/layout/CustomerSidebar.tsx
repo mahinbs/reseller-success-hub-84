@@ -109,17 +109,17 @@ export function CustomerSidebar() {
                   className={`animate-stagger-in animate-stagger-${Math.min(index + 1, 5)}`}
                 >
                   <SidebarMenuButton asChild isActive={isActive(item.url, item.exact)}>
-                    <NavLink 
-                      to={item.url}
-                      className={({ isActive }) => 
-                        `sidebar-item group flex items-center rounded-xl transition-all duration-300 relative ${
-                          isActive 
-                            ? 'sidebar-item-active bg-gradient-to-r from-primary/25 via-primary/15 to-blue-500/10 text-primary border border-primary/20 shadow-lg shadow-primary/20' 
-                            : 'hover:bg-gradient-to-r hover:from-muted/50 hover:to-muted/30 text-muted-foreground hover:text-foreground hover:shadow-md'
-                        } ${isCollapsed ? 'justify-center px-3 py-3' : 'justify-start gap-4 px-4 py-3'}`
-                       }
-                     >
-                       <div className="relative">
+                     <NavLink 
+                       to={item.url}
+                       className={({ isActive }) => 
+                         `sidebar-item group flex items-center rounded-xl transition-all duration-300 relative ${
+                           isActive 
+                             ? 'sidebar-item-active bg-gradient-to-r from-primary/25 via-primary/15 to-blue-500/10 text-primary border border-primary/20 shadow-lg shadow-primary/20' 
+                             : 'hover:bg-gradient-to-r hover:from-muted/50 hover:to-muted/30 text-muted-foreground hover:text-foreground hover:shadow-md'
+                         } ${isCollapsed ? 'justify-center w-10 h-10 p-0' : 'justify-start gap-4 px-4 py-3'}`
+                        }
+                      >
+                       <div className={`relative flex items-center justify-center ${isCollapsed ? 'w-10 h-10' : ''}`}>
                         <item.icon className={`sidebar-icon h-5 w-5 shrink-0 transition-all duration-300 ${
                           isActive(item.url, item.exact) ? 'text-primary animate-icon-bounce' : 'group-hover:scale-110'
                         }`} />
@@ -127,8 +127,8 @@ export function CustomerSidebar() {
                           <div className="absolute inset-0 bg-primary/20 rounded-full blur-md animate-pulse-glow" />
                         )}
                         {item.showBadge && cartItemsCount > 0 && isCollapsed && (
-                          <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center shadow-lg animate-pulse-glow">
-                            {cartItemsCount > 99 ? '99+' : cartItemsCount}
+                          <div className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold min-w-[16px] h-[16px] rounded-full flex items-center justify-center shadow-lg animate-pulse-glow">
+                            {cartItemsCount > 9 ? '9+' : cartItemsCount}
                           </div>
                         )}
                       </div>
