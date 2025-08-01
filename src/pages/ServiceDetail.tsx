@@ -151,50 +151,86 @@ const ServiceDetail = () => {
                 {service.description}
               </p>
 
-              {/* Clean Profit-First Pricing */}
+              {/* Enhanced Profit-First Pricing */}
               <div className="space-y-4 mb-6">
-                {/* Main Profit Highlight */}
-                <div className="text-center p-6 bg-card border rounded-xl shadow-sm">
-                  <Badge className="bg-green-500 text-white mb-3">
-                    🚀 RESELLABLE SERVICE
-                  </Badge>
-                  <h3 className="text-2xl font-bold text-foreground mb-2">
-                    Keep 70% of Every Sale
+                {/* UNLIMITED PROFIT POTENTIAL Header */}
+                <div className="text-center p-6 bg-gradient-to-r from-green-500/10 via-primary/10 to-purple-500/10 border-2 border-green-500/20 rounded-xl shadow-lg">
+                  <div className="flex items-center justify-center gap-2 mb-3">
+                    <span className="text-2xl">🚀</span>
+                    <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white text-sm font-bold px-4 py-1">
+                      UNLIMITED PROFIT POTENTIAL
+                    </Badge>
+                    <TrendingUp className="h-5 w-5 text-green-500" />
+                  </div>
+                  <h3 className="text-3xl font-bold text-foreground mb-2">
+                    Keep <span className="text-green-600">70%</span> of Every Sale
                   </h3>
-                  <p className="text-muted-foreground text-sm">
-                    White-label rights included • Unlimited reselling
+                  <p className="text-muted-foreground">
+                    White-label rights included • Unlimited reselling • We handle fulfillment
                   </p>
                 </div>
 
-                {/* Simple ROI Cards */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-4 bg-card border rounded-lg">
-                    <div className="text-lg font-bold text-green-600">1 Project</div>
-                    <div className="text-xs text-muted-foreground">Pays for entire year</div>
-                  </div>
-                  <div className="text-center p-4 bg-card border rounded-lg">
-                    <div className="text-lg font-bold text-blue-600">
-                      ₹{Math.ceil(getServicePricing(service.name).defaultPrice * 0.7).toLocaleString()}+
+                {/* Quick ROI Calculation Cards */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-5 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/10 border border-green-200 dark:border-green-800 rounded-lg shadow-sm">
+                    <div className="text-lg font-bold text-green-700 dark:text-green-400 mb-1">1 Project</div>
+                    <div className="text-sm text-green-600 dark:text-green-500 font-medium">Pays for entire year</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Break-even in one sale
                     </div>
-                    <div className="text-xs text-muted-foreground">Profit per project</div>
+                  </div>
+                  <div className="text-center p-5 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 border border-blue-200 dark:border-blue-800 rounded-lg shadow-sm">
+                    <div className="text-lg font-bold text-blue-700 dark:text-blue-400 mb-1">
+                      ₹{Math.ceil(getServicePricing(service.name).defaultPrice * 0.7 * 5).toLocaleString()}+
+                    </div>
+                    <div className="text-sm text-blue-600 dark:text-blue-500 font-medium">5 Projects Monthly</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Potential monthly earnings
+                    </div>
                   </div>
                 </div>
 
-                {/* Clean Pricing Breakdown */}
-                <div className="p-4 bg-muted/30 rounded-lg space-y-3">
+                {/* Detailed Profit Breakdown */}
+                <div className="p-5 bg-card border rounded-lg space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">License Fee:</span>
+                    <span className="text-sm text-muted-foreground">Your License Fee:</span>
                     <span className="font-semibold">₹{service.price.toLocaleString()}/{service.billing_period}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Project Range:</span>
+                    <span className="text-sm text-muted-foreground">Typical Project Range:</span>
                     <span className="font-semibold text-green-600">
                       {formatPriceRange(getServicePricing(service.name))}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center pt-2 border-t">
-                    <span className="font-medium">Your Profit (70%):</span>
-                    <span className="font-bold text-primary">Per Project Basis</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Your Profit Per Project:</span>
+                    <span className="font-bold text-green-600">
+                      ₹{Math.ceil(getServicePricing(service.name).minPrice * 0.7).toLocaleString()} - ₹{Math.ceil(getServicePricing(service.name).maxPrice * 0.7).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="pt-3 border-t border-border">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-foreground">Monthly Potential (5 projects):</span>
+                      <span className="font-bold text-2xl text-primary">
+                        ₹{Math.ceil(getServicePricing(service.name).defaultPrice * 0.7 * 5).toLocaleString()}+
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trust Indicators Row */}
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="p-3 bg-muted/30 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-green-500 mx-auto mb-1" />
+                    <div className="text-xs font-medium">White-label Rights</div>
+                  </div>
+                  <div className="p-3 bg-muted/30 rounded-lg">
+                    <Users className="h-5 w-5 text-blue-500 mx-auto mb-1" />
+                    <div className="text-xs font-medium">Unlimited Reselling</div>
+                  </div>
+                  <div className="p-3 bg-muted/30 rounded-lg">
+                    <Zap className="h-5 w-5 text-purple-500 mx-auto mb-1" />
+                    <div className="text-xs font-medium">We Handle All Work</div>
                   </div>
                 </div>
               </div>
