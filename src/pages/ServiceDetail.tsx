@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, ShoppingCart, Star, CheckCircle, TrendingUp, Users, Zap, DollarSign } from "lucide-react";
 import { ProfitCalculator } from "@/components/reseller/ProfitCalculator";
 import { ResellableTooltip } from "@/components/reseller/ResellableTooltip";
+import { getServicePricing, formatPriceRange } from "@/lib/servicePricing";
 
 interface Service {
   id: string;
@@ -153,33 +154,36 @@ const ServiceDetail = () => {
               <div className="space-y-3 mb-6 p-4 bg-gradient-to-r from-muted/50 to-muted/30 rounded-lg">
                 <div className="flex justify-between text-sm">
                   <ResellableTooltip 
-                    content="This is your cost - you set the resell price"
+                    content="Grants white-label rights to resell this service"
                     type="price"
                   >
-                    <span className="text-muted-foreground cursor-help">Your Cost:</span>
+                    <span className="text-muted-foreground cursor-help">Access Fee:</span>
                   </ResellableTooltip>
                   <span className="font-bold text-lg">
                     ₹{service.price.toLocaleString()}/{service.billing_period}
                   </span>
                 </div>
+                <div className="text-xs text-muted-foreground mb-2">
+                  Grants white-label rights to resell {service.name} projects
+                </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-green-600">Suggested Resell Price:</span>
+                  <span className="text-green-600">Average Project Price:</span>
                   <span className="text-green-600 font-semibold">
-                    ₹{(service.price * 2.5).toLocaleString()}/{service.billing_period}
+                    {formatPriceRange(getServicePricing(service.name))} (set by you)
                   </span>
                 </div>
                 <div className="flex justify-between text-sm border-t pt-2">
                   <ResellableTooltip 
-                    content="Your profit per sale at suggested price"
+                    content="You keep 70% of every project sale"
                     type="profit"
                   >
                     <span className="text-purple-500 font-medium cursor-help flex items-center gap-1">
                       <TrendingUp className="h-4 w-4" />
-                      Potential Profit:
+                      You Earn 70% Per Sale
                     </span>
                   </ResellableTooltip>
                   <span className="text-purple-500 font-bold text-lg">
-                    ₹{(service.price * 1.5).toLocaleString()}/{service.billing_period}
+                    Per Project Basis
                   </span>
                 </div>
               </div>
@@ -195,6 +199,10 @@ const ServiceDetail = () => {
                 <Button variant="outline" asChild>
                   <Link to="/dashboard/cart">View Cart</Link>
                 </Button>
+              </div>
+              
+              <div className="text-center text-sm text-muted-foreground mt-3 p-2 bg-muted/20 rounded-lg">
+                <span className="font-medium">Your Clients Pay You → We Deliver the Project</span>
               </div>
             </div>
 
@@ -229,36 +237,36 @@ const ServiceDetail = () => {
                   <div className="p-3 rounded-full bg-green-500/20 w-fit mx-auto">
                     <CheckCircle className="h-6 w-6 text-green-500" />
                   </div>
-                  <h4 className="font-semibold">Get Full Access</h4>
+                  <h4 className="font-semibold">Access white-label rights</h4>
                   <p className="text-sm text-muted-foreground">
-                    Immediate white-label access to the service
+                    Access white-label rights to resell this service
                   </p>
                 </div>
                 <div className="space-y-2">
                   <div className="p-3 rounded-full bg-blue-500/20 w-fit mx-auto">
                     <Users className="h-6 w-6 text-blue-500" />
                   </div>
-                  <h4 className="font-semibold">Find Your Clients</h4>
+                  <h4 className="font-semibold">Market this as your own</h4>
                   <p className="text-sm text-muted-foreground">
-                    Market to businesses who need this service
+                    Market this as your own service to clients
                   </p>
                 </div>
                 <div className="space-y-2">
                   <div className="p-3 rounded-full bg-purple-500/20 w-fit mx-auto">
                     <DollarSign className="h-6 w-6 text-purple-500" />
                   </div>
-                  <h4 className="font-semibold">Set Your Price</h4>
+                  <h4 className="font-semibold">You control pricing</h4>
                   <p className="text-sm text-muted-foreground">
-                    Charge 2-5x what you paid - keep all profit
+                    You control pricing per project — keep 70% profit
                   </p>
                 </div>
                 <div className="space-y-2">
                   <div className="p-3 rounded-full bg-orange-500/20 w-fit mx-auto">
                     <Zap className="h-6 w-6 text-orange-500" />
                   </div>
-                  <h4 className="font-semibold">We Fulfill</h4>
+                  <h4 className="font-semibold">We deliver seamlessly</h4>
                   <p className="text-sm text-muted-foreground">
-                    Relax while we deliver to your client
+                    Our team delivers and supports your clients seamlessly
                   </p>
                 </div>
               </div>
