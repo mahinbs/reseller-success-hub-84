@@ -119,7 +119,7 @@ const ServiceDetail = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background">
       {/* Enhanced Header */}
       <div className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5 py-8 px-4">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-4xl lg:max-w-6xl xl:max-w-7xl">
           <div className="flex items-center gap-4 mb-6">
             <Button variant="ghost" size="sm" asChild>
               <Link to="/dashboard/services" className="flex items-center gap-2">
@@ -129,8 +129,8 @@ const ServiceDetail = () => {
             </Button>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-center">
+            <div className="lg:col-span-2">
               <div className="flex items-center gap-3 mb-4">
                 <ResellableTooltip 
                   content="Buy once, resell unlimited times to your clients"
@@ -171,7 +171,7 @@ const ServiceDetail = () => {
                 </div>
 
                 {/* Quick ROI Calculation Cards */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="text-center p-5 bg-card border rounded-lg shadow-sm hover-scale">
                     <div className="text-xl font-bold text-green-500 mb-1">1 Project</div>
                     <div className="text-sm font-medium text-foreground">Pays for entire year</div>
@@ -219,7 +219,7 @@ const ServiceDetail = () => {
                 </div>
 
                 {/* Trust Indicators Row */}
-                <div className="grid grid-cols-3 gap-3 text-center">
+                <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 text-center">
                   <div className="p-3 bg-muted/30 rounded-lg">
                     <CheckCircle className="h-5 w-5 text-green-500 mx-auto mb-1" />
                     <div className="text-xs font-medium">White-label Rights</div>
@@ -270,7 +270,7 @@ const ServiceDetail = () => {
 
       {/* What Happens After You Buy Section */}
       <div className="py-8 px-4 bg-gradient-to-r from-green-500/5 via-primary/5 to-blue-500/5">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-4xl lg:max-w-6xl xl:max-w-7xl">
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-center">
@@ -325,7 +325,7 @@ const ServiceDetail = () => {
       {/* Features Section */}
       {service.features && service.features.length > 0 && (
         <div className="py-12 px-4">
-          <div className="container mx-auto max-w-4xl">
+          <div className="container mx-auto max-w-4xl lg:max-w-6xl xl:max-w-7xl">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold mb-4">What Your Clients Will Receive</h2>
               <p className="text-muted-foreground">
@@ -333,7 +333,7 @@ const ServiceDetail = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4 mb-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
               {service.features.map((feature, index) => (
                 <div key={index} className="flex items-start gap-3 p-4 rounded-lg glass-subtle">
                   <div className="p-1 rounded-full bg-green-500/20 mt-1">
@@ -349,15 +349,15 @@ const ServiceDetail = () => {
 
       {/* Profit Calculator */}
       <div className="py-8 px-4">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-4xl lg:max-w-6xl xl:max-w-7xl">
           <ProfitCalculator baseCost={service.price} serviceName={service.name} />
         </div>
       </div>
 
       {/* Trust Indicators */}
       <div className="py-8 px-4 bg-muted/20">
-        <div className="container mx-auto max-w-4xl">
-          <div className="grid md:grid-cols-3 gap-6 text-center">
+        <div className="container mx-auto max-w-4xl lg:max-w-6xl xl:max-w-7xl">
+          <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6 text-center">
             <div>
               <div className="text-3xl font-bold text-primary mb-2">1000+</div>
               <div className="text-sm text-muted-foreground">Active Resellers</div>
