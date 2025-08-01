@@ -151,40 +151,74 @@ const ServiceDetail = () => {
                 {service.description}
               </p>
 
-              <div className="space-y-3 mb-6 p-4 bg-gradient-to-r from-muted/50 to-muted/30 rounded-lg">
-                <div className="flex justify-between text-sm">
-                  <ResellableTooltip 
-                    content="Grants white-label rights to resell this service"
-                    type="price"
-                  >
-                    <span className="text-muted-foreground cursor-help">Access Fee:</span>
-                  </ResellableTooltip>
-                  <span className="font-bold text-lg">
-                    ₹{service.price.toLocaleString()}/{service.billing_period}
-                  </span>
+              {/* Profit-First Pricing Card */}
+              <div className="space-y-4 mb-6 p-6 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl border-2 border-green-200 dark:border-green-800 shadow-lg">
+                {/* Headline Profit Potential */}
+                <div className="text-center mb-4">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <TrendingUp className="h-6 w-6 text-green-500 animate-pulse" />
+                    <Badge className="bg-green-500 text-white text-sm px-4 py-1">
+                      🚀 UNLIMITED PROFIT POTENTIAL
+                    </Badge>
+                  </div>
+                  <h3 className="text-xl font-bold text-green-700 dark:text-green-400">
+                    KEEP 70% OF EVERY PROJECT SALE!
+                  </h3>
                 </div>
-                <div className="text-xs text-muted-foreground mb-2">
-                  Grants white-label rights to resell {service.name} projects
+
+                {/* ROI Calculator */}
+                <div className="bg-white/80 dark:bg-black/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                  <div className="text-center mb-3">
+                    <div className="text-lg font-bold text-primary">Quick ROI Calculation</div>
+                    <div className="text-sm text-muted-foreground">Based on average project pricing</div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div className="bg-green-100 dark:bg-green-900/30 rounded-lg p-3">
+                      <div className="text-2xl font-bold text-green-600">1 Project</div>
+                      <div className="text-sm text-muted-foreground">Pays for entire year!</div>
+                      <div className="text-xs text-green-600 font-medium mt-1">
+                        Just ₹{Math.ceil(service.price / 0.7).toLocaleString()} revenue needed
+                      </div>
+                    </div>
+                    <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3">
+                      <div className="text-2xl font-bold text-blue-600">5 Projects</div>
+                      <div className="text-sm text-muted-foreground">Monthly potential</div>
+                      <div className="text-xs text-blue-600 font-medium mt-1">
+                        ₹{Math.ceil((getServicePricing(service.name).defaultPrice * 0.7 * 5)).toLocaleString()}/month profit
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-green-600">Average Project Price:</span>
-                  <span className="text-green-600 font-semibold">
-                    {formatPriceRange(getServicePricing(service.name))} (set by you)
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm border-t pt-2">
-                  <ResellableTooltip 
-                    content="You keep 70% of every project sale"
-                    type="profit"
-                  >
-                    <span className="text-purple-500 font-medium cursor-help flex items-center gap-1">
-                      <TrendingUp className="h-4 w-4" />
-                      You Earn 70% Per Sale
+
+                {/* Pricing Breakdown */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-sm border-b border-green-200 dark:border-green-800 pb-2">
+                    <span className="text-muted-foreground">Business License Fee:</span>
+                    <span className="font-bold text-red-600">
+                      -₹{service.price.toLocaleString()}/{service.billing_period}
                     </span>
-                  </ResellableTooltip>
-                  <span className="text-purple-500 font-bold text-lg">
-                    Per Project Basis
-                  </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-green-600 font-medium">You Charge Your Clients:</span>
+                    <span className="text-green-600 font-bold">
+                      {formatPriceRange(getServicePricing(service.name))} per project
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-lg border-t border-green-200 dark:border-green-800 pt-2">
+                    <span className="text-green-700 dark:text-green-400 font-bold flex items-center gap-2">
+                      <DollarSign className="h-5 w-5" />
+                      Your Profit (70%):
+                    </span>
+                    <span className="text-green-700 dark:text-green-400 font-bold text-xl">
+                      ₹{Math.ceil(getServicePricing(service.name).defaultPrice * 0.7).toLocaleString()}+ per project
+                    </span>
+                  </div>
+                </div>
+
+                {/* Trust Badge */}
+                <div className="text-center text-xs text-muted-foreground bg-muted/30 rounded-lg p-2">
+                  ✅ White-label rights included • ✅ Unlimited reselling • ✅ We handle all fulfillment
                 </div>
               </div>
 
