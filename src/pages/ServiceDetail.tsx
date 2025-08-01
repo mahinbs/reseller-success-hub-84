@@ -172,18 +172,18 @@ const ServiceDetail = () => {
 
                 {/* Quick ROI Calculation Cards */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-5 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/10 border border-green-200 dark:border-green-800 rounded-lg shadow-sm">
-                    <div className="text-lg font-bold text-green-700 dark:text-green-400 mb-1">1 Project</div>
-                    <div className="text-sm text-green-600 dark:text-green-500 font-medium">Pays for entire year</div>
+                  <div className="text-center p-5 bg-card border rounded-lg shadow-sm hover-scale">
+                    <div className="text-xl font-bold text-green-500 mb-1">1 Project</div>
+                    <div className="text-sm font-medium text-foreground">Pays for entire year</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Break-even in one sale
                     </div>
                   </div>
-                  <div className="text-center p-5 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 border border-blue-200 dark:border-blue-800 rounded-lg shadow-sm">
-                    <div className="text-lg font-bold text-blue-700 dark:text-blue-400 mb-1">
+                  <div className="text-center p-5 bg-card border rounded-lg shadow-sm hover-scale">
+                    <div className="text-xl font-bold text-primary mb-1">
                       ₹{Math.ceil(getServicePricing(service.name).defaultPrice * 0.7 * 5).toLocaleString()}+
                     </div>
-                    <div className="text-sm text-blue-600 dark:text-blue-500 font-medium">5 Projects Monthly</div>
+                    <div className="text-sm font-medium text-foreground">5 Projects Monthly</div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Potential monthly earnings
                     </div>
