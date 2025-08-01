@@ -170,22 +170,74 @@ const ServiceDetail = () => {
                   </p>
                 </div>
 
-                {/* Quick ROI Calculation Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="text-center p-5 bg-card border rounded-lg shadow-sm hover-scale">
-                    <div className="text-xl font-bold text-green-500 mb-1">1 Project</div>
-                    <div className="text-sm font-medium text-foreground">Pays for entire year</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Break-even in one sale
+                {/* Enhanced ROI Calculation Cards */}
+                <div className="relative">
+                  {/* Connecting Lines */}
+                  <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent hidden lg:block -translate-y-1/2 opacity-30"></div>
+                  
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+                    {/* Card 1: ROI Achievement */}
+                    <div className="roi-card roi-card-green text-center p-5 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/20 dark:to-green-900/20 border border-green-200 dark:border-green-800 rounded-lg shadow-sm animate-stagger-1 group relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-center mb-2">
+                          <CheckCircle className="h-5 w-5 text-green-500 animate-pulse" />
+                        </div>
+                        <div className="text-xl font-bold text-green-600 mb-1">1 Project</div>
+                        <div className="text-sm font-medium text-foreground">Pays for entire year</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Break-even in one sale
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-center p-5 bg-card border rounded-lg shadow-sm hover-scale">
-                    <div className="text-xl font-bold text-primary mb-1">
-                      ₹{Math.ceil(getServicePricing(service.name).defaultPrice * 0.7 * 5).toLocaleString()}+
+
+                    {/* Card 2: Monthly Potential */}
+                    <div className="roi-card roi-card-blue text-center p-5 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg shadow-sm animate-stagger-2 group relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-center mb-2">
+                          <TrendingUp className="h-5 w-5 text-blue-500 transition-transform group-hover:scale-110 duration-300" />
+                        </div>
+                        <div className="text-xl font-bold text-blue-600 mb-1">
+                          ₹{Math.ceil(getServicePricing(service.name).defaultPrice * 0.7 * 5).toLocaleString()}+
+                        </div>
+                        <div className="text-sm font-medium text-foreground">5 Projects Monthly</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Potential monthly earnings
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-sm font-medium text-foreground">5 Projects Monthly</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Potential monthly earnings
+
+                    {/* Card 3: Break-even Time */}
+                    <div className="roi-card roi-card-purple text-center p-5 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg shadow-sm animate-stagger-3 group relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-center mb-2">
+                          <Zap className="h-5 w-5 text-purple-500 transition-transform group-hover:rotate-12 duration-300" />
+                        </div>
+                        <div className="text-xl font-bold text-purple-600 mb-1">Within 30 Days</div>
+                        <div className="text-sm font-medium text-foreground">Average time to ROI</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Most resellers recover investment
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card 4: Yearly Potential */}
+                    <div className="roi-card roi-card-orange text-center p-5 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/20 dark:to-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg shadow-sm animate-stagger-4 group relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-center mb-2">
+                          <DollarSign className="h-5 w-5 text-orange-500 transition-transform group-hover:scale-125 duration-300" />
+                        </div>
+                        <div className="text-xl font-bold text-orange-600 mb-1">
+                          ₹{Math.ceil(getServicePricing(service.name).defaultPrice * 0.7 * 60).toLocaleString()}+
+                        </div>
+                        <div className="text-sm font-medium text-foreground">Annual earning potential</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          With consistent sales
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
