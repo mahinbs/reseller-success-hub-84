@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { usePayment } from '@/hooks/usePayment';
 import { Button } from '@/components/ui/button';
@@ -25,9 +25,13 @@ import jsPDF from 'jspdf';
 const PaymentSuccessPage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const location = useLocation();
     const { user } = useAuth();
     const { getPurchase } = usePayment();
     const { toast } = useToast();
+
+    // Check if we're in dashboard context
+    const isInDashboard = location.pathname.startsWith('/dashboard');
 
     const [purchase, setPurchase] = useState<Purchase | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +46,7 @@ const PaymentSuccessPage = () => {
         }
 
         if (!purchaseId) {
-            navigate('/cart', { replace: true });
+            navigate(isInDashboard ? '/dashboard/cart' : '/cart', { replace: true });
             return;
         }
 
@@ -771,19 +775,46 @@ const PaymentSuccessPage = () => {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span>Subtotal</span>
-                                        <span>{formatCurrency(purchase.total_amount / 1.18)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-sm text-muted-foreground">
-                                        <span>GST (18%)</span>
-                                        <span>{formatCurrency(purchase.total_amount - (purchase.total_amount / 1.18))}</span>
-                                    </div>
-                                    <Separator />
-                                    <div className="flex justify-between text-lg font-semibold">
-                                        <span>Total Paid</span>
-                                        <span className="text-green-600">{formatCurrency(purchase.total_amount)}</span>
-                                    </div>
+                                    {(() => {
+                                        // Calculate proper amounts accounting for coupon
+                                        const itemsSubtotal = purchase.items?.reduce((sum, item) => sum + Number(item.price), 0) || 0;
+                                        const couponDiscount = Number(purchase.coupon_discount || 0);
+                                        const discountedSubtotal = itemsSubtotal - couponDiscount;
+                                        const gstAmount = discountedSubtotal * 0.18;
+                                        const finalTotal = discountedSubtotal + gstAmount;
+
+                                        return (
+                                            <>
+                                                <div className="flex justify-between text-sm">
+                                                    <span>Subtotal</span>
+                                                    <span>{formatCurrency(itemsSubtotal)}</span>
+                                                </div>
+                                                {couponDiscount > 0 && (
+                                                    <div className="flex justify-between text-sm text-green-600 font-medium">
+                                                        <span>Coupon Discount ({purchase.coupon_code})</span>
+                                                        <span>-{formatCurrency(couponDiscount)}</span>
+                                                    </div>
+                                                )}
+                                                {purchase.coupon_free_months && purchase.coupon_free_months > 0 && (
+                                                    <div className="bg-green-50 p-2 rounded-lg border border-green-200">
+                                                        <div className="flex justify-between text-sm text-green-700 font-medium">
+                                                            <span>🎉 Free Months Bonus</span>
+                                                            <span>{purchase.coupon_free_months} month(s)</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <div className="flex justify-between text-sm text-muted-foreground">
+                                                    <span>GST (18%)</span>
+                                                    <span>{formatCurrency(gstAmount)}</span>
+                                                </div>
+                                                <Separator />
+                                                <div className="flex justify-between text-lg font-semibold">
+                                                    <span>Total Paid</span>
+                                                    <span className="text-green-600">{formatCurrency(Math.max(finalTotal, 1))}</span>
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
                                 </div>
 
                                 <div className="space-y-3 pt-4">

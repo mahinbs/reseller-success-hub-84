@@ -10,6 +10,7 @@ interface Profile {
   role: 'admin' | 'customer';
   avatar_url: string | null;
   referral_name: string | null;
+  gst_number?: string | null;
 }
 
 interface AuthContextType {

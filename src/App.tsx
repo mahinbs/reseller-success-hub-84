@@ -25,6 +25,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminCoupons from "./pages/AdminCoupons";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -189,6 +190,7 @@ const App = () => (
                   <Route path="purchases" element={<AdminDashboard activeTab="purchases" />} />
                   <Route path="analytics" element={<AdminDashboard activeTab="analytics" />} />
                   <Route path="settings" element={<AdminDashboard activeTab="settings" />} />
+                  <Route path="coupons" element={<AdminCoupons />} />
                 </Route>
 
                 {/* Catch-all route */}

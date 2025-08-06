@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { User, LogOut, Settings, ShoppingCart, Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,10 @@ import { Badge } from '@/components/ui/badge';
 export const Header = () => {
   const { user, profile, signOut } = useAuth();
   const { getCartCount } = useCart();
+  const location = useLocation();
+
+  // Check if we're in dashboard context
+  const isInDashboard = location.pathname.startsWith('/dashboard');
 
   const getInitials = (name: string | null) => {
     if (!name) return 'U';
@@ -57,7 +61,7 @@ export const Header = () => {
           {user ? (
             <>
               <Button variant="ghost" size="icon" asChild className="relative hover:scale-110 transition-all-smooth">
-                <Link to="/cart">
+                <Link to={isInDashboard ? "/dashboard/cart" : "/cart"}>
                   <ShoppingCart className="h-5 w-5" />
                   {getCartCount() > 0 && (
                     <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
@@ -66,7 +70,7 @@ export const Header = () => {
                   )}
                 </Link>
               </Button>
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:scale-110 transition-all-smooth">

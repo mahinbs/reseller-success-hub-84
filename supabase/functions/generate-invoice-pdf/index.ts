@@ -61,7 +61,7 @@ serve(async (req) => {
             .select(`
         *,
         purchase_items(*),
-        profiles(full_name, email)
+        profiles(full_name, email, gst_number)
       `)
             .eq('id', purchase_id)
             .eq('user_id', user.id)
@@ -146,6 +146,8 @@ Invoice #: ${purchase.id.slice(-8).toUpperCase()}
 Date: ${orderDate}
 Customer: ${purchase.profiles.full_name || 'Valued Customer'}
 Email: ${purchase.profiles.email}
+${purchase.customer_gst_number ? `Customer GST: ${purchase.customer_gst_number}` : ''}
+${purchase.profiles.gst_number ? `Registered GST: ${purchase.profiles.gst_number}` : ''}
 
 ITEMS:
 ${purchase.purchase_items.map((item: any) =>
@@ -153,12 +155,14 @@ ${purchase.purchase_items.map((item: any) =>
     ).join('\n')}
 
 TOTALS:
-Subtotal: ₹${subtotal.toFixed(2)}
+Subtotal: ₹${subtotal.toFixed(2)}${purchase.coupon_code ? `
+Coupon Discount (${purchase.coupon_code}): -₹${Number(purchase.coupon_discount || 0).toFixed(2)}` : ''}
 GST (18%): ₹${gstAmount.toFixed(2)}
 TOTAL: ₹${total.toFixed(2)}
 
 Payment Status: COMPLETED
 Payment Method: ${purchase.payment_method || 'Razorpay'}
+${purchase.coupon_free_months ? `Free Service Months: ${purchase.coupon_free_months}` : ''}
 
 Thank you for choosing BoostMySites!
 support@boostmysites.com | +91 XXX XXX XXXX

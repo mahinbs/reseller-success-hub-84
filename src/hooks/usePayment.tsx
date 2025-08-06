@@ -64,7 +64,11 @@ export const usePayment = (options: PaymentOptions = {}) => {
     }, []);
 
     // Create purchase order
-    const createOrder = useCallback(async (cartItems: CartItem[]): Promise<OrderCreationResponse> => {
+    const createOrder = useCallback(async (
+        cartItems: CartItem[],
+        couponCode?: string,
+        customerGstNumber?: string
+    ): Promise<OrderCreationResponse> => {
         if (!user) {
             return { success: false, error: 'User not authenticated' };
         }
@@ -76,7 +80,7 @@ export const usePayment = (options: PaymentOptions = {}) => {
             await cleanupExpiredPurchases(user.id);
 
             // Create new purchase order
-            const result = await createPurchaseOrder(user.id, cartItems);
+            const result = await createPurchaseOrder(user.id, cartItems, couponCode, customerGstNumber);
 
             if (result.success && result.purchase_id) {
                 const purchase = await getPurchaseDetails(result.purchase_id);
@@ -102,7 +106,12 @@ export const usePayment = (options: PaymentOptions = {}) => {
         orderData: OrderCreationResponse,
         userDetails: { name: string; email: string; phone?: string }
     ): Promise<void> => {
-        if (!orderData.success || !orderData.razorpay_order_id || !orderData.purchase_id) {
+        if (!orderData.success || !orderData.purchase_id) {
+            setState(prev => ({ ...prev, error: 'Invalid order data' }));
+            return;
+        }
+
+        if (!orderData.razorpay_order_id) {
             setState(prev => ({ ...prev, error: 'Invalid order data' }));
             return;
         }

@@ -240,6 +240,42 @@ serve(async (req) => {
       )
     }
 
+    // Record coupon usage if coupon was applied (only after successful payment)
+    if (purchase.coupon_code) {
+      // Get coupon details
+      const { data: coupon, error: couponError } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', purchase.coupon_code)
+        .single()
+
+      if (coupon && !couponError) {
+        // Record coupon usage
+        const { error: usageError } = await supabase
+          .from('coupon_usage')
+          .insert({
+            coupon_id: coupon.id,
+            user_id: user.id,
+            purchase_id: purchase.id,
+            used_at: new Date().toISOString()
+          })
+
+        if (usageError) {
+          console.error('Error recording coupon usage:', usageError)
+          // Don't fail the payment verification for this
+        } else {
+          // Increment the coupon usage count
+          await supabase
+            .from('coupons')
+            .update({
+              current_uses: coupon.current_uses + 1,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', coupon.id)
+        }
+      }
+    }
+
     // Clear user's cart items
     await supabase
       .from('cart_items')

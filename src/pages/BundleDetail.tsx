@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Link, Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -34,9 +34,13 @@ const BundleDetail = () => {
   const { user, loading: authLoading } = useAuth();
   const { addToCart } = useCart();
   const { toast } = useToast();
+  const location = useLocation();
   const [bundle, setBundle] = useState<Bundle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Check if we're in dashboard context
+  const isInDashboard = location.pathname.startsWith('/dashboard');
 
   useEffect(() => {
     const loadBundle = async () => {
@@ -77,11 +81,11 @@ const BundleDetail = () => {
 
         const services = servicesData?.map(item => ({
           ...item.services,
-          features: Array.isArray(item.services.features) 
-            ? item.services.features 
-            : typeof item.services.features === 'string' 
-            ? JSON.parse(item.services.features || '[]') 
-            : []
+          features: Array.isArray(item.services.features)
+            ? item.services.features
+            : typeof item.services.features === 'string'
+              ? JSON.parse(item.services.features || '[]')
+              : []
         })).filter(Boolean) || [];
 
         setBundle({
@@ -179,11 +183,11 @@ const BundleDetail = () => {
                 </Badge>
                 <Badge variant="outline">Bundle</Badge>
               </div>
-              
+
               <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 {bundle.name}
               </h1>
-              
+
               <p className="text-lg text-muted-foreground mb-6">
                 {bundle.description}
               </p>
@@ -210,7 +214,7 @@ const BundleDetail = () => {
               </div>
 
               <div className="flex gap-3">
-                <Button 
+                <Button
                   onClick={handleAddToCart}
                   className="flex-1 glass-button hover:glow-button transition-all duration-300"
                 >
@@ -218,7 +222,7 @@ const BundleDetail = () => {
                   Add to Cart
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link to="/cart">View Cart</Link>
+                  <Link to={isInDashboard ? "/dashboard/cart" : "/cart"}>View Cart</Link>
                 </Button>
               </div>
             </div>
@@ -275,7 +279,7 @@ const BundleDetail = () => {
                     <CardDescription className="mb-4">
                       {service.description}
                     </CardDescription>
-                    
+
                     {service.features && service.features.length > 0 && (
                       <div>
                         <h4 className="font-semibold mb-2 text-sm">Key Features:</h4>

@@ -101,10 +101,11 @@ const CartPage = () => {
               Discover our amazing AI services and add them to your cart
             </p>
 
-            <Button asChild className="gradient-primary">
-              <a href={isInDashboard ? "/dashboard/services" : "/services"}>
-                Browse Services
-              </a>
+            <Button
+              onClick={() => navigate(isInDashboard ? "/dashboard/services" : "/services")}
+              className="gradient-primary"
+            >
+              Browse Services
             </Button>
           </CardContent>
         </Card>
@@ -135,8 +136,8 @@ const CartPage = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {cart.map((item) => (
-              <Card key={item.id} className="glass-subtle hover:scale-[1.01] transition-all-smooth">
+            {cart.map((item, index) => (
+              <Card key={`${item.id}-${index}`} className="glass-subtle hover:scale-[1.01] transition-all-smooth">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -192,12 +193,10 @@ const CartPage = () => {
 
               <Button
                 variant="ghost"
-                asChild
+                onClick={() => navigate(isInDashboard ? "/dashboard/services" : "/services")}
                 className="hover:scale-105 transition-all-smooth"
               >
-                <a href={isInDashboard ? "/dashboard/services" : "/services"}>
-                  Continue Shopping
-                </a>
+                Continue Shopping
               </Button>
             </div>
           </div>
@@ -210,8 +209,8 @@ const CartPage = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex justify-between text-sm">
+                  {cart.map((item, index) => (
+                    <div key={`${item.id}-summary-${index}`} className="flex justify-between text-sm">
                       <span className="truncate mr-2">{item.name}</span>
                       <span>₹{item.price}</span>
                     </div>

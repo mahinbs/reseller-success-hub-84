@@ -48,7 +48,9 @@ export interface PaymentResponse {
  */
 export const createPurchaseOrder = async (
     userId: string,
-    cartItems: CartItem[]
+    cartItems: CartItem[],
+    couponCode?: string,
+    customerGstNumber?: string
 ): Promise<OrderCreationResponse> => {
     try {
         if (!cartItems.length) {
@@ -64,7 +66,11 @@ export const createPurchaseOrder = async (
 
         // Call Supabase Edge Function to create order
         const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
-            body: { cart_items: cartItems },
+            body: {
+                cart_items: cartItems,
+                coupon_code: couponCode || '',
+                customer_gst_number: customerGstNumber || ''
+            },
             headers: {
                 Authorization: `Bearer ${session.access_token}`,
             },

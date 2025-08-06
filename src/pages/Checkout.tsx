@@ -22,6 +22,8 @@ import {
     ShoppingBag
 } from 'lucide-react';
 import { calculateGST, getPriceWithGST, formatCurrency } from '@/lib/gstUtils';
+import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
@@ -29,6 +31,9 @@ const CheckoutPage = () => {
     const { user, profile } = useAuth();
     const { cart, clearCart, getCartTotal } = useCart();
     const { toast } = useToast();
+
+    // Check if we're in dashboard context
+    const isInDashboard = location.pathname.startsWith('/dashboard');
 
     // Form state
     const [formData, setFormData] = useState({
@@ -39,11 +44,22 @@ const CheckoutPage = () => {
         city: '',
         state: '',
         pincode: '',
+        gstNumber: profile?.gst_number || '',
+        couponCode: '',
         agreeToTerms: false,
     });
 
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [orderExpiry, setOrderExpiry] = useState<Date | null>(null);
+
+    // Coupon state
+    const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+    const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+    const [couponDiscount, setCouponDiscount] = useState(0);
+
+    // Available coupons state
+    const [availableCoupons, setAvailableCoupons] = useState<any[]>([]);
+    const [loadingCoupons, setLoadingCoupons] = useState(true);
 
     // Payment hook
     const {
@@ -71,6 +87,60 @@ const CheckoutPage = () => {
         }
     });
 
+    // Fetch available coupons on mount
+    useEffect(() => {
+        const fetchCoupons = async () => {
+            setLoadingCoupons(true);
+            try {
+                const now = new Date().toISOString();
+
+                // Get all active, valid coupons
+                const { data: coupons, error: couponError } = await supabase
+                    .from('coupons')
+                    .select('*')
+                    .eq('is_active', true)
+                    .lte('valid_from', now)
+                    .or(`valid_until.is.null,valid_until.gt.${now}`);
+
+                console.log('Fetched coupons:', coupons);
+                console.log('Current time:', now);
+
+                if (couponError) throw couponError;
+
+                // Get all coupon usages for this user
+                const { data: used, error: usedError } = await supabase
+                    .from('coupon_usage')
+                    .select('coupon_id')
+                    .eq('user_id', user.id);
+
+                if (usedError) throw usedError;
+
+                const usedIds = used ? used.map(u => u.coupon_id) : [];
+                // Mark coupons as used or not and filter out invalid ones
+                const couponsWithUsage = (coupons || [])
+                    .filter(c => {
+                        // For free_months coupons, ensure free_months > 0
+                        if (c.discount_type === 'free_months') {
+                            return c.free_months > 0;
+                        }
+                        // For other types, ensure discount_value > 0
+                        return c.discount_value > 0;
+                    })
+                    .map(c => ({
+                        ...c,
+                        alreadyUsed: usedIds.includes(c.id)
+                    }));
+                setAvailableCoupons(couponsWithUsage);
+            } catch (e) {
+                console.error('Error fetching coupons:', e);
+                setAvailableCoupons([]);
+            } finally {
+                setLoadingCoupons(false);
+            }
+        };
+        if (user) fetchCoupons();
+    }, [user]);
+
     // Check if user is authenticated
     useEffect(() => {
         if (!user) {
@@ -80,15 +150,16 @@ const CheckoutPage = () => {
 
         // Check if cart is empty
         if (cart.length === 0) {
-            navigate('/cart', { replace: true });
+            navigate(isInDashboard ? '/dashboard/cart' : '/cart', { replace: true });
             return;
         }
     }, [user, cart, navigate]);
 
-    // Calculate pricing
+    // Calculate pricing with coupon discount
     const subtotal = getCartTotal();
-    const gstAmount = calculateGST(subtotal);
-    const totalAmount = getPriceWithGST(subtotal);
+    const discountedSubtotal = subtotal - couponDiscount;
+    const gstAmount = calculateGST(discountedSubtotal);
+    const totalAmount = getPriceWithGST(discountedSubtotal);
 
     // Form validation
     const validateForm = (): boolean => {
@@ -115,6 +186,159 @@ const CheckoutPage = () => {
         }
     };
 
+    // Handle coupon application
+    const handleApplyCoupon = async () => {
+        if (!formData.couponCode.trim()) return;
+
+        setIsApplyingCoupon(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+
+            // Check if coupon exists and is valid
+            const { data: coupon, error } = await supabase
+                .from('coupons')
+                .select('*')
+                .eq('code', formData.couponCode)
+                .eq('is_active', true)
+                .maybeSingle();
+
+            if (error) {
+                console.error('Error fetching coupon:', error);
+                toast({
+                    title: "Error",
+                    description: "Could not validate coupon. Please try again.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            if (!coupon) {
+                toast({
+                    title: "Invalid Coupon",
+                    description: "Coupon code not found or expired.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            // Check if coupon is still valid (dates)
+            const now = new Date();
+            const validFrom = new Date(coupon.valid_from);
+            const validUntil = coupon.valid_until ? new Date(coupon.valid_until) : null;
+
+            if (now < validFrom || (validUntil && now > validUntil)) {
+                toast({
+                    title: "Coupon Expired",
+                    description: "This coupon is no longer valid.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            // Check if user has already used this coupon
+            const { data: usage, error: usageError } = await supabase
+                .from('coupon_usage')
+                .select('id')
+                .eq('coupon_id', coupon.id)
+                .eq('user_id', user.id)
+                .maybeSingle();
+
+            // If there's an error other than "no rows", something went wrong
+            if (usageError && usageError.code !== 'PGRST116') {
+                console.error('Error checking coupon usage:', usageError);
+                toast({
+                    title: "Error",
+                    description: "Could not verify coupon usage. Please try again.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            if (usage) {
+                toast({
+                    title: "Coupon Already Used",
+                    description: "You have already used this coupon.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            // Check usage limits
+            if (coupon.max_uses && coupon.current_uses >= coupon.max_uses) {
+                toast({
+                    title: "Coupon Limit Reached",
+                    description: "This coupon has reached its usage limit.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            // Apply coupon discount
+            let discount = 0;
+
+            // For multiple items in cart, apply discount only to the lowest price item
+            const lowestPriceItem = Math.min(...cart.map(item => item.price));
+
+            if (coupon.discount_type === 'percentage') {
+                if (cart.length > 1) {
+                    // Apply percentage only to lowest price item
+                    discount = (lowestPriceItem * coupon.discount_value) / 100;
+                } else {
+                    // Apply to full subtotal if only one item
+                    discount = (subtotal * coupon.discount_value) / 100;
+                }
+            } else if (coupon.discount_type === 'fixed') {
+                if (cart.length > 1) {
+                    // Apply fixed discount only to lowest price item (don't exceed item price)
+                    discount = Math.min(coupon.discount_value, lowestPriceItem);
+                } else {
+                    // Apply to full subtotal if only one item
+                    discount = coupon.discount_value;
+                }
+            } else if (coupon.discount_type === 'free_months') {
+                // For free months, always apply only to the lowest price item
+                const lowestPriceMonthlyEquivalent = lowestPriceItem;
+
+                // If it's a monthly service, use direct price
+                const lowestPriceMonthly = cart.find(item =>
+                    item.price === lowestPriceItem &&
+                    (item.billing_period === 'monthly' || item.billing_period === 'month')
+                );
+
+                if (lowestPriceMonthly) {
+                    discount = lowestPriceMonthly.price * (coupon.free_months || 1);
+                } else {
+                    // If lowest price item is not monthly, estimate monthly equivalent
+                    // Assume annual service, so divide by 12 to get monthly equivalent
+                    const estimatedMonthly = lowestPriceItem / 12;
+                    discount = estimatedMonthly * (coupon.free_months || 1);
+                }
+
+                // Don't exceed the actual item price
+                discount = Math.min(discount, lowestPriceItem);
+            }
+
+            setAppliedCoupon(coupon);
+            setCouponDiscount(Math.min(discount, subtotal)); // Don't discount more than subtotal
+
+            toast({
+                title: "Coupon Applied!",
+                description: `You saved ₹${Math.min(discount, subtotal).toFixed(2)}`,
+            });
+
+        } catch (error) {
+            console.error('Error applying coupon:', error);
+            toast({
+                title: "Error",
+                description: "Failed to apply coupon. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsApplyingCoupon(false);
+        }
+    };
+
     // Handle checkout process
     const handleCheckout = async () => {
         if (!validateForm()) {
@@ -127,8 +351,20 @@ const CheckoutPage = () => {
         }
 
         try {
-            // Create order
-            const orderResult = await createOrder(cart);
+            // Create order with coupon and GST data
+            const cartItems = cart.map(item => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                type: item.type,
+                billing_period: item.billing_period
+            }));
+
+            const orderResult = await createOrder(
+                cartItems,
+                appliedCoupon?.code || '',
+                formData.gstNumber || ''
+            );
 
             if (!orderResult.success) {
                 throw new Error(orderResult.error || 'Failed to create order');
@@ -195,7 +431,7 @@ const CheckoutPage = () => {
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => navigate('/cart')}
+                            onClick={() => navigate(isInDashboard ? '/dashboard/cart' : '/cart')}
                             className="hover:scale-105 transition-all"
                         >
                             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -333,6 +569,110 @@ const CheckoutPage = () => {
                                     </div>
                                 </div>
 
+                                {/* GST Number - Optional */}
+                                <div>
+                                    <Label htmlFor="gstNumber">GST Number (Optional)</Label>
+                                    <Input
+                                        id="gstNumber"
+                                        value={formData.gstNumber}
+                                        onChange={(e) => handleInputChange('gstNumber', e.target.value.toUpperCase())}
+                                        placeholder="Enter GST number (e.g., 22AAAAA0000A1Z5)"
+                                        maxLength={15}
+                                    />
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        Provide GST number for business purchases to claim input tax credit
+                                    </p>
+                                </div>
+
+                                {/* Coupon Code */}
+                                <div>
+                                    <Label htmlFor="couponCode">Coupon Code (Optional)</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            id="couponCode"
+                                            value={formData.couponCode}
+                                            onChange={(e) => handleInputChange('couponCode', e.target.value.toUpperCase())}
+                                            placeholder="Enter coupon code"
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={handleApplyCoupon}
+                                            disabled={!formData.couponCode || isApplyingCoupon || (availableCoupons.find(c => c.code === formData.couponCode)?.alreadyUsed)}
+                                        >
+                                            {isApplyingCoupon ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                'Apply'
+                                            )}
+                                        </Button>
+                                    </div>
+                                    {appliedCoupon && (
+                                        <div className="flex items-center gap-2 mt-2">
+                                            <CheckCircle className="h-4 w-4 text-green-600" />
+                                            <span className="text-sm text-green-600">
+                                                Coupon applied: {appliedCoupon.description}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {/* Available Coupons */}
+                                    <div className="mt-4">
+                                        <h4 className="text-sm font-medium mb-2">Available Coupons</h4>
+                                        {loadingCoupons ? (
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                Loading coupons...
+                                            </div>
+                                        ) : availableCoupons.length > 0 ? (
+                                            <div className="space-y-2">
+                                                {availableCoupons.map((coupon) => (
+                                                    <div key={coupon.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center gap-2">
+                                                                <Badge variant="secondary" className="font-mono">
+                                                                    {coupon.code}
+                                                                </Badge>
+                                                                {coupon.alreadyUsed && (
+                                                                    <Badge variant="outline" className="text-xs">
+                                                                        Used
+                                                                    </Badge>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-sm text-muted-foreground mt-1">
+                                                                {coupon.description}
+                                                            </p>
+                                                            <div className="text-xs text-muted-foreground mt-1">
+                                                                {coupon.discount_type === 'percentage' && `${coupon.discount_value}% off`}
+                                                                {coupon.discount_type === 'fixed' && `₹${coupon.discount_value} off`}
+                                                                {coupon.discount_type === 'free_months' && `${coupon.free_months} month${coupon.free_months > 1 ? 's' : ''} free`}
+                                                                {coupon.valid_until && ` • Expires ${format(new Date(coupon.valid_until), 'MMM dd, yyyy')}`}
+                                                            </div>
+                                                        </div>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={async () => {
+                                                                handleInputChange('couponCode', coupon.code);
+                                                                // Wait for state update
+                                                                setTimeout(handleApplyCoupon, 100);
+                                                            }}
+                                                            disabled={coupon.alreadyUsed || isApplyingCoupon}
+                                                        >
+                                                            {coupon.alreadyUsed ? 'Used' : 'Apply'}
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground">
+                                                No active coupons available at this time.
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
                                 <div className="flex items-start gap-3 pt-4">
                                     <input
                                         type="checkbox"
@@ -405,6 +745,12 @@ const CheckoutPage = () => {
                                         <span>Subtotal</span>
                                         <span>₹{subtotal.toFixed(2)}</span>
                                     </div>
+                                    {appliedCoupon && couponDiscount > 0 && (
+                                        <div className="flex justify-between text-sm text-green-600">
+                                            <span>Coupon Discount ({appliedCoupon.code})</span>
+                                            <span>-₹{couponDiscount.toFixed(2)}</span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between text-sm text-muted-foreground">
                                         <span>GST (18%)</span>
                                         <span>₹{gstAmount.toFixed(2)}</span>

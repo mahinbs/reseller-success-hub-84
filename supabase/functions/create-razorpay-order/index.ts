@@ -14,6 +14,8 @@ interface OrderRequest {
         type: 'service' | 'bundle' | 'addon';
         billing_period?: string;
     }>;
+    coupon_code?: string;
+    customer_gst_number?: string;
 }
 
 interface RazorpayOrderResponse {
@@ -68,7 +70,7 @@ serve(async (req) => {
         }
 
         // Parse request body
-        const { cart_items }: OrderRequest = await req.json()
+        const { cart_items, coupon_code, customer_gst_number }: OrderRequest = await req.json()
 
         if (!cart_items || cart_items.length === 0) {
             return new Response(
@@ -80,11 +82,101 @@ serve(async (req) => {
             )
         }
 
-        // Calculate total amount (including 18% GST)
+        // Calculate subtotal
         const subtotal = cart_items.reduce((sum, item) => sum + item.price, 0)
-        const gstAmount = subtotal * 0.18
-        const totalAmount = subtotal + gstAmount
+
+        // Apply coupon discount if provided
+        let couponDiscount = 0
+        let appliedCoupon: any = null
+
+        if (coupon_code) {
+            const { data: coupon, error: couponError } = await supabase
+                .from('coupons')
+                .select('*')
+                .eq('code', coupon_code)
+                .eq('is_active', true)
+                .single()
+
+            if (coupon && !couponError) {
+                // Check if coupon is still valid (dates)
+                const now = new Date()
+                const validFrom = new Date(coupon.valid_from)
+                const validUntil = coupon.valid_until ? new Date(coupon.valid_until) : null
+
+                if (now >= validFrom && (!validUntil || now <= validUntil)) {
+                    // Check if user has already used this coupon
+                    const { data: usage } = await supabase
+                        .from('coupon_usage')
+                        .select('id')
+                        .eq('coupon_id', coupon.id)
+                        .eq('user_id', user.id)
+                        .single()
+
+                    if (!usage) {
+                        // Check usage limits
+                        if (!coupon.max_uses || coupon.current_uses < coupon.max_uses) {
+                            // For multiple items in cart, apply discount only to the lowest price item
+                            const lowestPriceItem = Math.min(...cart_items.map(item => item.price))
+
+                            // Apply discount
+                            if (coupon.discount_type === 'percentage') {
+                                if (cart_items.length > 1) {
+                                    // Apply percentage only to lowest price item
+                                    couponDiscount = (lowestPriceItem * coupon.discount_value) / 100
+                                } else {
+                                    // Apply to full subtotal if only one item
+                                    couponDiscount = (subtotal * coupon.discount_value) / 100
+                                }
+                            } else if (coupon.discount_type === 'fixed') {
+                                if (cart_items.length > 1) {
+                                    // Apply fixed discount only to lowest price item (don't exceed item price)
+                                    couponDiscount = Math.min(coupon.discount_value, lowestPriceItem)
+                                } else {
+                                    // Apply to full subtotal if only one item
+                                    couponDiscount = coupon.discount_value
+                                }
+                            } else if (coupon.discount_type === 'free_months') {
+                                // For free months, always apply only to the lowest price item
+                                const lowestPriceMonthly = cart_items.find(item =>
+                                    item.price === lowestPriceItem &&
+                                    (item.billing_period === 'monthly' || item.billing_period === 'month')
+                                )
+
+                                if (lowestPriceMonthly) {
+                                    couponDiscount = lowestPriceMonthly.price * (coupon.free_months || 1)
+                                } else {
+                                    // If lowest price item is not monthly, estimate monthly equivalent
+                                    // Assume annual service, so divide by 12 to get monthly equivalent
+                                    const estimatedMonthly = lowestPriceItem / 12
+                                    couponDiscount = estimatedMonthly * (coupon.free_months || 1)
+                                }
+
+                                // Don't exceed the actual item price
+                                couponDiscount = Math.min(couponDiscount, lowestPriceItem)
+                            }
+
+                            couponDiscount = Math.min(couponDiscount, subtotal) // Don't discount more than subtotal
+                            appliedCoupon = coupon
+                        }
+                    }
+                }
+            }
+        }
+
+        // Calculate final amounts
+        const discountedSubtotal = subtotal - couponDiscount
+        const gstAmount = discountedSubtotal * 0.18
+        let totalAmount = discountedSubtotal + gstAmount
+
+        // Ensure minimum amount of ₹1 for Razorpay (even for 100% discount coupons)
+        const minimumAmount = 1.00
+        if (totalAmount < minimumAmount) {
+            totalAmount = minimumAmount
+        }
+
         const amountInPaise = Math.round(totalAmount * 100) // Convert to paise
+
+        // Note: We no longer handle zero-amount orders here since we ensure minimum ₹1
 
         // Create purchase record in database first
         const { data: purchase, error: purchaseError } = await supabase
@@ -94,6 +186,10 @@ serve(async (req) => {
                 total_amount: totalAmount,
                 payment_status: 'pending',
                 expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(), // 15 minutes
+                coupon_code: appliedCoupon?.code || null,
+                coupon_discount: couponDiscount || null,
+                coupon_free_months: appliedCoupon?.free_months || null,
+                customer_gst_number: customer_gst_number || null,
             })
             .select()
             .single()
@@ -136,6 +232,8 @@ serve(async (req) => {
                 }
             )
         }
+
+        // Note: Coupon usage will be recorded only after successful payment verification
 
         // Create Razorpay order
         // Note: Receipt must be ≤ 40 characters for Razorpay

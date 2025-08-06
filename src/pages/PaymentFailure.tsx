@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +17,11 @@ import {
 const PaymentFailurePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const { user } = useAuth();
+
+  // Check if we're in dashboard context
+  const isInDashboard = location.pathname.startsWith('/dashboard');
 
   const [error, setError] = useState<string>('');
   const [isRetrying, setIsRetrying] = useState(false);
@@ -45,7 +49,7 @@ const PaymentFailurePage = () => {
   };
 
   const handleBackToCart = () => {
-    navigate('/cart', { replace: true });
+    navigate(isInDashboard ? '/dashboard/cart' : '/cart', { replace: true });
   };
 
   const handleContactSupport = () => {
