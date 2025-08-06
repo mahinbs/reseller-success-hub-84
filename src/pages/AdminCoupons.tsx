@@ -268,7 +268,7 @@ export default function AdminCoupons() {
                                         <SelectContent>
                                             <SelectItem value="percentage">Percentage Off</SelectItem>
                                             <SelectItem value="fixed">Fixed Amount Off</SelectItem>
-                                            <SelectItem value="free_months">Free Months</SelectItem>
+                                            {/* <SelectItem value="free_months">Free Months</SelectItem> */}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -290,7 +290,7 @@ export default function AdminCoupons() {
                                     </div>
                                 )}
 
-                                {formData.discount_type === 'free_months' && (
+                                {/* {formData.discount_type === 'free_months' && (
                                     <div>
                                         <Label htmlFor="free_months">Number of Free Months</Label>
                                         <Input
@@ -303,7 +303,7 @@ export default function AdminCoupons() {
                                             required
                                         />
                                     </div>
-                                )}
+                                )} */}
 
                                 <div>
                                     <Label htmlFor="max_uses">Max Uses (leave empty for unlimited)</Label>

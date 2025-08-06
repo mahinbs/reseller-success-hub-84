@@ -539,6 +539,8 @@ export type Database = {
           coupon_discount: number | null
           coupon_free_months: number | null
           created_at: string
+          customer_address: string | null
+          customer_business_name: string | null
           customer_gst_number: string | null
           expires_at: string | null
           id: string
@@ -555,6 +557,8 @@ export type Database = {
           coupon_discount?: number | null
           coupon_free_months?: number | null
           created_at?: string
+          customer_address?: string | null
+          customer_business_name?: string | null
           customer_gst_number?: string | null
           expires_at?: string | null
           id?: string
@@ -571,6 +575,8 @@ export type Database = {
           coupon_discount?: number | null
           coupon_free_months?: number | null
           created_at?: string
+          customer_address?: string | null
+          customer_business_name?: string | null
           customer_gst_number?: string | null
           expires_at?: string | null
           id?: string

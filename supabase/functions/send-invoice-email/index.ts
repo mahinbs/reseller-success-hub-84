@@ -11,6 +11,55 @@ interface InvoiceEmailRequest {
   email_type?: 'confirmation' | 'manual'; // confirmation = auto, manual = user requested
 }
 
+// Helper function to convert number to words
+function convertNumberToWords(num: number): string {
+  const ones = ['', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE'];
+  const teens = ['TEN', 'ELEVEN', 'TWELVE', 'THIRTEEN', 'FOURTEEN', 'FIFTEEN', 'SIXTEEN', 'SEVENTEEN', 'EIGHTEEN', 'NINETEEN'];
+  const tens = ['', '', 'TWENTY', 'THIRTY', 'FORTY', 'FIFTY', 'SIXTY', 'SEVENTY', 'EIGHTY', 'NINETY'];
+  const thousands = ['', 'THOUSAND', 'LAKH', 'CRORE'];
+
+  if (num === 0) return 'ZERO';
+
+  function convertHundreds(n: number): string {
+    let result = '';
+    if (n >= 100) {
+      result += ones[Math.floor(n / 100)] + ' HUNDRED ';
+      n %= 100;
+    }
+    if (n >= 20) {
+      result += tens[Math.floor(n / 10)] + ' ';
+      n %= 10;
+    } else if (n >= 10) {
+      result += teens[n - 10] + ' ';
+      return result;
+    }
+    if (n > 0) {
+      result += ones[n] + ' ';
+    }
+    return result;
+  }
+
+  let result = '';
+  let unitIndex = 0;
+
+  while (num > 0) {
+    if (unitIndex === 0) {
+      if (num % 1000 !== 0) {
+        result = convertHundreds(num % 1000) + thousands[unitIndex] + ' ' + result;
+      }
+      num = Math.floor(num / 1000);
+    } else {
+      if (num % 100 !== 0) {
+        result = convertHundreds(num % 100) + thousands[unitIndex] + ' ' + result;
+      }
+      num = Math.floor(num / 100);
+    }
+    unitIndex++;
+  }
+
+  return result.trim();
+}
+
 // Generate invoice HTML function
 function generateInvoiceHTML(purchase: any, subtotal: number, couponDiscount: number, gstAmount: number, total: number): string {
   const orderDate = new Date(purchase.created_at).toLocaleDateString('en-IN', {
@@ -20,8 +69,8 @@ function generateInvoiceHTML(purchase: any, subtotal: number, couponDiscount: nu
     hour: '2-digit',
     minute: '2-digit'
   });
-  const invoiceNumber = `BMS-${purchase.id.slice(-8).toUpperCase()}`;
-  const currentDate = new Date().toLocaleDateString('en-IN');
+  const invoiceNumber = purchase.id.slice(-4).toUpperCase();
+  const currentDate = new Date().toLocaleDateString('en-GB');
 
   return `
     <!DOCTYPE html>
@@ -34,10 +83,10 @@ function generateInvoiceHTML(purchase: any, subtotal: number, couponDiscount: nu
             * { margin: 0; padding: 0; box-sizing: border-box; }
             
             body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                line-height: 1.6;
-                color: #2c3e50;
-                background-color: #f8fafc;
+                font-family: Arial, sans-serif;
+                line-height: 1.4;
+                color: #333;
+                background-color: #f5f5f5;
                 padding: 20px;
             }
             
@@ -45,331 +94,182 @@ function generateInvoiceHTML(purchase: any, subtotal: number, couponDiscount: nu
                 max-width: 800px;
                 margin: 0 auto;
                 background: white;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                overflow: hidden;
+                border: 1px solid #ddd;
             }
             
-            /* Header Section */
+            /* Header */
             .header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 40px;
-                text-align: center;
-                position: relative;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                padding: 20px;
+                border-bottom: 1px solid #ddd;
             }
             
-            .company-logo {
-                font-size: 36px;
-                font-weight: 800;
-                margin-bottom: 8px;
-                position: relative;
-                z-index: 1;
+            .header-left h1 {
+                color: #8B5CF6;
+                font-size: 32px;
+                font-weight: bold;
+                margin-bottom: 5px;
             }
             
-            .company-tagline {
-                font-size: 16px;
-                font-weight: 300;
-                opacity: 0.9;
-                position: relative;
-                z-index: 1;
-            }
-            
-            .invoice-badge {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                background: rgba(255,255,255,0.2);
-                border: 2px solid rgba(255,255,255,0.3);
-                padding: 8px 16px;
-                border-radius: 25px;
-                font-weight: 600;
+            .header-left p {
+                color: #666;
                 font-size: 14px;
-                z-index: 1;
+                margin: 2px 0;
             }
             
-            /* Main Content */
-            .content {
-                padding: 40px;
+            .header-right {
+                text-align: right;
             }
             
-            .invoice-meta {
+            .logo {
+                font-size: 24px;
+                font-weight: bold;
+                color: #333;
+            }
+            
+            .logo .boost { color: #333; }
+            .logo .my { color: #333; }
+            .logo .sites { color: #FF8C00; }
+            
+            /* Billing Section */
+            .billing-section {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 gap: 40px;
-                margin-bottom: 40px;
+                padding: 30px 20px;
+                border-bottom: 1px solid #ddd;
             }
             
-            .meta-section h3 {
-                color: #4F46E5;
+            .billing-box {
+                background: #F8F9FA;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            
+            .billing-title {
+                color: #8B5CF6;
                 font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 15px;
+            }
+            
+            .billing-content p {
+                margin: 3px 0;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+            
+            .billing-content strong {
                 font-weight: 600;
-                margin-bottom: 16px;
-                border-bottom: 2px solid #e5e7eb;
-                padding-bottom: 8px;
-            }
-            
-            .meta-item {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 8px;
-                padding: 4px 0;
-            }
-            
-            .meta-label {
-                font-weight: 500;
-                color: #6b7280;
-            }
-            
-            .meta-value {
-                font-weight: 600;
-                color: #111827;
-            }
-            
-            .status-paid {
-                background: #10b981;
-                color: white;
-                padding: 4px 12px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: 600;
-                text-transform: uppercase;
             }
             
             /* Items Table */
             .items-section {
-                margin: 40px 0;
-            }
-            
-            .section-title {
-                color: #4F46E5;
-                font-size: 20px;
-                font-weight: 600;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-            }
-            
-            .section-title::before {
-                content: '📋';
-                margin-right: 10px;
+                padding: 0 20px;
             }
             
             .items-table {
                 width: 100%;
                 border-collapse: collapse;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                margin: 20px 0;
             }
             
             .items-table th {
-                background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
-                color: #374151;
-                font-weight: 600;
-                padding: 16px;
+                background: #8B5CF6;
+                color: white;
+                padding: 12px 8px;
                 text-align: left;
-                font-size: 14px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
+                font-size: 12px;
+                font-weight: bold;
             }
             
             .items-table td {
-                padding: 16px;
-                border-bottom: 1px solid #e5e7eb;
-                vertical-align: top;
-            }
-            
-            .items-table tbody tr:hover {
-                background-color: #f9fafb;
-            }
-            
-            .item-name {
-                font-weight: 600;
-                color: #111827;
-            }
-            
-            .item-type {
-                background: #ddd6fe;
-                color: #5b21b6;
-                padding: 2px 8px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: 500;
-            }
-            
-            .item-billing {
-                color: #6b7280;
+                padding: 12px 8px;
+                border-bottom: 1px solid #eee;
                 font-size: 14px;
             }
             
-            .item-price {
-                font-weight: 700;
-                color: #059669;
+            .items-table tbody tr:nth-child(even) {
+                background: #f9f9f9;
+            }
+            
+            .item-number {
+                width: 30px;
+                text-align: center;
+            }
+            
+            .amount-cell {
                 text-align: right;
+                font-family: monospace;
             }
             
             /* Totals Section */
             .totals-section {
-                margin-top: 40px;
-                display: flex;
-                justify-content: flex-end;
+                padding: 20px;
+                border-top: 1px solid #ddd;
             }
             
-            .totals-table {
-                min-width: 350px;
+            .totals-left {
+                width: 60%;
+                display: inline-block;
+                vertical-align: top;
+            }
+            
+            .amount-words {
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 20px;
+            }
+            
+            .totals-right {
+                width: 35%;
+                display: inline-block;
+                vertical-align: top;
+                text-align: right;
             }
             
             .total-row {
                 display: flex;
                 justify-content: space-between;
-                padding: 12px 20px;
-                border-bottom: 1px solid #e5e7eb;
-            }
-            
-            .total-row.subtotal {
-                background: #f9fafb;
-            }
-            
-            .total-row.discount {
-                background: #ecfdf5;
-                color: #059669;
-                font-weight: 600;
-            }
-            
-            .total-row.tax {
-                background: #fef3c7;
-                color: #d97706;
-            }
-            
-            .total-row.final {
-                background: linear-gradient(90deg, #4F46E5 0%, #7c3aed 100%);
-                color: white;
-                font-weight: 700;
-                font-size: 18px;
-                border: none;
-                border-radius: 8px;
-                margin-top: 8px;
-            }
-            
-            /* Special Offers */
-            .special-offer {
-                background: linear-gradient(90deg, #ecfdf5 0%, #d1fae5 100%);
-                border: 2px solid #10b981;
-                border-radius: 12px;
-                padding: 20px;
-                margin: 20px 0;
-                text-align: center;
-            }
-            
-            .special-offer h4 {
-                color: #059669;
-                font-size: 18px;
-                margin-bottom: 8px;
-            }
-            
-            /* Next Steps */
-            .next-steps {
-                background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-                border-radius: 12px;
-                padding: 30px;
-                margin: 40px 0;
-            }
-            
-            .next-steps h3 {
-                color: #0369a1;
-                font-size: 20px;
-                margin-bottom: 16px;
-                display: flex;
-                align-items: center;
-            }
-            
-            .next-steps h3::before {
-                content: '🚀';
-                margin-right: 10px;
-            }
-            
-            .next-steps ul {
-                list-style: none;
-                padding: 0;
-            }
-            
-            .next-steps li {
-                padding: 8px 0;
-                padding-left: 24px;
-                position: relative;
-                color: #0c4a6e;
-            }
-            
-            .next-steps li::before {
-                content: '✓';
-                position: absolute;
-                left: 0;
-                color: #059669;
-                font-weight: bold;
-            }
-            
-            /* Footer */
-            .footer {
-                background: #1f2937;
-                color: white;
-                padding: 30px 40px;
-                text-align: center;
-            }
-            
-            .footer-content {
-                max-width: 600px;
-                margin: 0 auto;
-            }
-            
-            .company-info {
-                font-size: 18px;
-                font-weight: 600;
-                margin-bottom: 16px;
-            }
-            
-            .contact-info {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 16px;
-                margin: 16px 0;
+                margin: 8px 0;
                 font-size: 14px;
             }
             
-            .footer-message {
-                margin-top: 20px;
-                padding-top: 20px;
-                border-top: 1px solid #374151;
-                font-style: italic;
-                opacity: 0.8;
+            .total-row.final {
+                border-top: 2px solid #333;
+                font-weight: bold;
+                font-size: 16px;
+                padding-top: 8px;
+                margin-top: 15px;
             }
             
-            /* Responsive */
-            @media (max-width: 600px) {
-                .invoice-meta {
-                    grid-template-columns: 1fr;
-                    gap: 20px;
-                }
-                
-                .contact-info {
-                    grid-template-columns: 1fr;
-                }
-                
-                .content {
-                    padding: 20px;
-                }
-                
-                .header {
-                    padding: 20px;
-                }
-                
-                .invoice-badge {
-                    position: relative;
-                    top: auto;
-                    right: auto;
-                    margin-top: 16px;
-                    display: inline-block;
-                }
+            /* Terms */
+            .terms-section {
+                padding: 20px;
+                border-top: 1px solid #ddd;
+                background: #f9f9f9;
+            }
+            
+            .terms-title {
+                color: #8B5CF6;
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            
+            .terms-content {
+                font-size: 12px;
+                color: #666;
+            }
+            
+            .terms-content ol {
+                margin-left: 20px;
+            }
+            
+            .terms-content li {
+                margin: 5px 0;
             }
         </style>
     </head>
@@ -377,146 +277,121 @@ function generateInvoiceHTML(purchase: any, subtotal: number, couponDiscount: nu
         <div class="invoice-container">
             <!-- Header -->
             <div class="header">
-                <div class="invoice-badge">INVOICE</div>
-                <div class="company-logo">BoostMySites</div>
-                <div class="company-tagline">Payment Receipt</div>
-            </div>
-            
-            <!-- Content -->
-            <div class="content">
-                <!-- Invoice Meta Information -->
-                <div class="invoice-meta">
-                    <div class="meta-section">
-                        <h3>📄 Invoice Details</h3>
-                        <div class="meta-item">
-                            <span class="meta-label">Invoice Number:</span>
-                            <span class="meta-value">${invoiceNumber}</span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Issue Date:</span>
-                            <span class="meta-value">${currentDate}</span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Order Date:</span>
-                            <span class="meta-value">${orderDate}</span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Payment Status:</span>
-                            <span class="status-paid">PAID</span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Payment Method:</span>
-                            <span class="meta-value">${purchase.payment_method || 'Razorpay'}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="meta-section">
-                        <h3>👤 Customer Details</h3>
-                        <div class="meta-item">
-                            <span class="meta-label">Name:</span>
-                            <span class="meta-value">${purchase.profiles.full_name || 'Valued Customer'}</span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Email:</span>
-                            <span class="meta-value">${purchase.profiles.email}</span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Customer ID:</span>
-                            <span class="meta-value">${purchase.user_id.slice(-8).toUpperCase()}</span>
-                        </div>
-                        ${purchase.customer_gst_number ? `
-                        <div class="meta-item">
-                            <span class="meta-label">GST Number:</span>
-                            <span class="meta-value">${purchase.customer_gst_number}</span>
-                        </div>` : ''}
-                        ${purchase.profiles.gst_number ? `
-                        <div class="meta-item">
-                            <span class="meta-label">Registered GST:</span>
-                            <span class="meta-value">${purchase.profiles.gst_number}</span>
-                        </div>` : ''}
-                    </div>
+                <div class="header-left">
+                    <h1>INVOICE</h1>
+                    <p><strong>Invoice No #</strong> ${invoiceNumber}</p>
+                    <p><strong>Invoice Date</strong> ${currentDate}</p>
                 </div>
-                
-                <!-- Items Section -->
-                <div class="items-section">
-                    <h2 class="section-title">Order Items</h2>
-                    <table class="items-table">
-                        <thead>
-                            <tr>
-                                <th>Service/Product</th>
-                                <th>Type</th>
-                                <th>Billing Period</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${purchase.purchase_items.map((item: any) => `
-                            <tr>
-                                <td class="item-name">${item.item_name}</td>
-                                <td><span class="item-type">${item.service_id ? 'Service' : item.bundle_id ? 'Bundle' : 'Add-on'}</span></td>
-                                <td class="item-billing">${item.billing_period || 'One-time'}</td>
-                                <td class="item-price">₹${Number(item.item_price).toFixed(2)}</td>
-                            </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Totals Section -->
-                <div class="totals-section">
-                    <div class="totals-table">
-                        <div class="total-row subtotal">
-                            <span>Subtotal:</span>
-                            <span>₹${subtotal.toFixed(2)}</span>
-                        </div>
-                        ${couponDiscount > 0 ? `
-                        <div class="total-row discount">
-                            <span>Coupon Discount (${purchase.coupon_code}):</span>
-                            <span>-₹${couponDiscount.toFixed(2)}</span>
-                        </div>` : ''}
-                        <div class="total-row tax">
-                            <span>GST (18%):</span>
-                            <span>₹${gstAmount.toFixed(2)}</span>
-                        </div>
-                        <div class="total-row final">
-                            <span>Total Amount:</span>
-                            <span>₹${total.toFixed(2)}</span>
-                        </div>
+                <div class="header-right">
+                    <div class="logo">
+                        <span class="boost">BOOST</span><span class="my">MY</span><span class="sites">SITES</span>
                     </div>
-                </div>
-                
-                ${purchase.coupon_free_months ? `
-                <div class="special-offer">
-                    <h4>🎉 Special Offer Applied</h4>
-                    <p>You've received <strong>${purchase.coupon_free_months} free service months</strong> with this order!</p>
-                </div>` : ''}
-                
-                <!-- Service Information -->
-                <div class="next-steps">
-                    <h3>Service Details</h3>
-                    <ul>
-                        <li>Dashboard access: Use your registered email</li>
-                        <li>Support: support@boostmysites.com</li>
-                    </ul>
                 </div>
             </div>
             
-            <!-- Footer -->
-            <div class="footer">
-                <div class="footer-content">
-                    <div class="company-info">BoostMySites</div>
-                    <div class="contact-info">
-                        <div>📧 support@boostmysites.com</div>
-                        <div>📞 +91 XXX XXX XXXX</div>
+            <!-- Billing Information -->
+            <div class="billing-section">
+                <div class="billing-box">
+                    <div class="billing-title">Billed By</div>
+                    <div class="billing-content">
+                        <p><strong>TRIPLE-SEVEN BOOSTMYSITES AI SOLUTIONS LLP</strong></p>
+                        <p>House No: 137, 3rd Main,3rd Cross,4th Phase, Dollars</p>
+                        <p>Colony,JP Nagar,Bangalore South,</p>
+                        <p>Karnataka, India - 560078</p>
+                        <p><strong>GSTIN:</strong> 29AAPFV2264G1ZQ</p>
+                        <p><strong>PAN:</strong> AAPFV2264G</p>
                     </div>
-                    <div class="footer-message">
-                        Thank you for choosing BoostMySites for your digital transformation journey!
+                </div>
+                <div class="billing-box">
+                    <div class="billing-title">Billed To</div>
+                    <div class="billing-content">
+                        <p><strong>${purchase.profiles.full_name || 'Valued Customer'}</strong></p>
+                        ${purchase.customer_address ? `<p>${purchase.customer_address}</p>` : ''}
+                        <p>Email: ${purchase.profiles.email}</p>
+                        ${purchase.customer_gst_number ? `<p><strong>GSTIN:</strong> ${purchase.customer_gst_number}</p>` : ''}
+                        ${purchase.customer_business_name ? `<p><strong>Business:</strong> ${purchase.customer_business_name}</p>` : ''}
                     </div>
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #374151; font-size: 12px; color: #9CA3AF;">
-                        <p>This is a transactional email regarding your purchase. No unsubscribe option is required.</p>
-                        <p>If you have questions, reply to this email or contact support@boostmysites.com</p>
-                        <p>© 2025 BoostMySites. All rights reserved.</p>
+                </div>
+            </div>
+            
+            <!-- Items Table -->
+            <div class="items-section">
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th class="item-number">Item</th>
+                            <th>Description</th>
+                            <th>GST Rate</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Taxable Amount</th>
+                            <th>CGST</th>
+                            <th>SGST</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${purchase.purchase_items.map((item: any, index: number) => {
+    const itemPrice = Number(item.item_price);
+    const discountForThisItem = couponDiscount > 0 && index === 0 ? couponDiscount : 0;
+    const taxableAmount = itemPrice - discountForThisItem;
+    const cgst = taxableAmount * 0.09; // 9% CGST
+    const sgst = taxableAmount * 0.09; // 9% SGST
+    const totalWithTax = taxableAmount + cgst + sgst;
+
+    return `
+                            <tr>
+                                <td class="item-number">${index + 1}.</td>
+                                <td>${item.item_name}</td>
+                                <td>18%</td>
+                                <td>1</td>
+                                <td class="amount-cell">₹${itemPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                <td class="amount-cell">₹${taxableAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                <td class="amount-cell">₹${cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                <td class="amount-cell">₹${sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                <td class="amount-cell">₹${totalWithTax.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                            </tr>
+                            `;
+  }).join('')}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Totals -->
+            <div class="totals-section">
+                <div class="totals-left">
+                    <div class="amount-words">
+                        <strong>Total (in words) :</strong> ${convertNumberToWords(Math.round(total))} RUPEES ONLY
                     </div>
+                </div>
+                <div class="totals-right">
+                    <div class="total-row">
+                        <span>Taxable Amount</span>
+                        <span>₹${(subtotal - couponDiscount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="total-row">
+                        <span>CGST</span>
+                        <span>₹${(gstAmount / 2).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="total-row">
+                        <span>SGST</span>
+                        <span>₹${(gstAmount / 2).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="total-row final">
+                        <span>Total (INR)</span>
+                        <span>₹${total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Terms and Conditions -->
+            <div class="terms-section">
+                <div class="terms-title">Terms and Conditions</div>
+                <div class="terms-content">
+                    <ol>
+                        <li>Amount paid to the company is not refundable.</li>
+                        <li>http://boostmysites.com/terms-and-conditions/</li>
+                    </ol>
                 </div>
             </div>
         </div>
@@ -689,7 +564,7 @@ serve(async (req) => {
         from: 'BoostMySites Billing <noreply@baas.boostmysites.com>',
         to: [purchase.profiles.email],
         cc: ['admin@boostmysites.com'], // CC instead of multiple TO addresses
-        subject: `Receipt #${purchase.id.slice(-8).toUpperCase()}`,
+        subject: `Receipt #${purchase.id.slice(-4).toUpperCase()}`,
         reply_to: 'support@boostmysites.com',
         html: invoiceHtml,
         headers: {

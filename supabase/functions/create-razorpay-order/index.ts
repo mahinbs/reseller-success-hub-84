@@ -16,6 +16,11 @@ interface OrderRequest {
     }>;
     coupon_code?: string;
     customer_gst_number?: string;
+    business_info?: {
+        businessName?: string;
+        businessAddress?: string;
+        businessGstNumber?: string;
+    };
 }
 
 interface RazorpayOrderResponse {
@@ -70,7 +75,7 @@ serve(async (req) => {
         }
 
         // Parse request body
-        const { cart_items, coupon_code, customer_gst_number }: OrderRequest = await req.json()
+        const { cart_items, coupon_code, customer_gst_number, business_info }: OrderRequest = await req.json()
 
         if (!cart_items || cart_items.length === 0) {
             return new Response(
@@ -190,6 +195,8 @@ serve(async (req) => {
                 coupon_discount: couponDiscount || null,
                 coupon_free_months: appliedCoupon?.free_months || null,
                 customer_gst_number: customer_gst_number || null,
+                customer_business_name: business_info?.businessName || null,
+                customer_address: business_info?.businessAddress || (business_info?.businessName ? business_info.businessAddress : null),
             })
             .select()
             .single()

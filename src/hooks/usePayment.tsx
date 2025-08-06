@@ -67,7 +67,12 @@ export const usePayment = (options: PaymentOptions = {}) => {
     const createOrder = useCallback(async (
         cartItems: CartItem[],
         couponCode?: string,
-        customerGstNumber?: string
+        customerGstNumber?: string,
+        businessInfo?: {
+            businessName?: string;
+            businessAddress?: string;
+            businessGstNumber?: string;
+        }
     ): Promise<OrderCreationResponse> => {
         if (!user) {
             return { success: false, error: 'User not authenticated' };
@@ -80,7 +85,7 @@ export const usePayment = (options: PaymentOptions = {}) => {
             await cleanupExpiredPurchases(user.id);
 
             // Create new purchase order
-            const result = await createPurchaseOrder(user.id, cartItems, couponCode, customerGstNumber);
+            const result = await createPurchaseOrder(user.id, cartItems, couponCode, customerGstNumber, businessInfo);
 
             if (result.success && result.purchase_id) {
                 const purchase = await getPurchaseDetails(result.purchase_id);

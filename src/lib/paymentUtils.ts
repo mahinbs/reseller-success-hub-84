@@ -50,7 +50,12 @@ export const createPurchaseOrder = async (
     userId: string,
     cartItems: CartItem[],
     couponCode?: string,
-    customerGstNumber?: string
+    customerGstNumber?: string,
+    businessInfo?: {
+        businessName?: string;
+        businessAddress?: string;
+        businessGstNumber?: string;
+    }
 ): Promise<OrderCreationResponse> => {
     try {
         if (!cartItems.length) {
@@ -69,7 +74,8 @@ export const createPurchaseOrder = async (
             body: {
                 cart_items: cartItems,
                 coupon_code: couponCode || '',
-                customer_gst_number: customerGstNumber || ''
+                customer_gst_number: customerGstNumber || '',
+                business_info: businessInfo || {}
             },
             headers: {
                 Authorization: `Bearer ${session.access_token}`,

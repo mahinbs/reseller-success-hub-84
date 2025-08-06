@@ -44,8 +44,11 @@ const CheckoutPage = () => {
         city: '',
         state: '',
         pincode: '',
-        gstNumber: profile?.gst_number || '',
-        couponCode: '',
+        // Business information
+        isBusiness: false,
+        businessName: '',
+        businessAddress: '',
+        businessGstNumber: '',
         agreeToTerms: false,
     });
 
@@ -172,6 +175,17 @@ const CheckoutPage = () => {
         if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
             errors.phone = 'Phone number must be 10 digits';
         }
+
+        // Business field validation
+        if (formData.isBusiness) {
+            if (!formData.businessName.trim()) errors.businessName = 'Business name is required';
+            if (!formData.businessAddress.trim()) errors.businessAddress = 'Business address is required';
+            if (!formData.businessGstNumber.trim()) errors.businessGstNumber = 'Business GST number is required';
+            if (formData.businessGstNumber && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(formData.businessGstNumber)) {
+                errors.businessGstNumber = 'Invalid GST number format';
+            }
+        }
+
         if (!formData.agreeToTerms) errors.agreeToTerms = 'You must agree to the terms';
 
         setFormErrors(errors);
@@ -360,10 +374,17 @@ const CheckoutPage = () => {
                 billing_period: item.billing_period
             }));
 
+            const businessInfo = formData.isBusiness ? {
+                businessName: formData.businessName,
+                businessAddress: formData.businessAddress,
+                businessGstNumber: formData.businessGstNumber
+            } : undefined;
+
             const orderResult = await createOrder(
                 cartItems,
                 appliedCoupon?.code || '',
-                formData.gstNumber || ''
+                formData.isBusiness ? formData.businessGstNumber : '',
+                businessInfo
             );
 
             if (!orderResult.success) {
@@ -569,22 +590,7 @@ const CheckoutPage = () => {
                                     </div>
                                 </div>
 
-                                {/* GST Number - Optional */}
-                                <div>
-                                    <Label htmlFor="gstNumber">GST Number (Optional)</Label>
-                                    <Input
-                                        id="gstNumber"
-                                        value={formData.gstNumber}
-                                        onChange={(e) => handleInputChange('gstNumber', e.target.value.toUpperCase())}
-                                        placeholder="Enter GST number (e.g., 22AAAAA0000A1Z5)"
-                                        maxLength={15}
-                                    />
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                        Provide GST number for business purchases to claim input tax credit
-                                    </p>
-                                </div>
-
-                                {/* Coupon Code */}
+                                {/* Coupon Code - Users can apply coupons given by admin */}
                                 <div>
                                     <Label htmlFor="couponCode">Coupon Code (Optional)</Label>
                                     <div className="flex gap-2">
@@ -598,7 +604,7 @@ const CheckoutPage = () => {
                                             type="button"
                                             variant="outline"
                                             onClick={handleApplyCoupon}
-                                            disabled={!formData.couponCode || isApplyingCoupon || (availableCoupons.find(c => c.code === formData.couponCode)?.alreadyUsed)}
+                                            disabled={!formData.couponCode || isApplyingCoupon}
                                         >
                                             {isApplyingCoupon ? (
                                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -615,62 +621,74 @@ const CheckoutPage = () => {
                                             </span>
                                         </div>
                                     )}
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        Contact admin for available coupon codes
+                                    </p>
+                                </div>
 
-                                    {/* Available Coupons */}
-                                    <div className="mt-4">
-                                        <h4 className="text-sm font-medium mb-2">Available Coupons</h4>
-                                        {loadingCoupons ? (
-                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                Loading coupons...
-                                            </div>
-                                        ) : availableCoupons.length > 0 ? (
-                                            <div className="space-y-2">
-                                                {availableCoupons.map((coupon) => (
-                                                    <div key={coupon.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/50">
-                                                        <div className="flex-1">
-                                                            <div className="flex items-center gap-2">
-                                                                <Badge variant="secondary" className="font-mono">
-                                                                    {coupon.code}
-                                                                </Badge>
-                                                                {coupon.alreadyUsed && (
-                                                                    <Badge variant="outline" className="text-xs">
-                                                                        Used
-                                                                    </Badge>
-                                                                )}
-                                                            </div>
-                                                            <p className="text-sm text-muted-foreground mt-1">
-                                                                {coupon.description}
-                                                            </p>
-                                                            <div className="text-xs text-muted-foreground mt-1">
-                                                                {coupon.discount_type === 'percentage' && `${coupon.discount_value}% off`}
-                                                                {coupon.discount_type === 'fixed' && `₹${coupon.discount_value} off`}
-                                                                {coupon.discount_type === 'free_months' && `${coupon.free_months} month${coupon.free_months > 1 ? 's' : ''} free`}
-                                                                {coupon.valid_until && ` • Expires ${format(new Date(coupon.valid_until), 'MMM dd, yyyy')}`}
-                                                            </div>
-                                                        </div>
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={async () => {
-                                                                handleInputChange('couponCode', coupon.code);
-                                                                // Wait for state update
-                                                                setTimeout(handleApplyCoupon, 100);
-                                                            }}
-                                                            disabled={coupon.alreadyUsed || isApplyingCoupon}
-                                                        >
-                                                            {coupon.alreadyUsed ? 'Used' : 'Apply'}
-                                                        </Button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <p className="text-sm text-muted-foreground">
-                                                No active coupons available at this time.
-                                            </p>
-                                        )}
+                                {/* Business Information */}
+                                <div className="border-t pt-4">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <input
+                                            type="checkbox"
+                                            id="isBusiness"
+                                            checked={formData.isBusiness}
+                                            onChange={(e) => handleInputChange('isBusiness', e.target.checked)}
+                                        />
+                                        <Label htmlFor="isBusiness" className="text-base font-medium">
+                                            This is a business purchase
+                                        </Label>
                                     </div>
+
+                                    {formData.isBusiness && (
+                                        <div className="space-y-4 pl-6 border-l-2 border-muted">
+                                            <div>
+                                                <Label htmlFor="businessName">Business Name *</Label>
+                                                <Input
+                                                    id="businessName"
+                                                    value={formData.businessName}
+                                                    onChange={(e) => handleInputChange('businessName', e.target.value)}
+                                                    placeholder="Enter your business name"
+                                                    className={formErrors.businessName ? 'border-destructive' : ''}
+                                                />
+                                                {formErrors.businessName && (
+                                                    <p className="text-sm text-destructive mt-1">{formErrors.businessName}</p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <Label htmlFor="businessAddress">Business Address *</Label>
+                                                <Input
+                                                    id="businessAddress"
+                                                    value={formData.businessAddress}
+                                                    onChange={(e) => handleInputChange('businessAddress', e.target.value)}
+                                                    placeholder="Enter your business address"
+                                                    className={formErrors.businessAddress ? 'border-destructive' : ''}
+                                                />
+                                                {formErrors.businessAddress && (
+                                                    <p className="text-sm text-destructive mt-1">{formErrors.businessAddress}</p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <Label htmlFor="businessGstNumber">Business GST Number *</Label>
+                                                <Input
+                                                    id="businessGstNumber"
+                                                    value={formData.businessGstNumber}
+                                                    onChange={(e) => handleInputChange('businessGstNumber', e.target.value.toUpperCase())}
+                                                    placeholder="Enter business GST number (e.g., 22AAAAA0000A1Z5)"
+                                                    maxLength={15}
+                                                    className={formErrors.businessGstNumber ? 'border-destructive' : ''}
+                                                />
+                                                {formErrors.businessGstNumber && (
+                                                    <p className="text-sm text-destructive mt-1">{formErrors.businessGstNumber}</p>
+                                                )}
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    Business GST number will be used for invoice generation
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex items-start gap-3 pt-4">
