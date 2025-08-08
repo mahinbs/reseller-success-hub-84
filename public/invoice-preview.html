@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Invoice Preview - BoostMySites</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .invoice-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .invoice-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header-left h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 2px;
+        }
+        
+        .header-left .invoice-details {
+            display: flex;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        
+        .invoice-detail {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .invoice-detail strong {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+        
+        .invoice-detail span {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .header-right {
+            text-align: right;
+        }
+        
+        .logo-container {
+            background: rgba(255,255,255,0.95);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .logo img {
+            width: 120px;
+            height: 120px;
+            border-radius: 16px;
+            object-fit: contain;
+        }
+        
+        .company-tagline {
+            font-size: 16px;
+            color: #6b7280;
+            margin-top: 12px;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        /* Billing Section */
+        .billing-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+            background: #f8fafc;
+        }
+        
+        .billing-box {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .billing-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .billing-title {
+            color: #667eea;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .billing-title::before {
+            content: '📍';
+            font-size: 16px;
+        }
+        
+        .billing-content p {
+            margin: 8px 0;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #374151;
+        }
+        
+        .billing-content strong {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        /* Items Table */
+        .items-section {
+            padding: 40px;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .items-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 16px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .items-table td {
+            padding: 20px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 15px;
+            color: #374151;
+        }
+        
+        .items-table tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        .items-table tbody tr:hover {
+            background: #f0f9ff;
+            transition: background-color 0.3s ease;
+        }
+        
+        .item-number {
+            width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .amount-cell {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #059669;
+        }
+        
+        /* Totals Section */
+        .totals-section {
+            padding: 40px;
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .totals-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+        }
+        
+        .totals-left {
+            flex: 1;
+        }
+        
+        .amount-words {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .amount-words strong {
+            color: #667eea;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .amount-words span {
+            font-size: 16px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+        
+        .totals-right {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            min-width: 300px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0;
+            font-size: 15px;
+            padding: 8px 0;
+        }
+        
+        .total-row.final {
+            border-top: 2px solid #667eea;
+            font-weight: 700;
+            font-size: 18px;
+            padding-top: 15px;
+            margin-top: 20px;
+            color: #1f2937;
+        }
+        
+        .total-row .label {
+            color: #6b7280;
+        }
+        
+        .total-row .amount {
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .total-row.final .amount {
+            color: #059669;
+            font-size: 20px;
+        }
+        
+        /* Payment Status */
+        .payment-status {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Terms */
+        .terms-section {
+            padding: 40px;
+            background: #1f2937;
+            color: white;
+        }
+        
+        .terms-title {
+            color: #fbbf24;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .terms-title::before {
+            content: '📋';
+            font-size: 16px;
+        }
+        
+        .terms-content {
+            font-size: 14px;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+        
+        .terms-content ol {
+            margin-left: 20px;
+        }
+        
+        .terms-content li {
+            margin: 8px 0;
+            padding-left: 10px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #111827;
+            color: #9ca3af;
+            padding: 30px 40px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .footer-left, .footer-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-item::before {
+            font-size: 16px;
+        }
+        
+        .footer-item.email::before { content: '📧'; }
+        .footer-item.phone::before { content: '📞'; }
+        .footer-item.website::before { content: '🌐'; }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding: 20px 10px; }
+            
+            .header-content { flex-direction: column; gap: 30px; text-align: center; }
+            
+            .header-left h1 { font-size: 36px; }
+            
+            .invoice-details { flex-direction: column; gap: 15px; }
+            
+            .billing-section { grid-template-columns: 1fr; gap: 20px; }
+            
+            .totals-container { flex-direction: column; }
+            
+            .footer-content { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>INVOICE</h1>
+                    <div class="invoice-details">
+                        <div class="invoice-detail">
+                            <strong>Invoice No</strong>
+                            <span>#INV123</span>
+                        </div>
+                        <div class="invoice-detail">
+                            <strong>Date</strong>
+                            <span>25/01/2025</span>
+                        </div>
+                        <div class="invoice-detail">
+                            <strong>Status</strong>
+                            <span style="color: #10b981;">✅ Paid</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="logo-container">
+                        <div class="logo">
+                            <img src="https://res.cloudinary.com/dknafpppp/image/upload/v1753029599/F8AB7FD9-8833-4CB2-B517-27BE0B1C6BA7_2_copy_bzt39k.png" alt="BoostMySites Logo">
+                            <div class="company-tagline">AI-Powered Digital Solutions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Billing Information -->
+        <div class="billing-section">
+            <div class="billing-box">
+                <div class="billing-title">Billed By</div>
+                <div class="billing-content">
+                    <p><strong>TRIPLE-SEVEN BOOSTMYSITES AI SOLUTIONS LLP</strong></p>
+                    <p>House No: 137, 3rd Main, 3rd Cross, 4th Phase</p>
+                    <p>Dollars Colony, JP Nagar, Bangalore South</p>
+                    <p>Karnataka, India - 560078</p>
+                    <p><strong>GSTIN:</strong> 29AAPFV2264G1ZQ</p>
+                    <p><strong>PAN:</strong> AAPFV2264G</p>
+                    <p><strong>Email:</strong> support@boostmysites.com</p>
+                </div>
+            </div>
+            <div class="billing-box">
+                <div class="billing-title">Billed To</div>
+                <div class="billing-content">
+                    <p><strong>John Doe</strong></p>
+                    <p>123 Business Street, Tech Park</p>
+                    <p>Bangalore, Karnataka - 560001</p>
+                    <p><strong>Email:</strong> john.doe@example.com</p>
+                    <p><strong>GSTIN:</strong> 29ABCDE1234F1Z5</p>
+                    <p><strong>Business:</strong> Doe Technologies Pvt Ltd</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Items Table -->
+        <div class="items-section">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th class="item-number">#</th>
+                        <th>Description</th>
+                        <th class="amount-cell">Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="item-number">1</td>
+                        <td><strong>Website Development Package</strong></td>
+                        <td class="amount-cell">₹25,000.00</td>
+                    </tr>
+                    <tr>
+                        <td class="item-number">2</td>
+                        <td><strong>SEO Optimization Service</strong></td>
+                        <td class="amount-cell">₹15,000.00</td>
+                    </tr>
+                    <tr>
+                        <td class="item-number">3</td>
+                        <td><strong>Social Media Management</strong></td>
+                        <td class="amount-cell">₹8,000.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Totals Section -->
+        <div class="totals-section">
+            <div class="totals-container">
+                <div class="totals-left">
+                    <div class="amount-words">
+                        <strong>Amount in words</strong>
+                        <span>Forty-Eight Thousand Rupees Only</span>
+                    </div>
+                    <div class="payment-status">
+                        ✅ Payment Completed Successfully
+                    </div>
+                </div>
+                <div class="totals-right">
+                    <div class="total-row">
+                        <span class="label">Subtotal:</span>
+                        <span class="amount">₹48,000.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span class="label">Coupon Discount (WELCOME10):</span>
+                        <span class="amount" style="color: #dc2626;">-₹4,800.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span class="label">GST (18%):</span>
+                        <span class="amount">₹7,776.00</span>
+                    </div>
+                    <div class="total-row final">
+                        <span class="label">Total Amount:</span>
+                        <span class="amount">₹50,976.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Terms Section -->
+        <div class="terms-section">
+            <div class="terms-title">Terms & Conditions</div>
+            <div class="terms-content">
+                <ol>
+                    <li>Payment is due upon receipt of this invoice and has been successfully processed.</li>
+                    <li>All prices are in Indian Rupees (INR) and include applicable GST at 18%.</li>
+                    <li>Services will be activated immediately upon payment confirmation.</li>
+                    <li>For technical support or billing queries, please contact our support team.</li>
+                    <li>This is a computer-generated invoice and does not require a physical signature.</li>
+                    <li>All services are subject to our standard terms of service and privacy policy.</li>
+                </ol>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="footer-item email">support@boostmysites.com</div>
+                    <div class="footer-item phone">+91 XXX XXX XXXX</div>
+                </div>
+                <div class="footer-right">
+                    <div class="footer-item website">www.boostmysites.com</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
