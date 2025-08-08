@@ -50,6 +50,7 @@ const CheckoutPage = () => {
         businessAddress: '',
         businessGstNumber: '',
         agreeToTerms: false,
+        couponCode: '',
     });
 
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});

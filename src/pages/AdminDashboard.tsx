@@ -92,6 +92,9 @@ interface Purchase {
   created_at: string;
   updated_at: string;
   expires_at?: string;
+  coupon_code?: string | null;
+  coupon_discount?: number | null;
+  coupon_free_months?: number | null;
   profiles?: {
     email: string;
     full_name: string;
@@ -427,6 +430,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
           total_price: data.total_price,
           discount_percentage: data.discount_percentage,
           is_active: data.is_active,
+          image_url: data.image_url,
         }])
         .select()
         .single();

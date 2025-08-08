@@ -22,6 +22,9 @@ export interface Purchase {
     razorpay_order_id?: string;
     razorpay_payment_id?: string;
     expires_at?: string;
+    coupon_code?: string | null;
+    coupon_discount?: number | null;
+    coupon_free_months?: number | null;
     items: CartItem[];
 }
 
@@ -192,6 +195,9 @@ export const getPurchaseDetails = async (purchaseId: string): Promise<Purchase |
             razorpay_order_id: purchase.razorpay_order_id,
             razorpay_payment_id: purchase.razorpay_payment_id,
             expires_at: purchase.expires_at,
+            coupon_code: purchase.coupon_code,
+            coupon_discount: purchase.coupon_discount,
+            coupon_free_months: purchase.coupon_free_months,
             items,
         };
     } catch (error) {

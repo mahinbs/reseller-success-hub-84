@@ -73,7 +73,7 @@ export default function AdminCoupons() {
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
-            setCoupons(data || []);
+            setCoupons((data || []) as Coupon[]);
         } catch (error) {
             console.error('Error loading coupons:', error);
             toast({
