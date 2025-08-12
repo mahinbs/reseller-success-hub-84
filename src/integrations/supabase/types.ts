@@ -210,7 +210,7 @@ export type Database = {
           created_at?: string
           current_uses?: number
           description?: string | null
-          discount_type: string
+          discount_type: 'percentage' | 'fixed' | 'free_months' | '1DollarService'
           discount_value?: number
           free_months?: number | null
           id?: string
@@ -225,7 +225,7 @@ export type Database = {
           created_at?: string
           current_uses?: number
           description?: string | null
-          discount_type?: string
+          discount_type?: 'percentage' | 'fixed' | 'free_months' | '1DollarService'
           discount_value?: number
           free_months?: number | null
           id?: string

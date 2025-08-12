@@ -15,7 +15,7 @@ interface Coupon {
     id: string;
     code: string;
     description: string;
-    discount_type: 'percentage' | 'fixed' | 'free_months';
+    discount_type: 'percentage' | 'fixed' | 'free_months' | '1DollarService';
     discount_value: number;
     free_months: number;
     max_uses: number | null;
@@ -37,7 +37,7 @@ export default function AdminCoupons() {
     const [formData, setFormData] = useState({
         code: '',
         description: '',
-        discount_type: 'percentage' as 'percentage' | 'fixed' | 'free_months',
+        discount_type: 'percentage' as 'percentage' | 'fixed' | 'free_months' | '1DollarService',
         discount_value: 0,
         free_months: 0,
         max_uses: '',
@@ -94,7 +94,7 @@ export default function AdminCoupons() {
                 code: formData.code.toUpperCase(),
                 description: formData.description,
                 discount_type: formData.discount_type,
-                discount_value: formData.discount_value,
+                discount_value: formData.discount_type === '1DollarService' ? 84 : formData.discount_value, // 84 rupees = 1 dollar
                 free_months: formData.discount_type === 'free_months' ? formData.free_months : 0,
                 max_uses: formData.max_uses ? parseInt(formData.max_uses) : null,
                 valid_from: new Date(formData.valid_from).toISOString(),
@@ -143,7 +143,7 @@ export default function AdminCoupons() {
         setFormData({
             code: '',
             description: '',
-            discount_type: 'percentage',
+            discount_type: 'percentage' as 'percentage' | 'fixed' | 'free_months' | '1DollarService',
             discount_value: 0,
             free_months: 0,
             max_uses: '',
@@ -159,7 +159,7 @@ export default function AdminCoupons() {
         setFormData({
             code: coupon.code,
             description: coupon.description,
-            discount_type: coupon.discount_type,
+            discount_type: coupon.discount_type as 'percentage' | 'fixed' | 'free_months' | '1DollarService',
             discount_value: coupon.discount_value,
             free_months: coupon.free_months || 0,
             max_uses: coupon.max_uses?.toString() || '',
@@ -258,7 +258,7 @@ export default function AdminCoupons() {
                                     <Label htmlFor="discount_type">Discount Type *</Label>
                                     <Select
                                         value={formData.discount_type}
-                                        onValueChange={(value: 'percentage' | 'fixed' | 'free_months') =>
+                                        onValueChange={(value: 'percentage' | 'fixed' | 'free_months' | '1DollarService') =>
                                             setFormData({ ...formData, discount_type: value })
                                         }
                                     >
@@ -268,12 +268,13 @@ export default function AdminCoupons() {
                                         <SelectContent>
                                             <SelectItem value="percentage">Percentage Off</SelectItem>
                                             <SelectItem value="fixed">Fixed Amount Off</SelectItem>
+                                            <SelectItem value="1DollarService">1 Dollar Service</SelectItem>
                                             {/* <SelectItem value="free_months">Free Months</SelectItem> */}
                                         </SelectContent>
                                     </Select>
                                 </div>
 
-                                {formData.discount_type !== 'free_months' && (
+                                {formData.discount_type !== 'free_months' && formData.discount_type !== '1DollarService' && (
                                     <div>
                                         <Label htmlFor="discount_value">
                                             {formData.discount_type === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'}
@@ -287,6 +288,15 @@ export default function AdminCoupons() {
                                             max={formData.discount_type === 'percentage' ? '100' : undefined}
                                             required
                                         />
+                                    </div>
+                                )}
+
+                                {formData.discount_type === '1DollarService' && (
+                                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                        <p className="text-sm text-blue-800">
+                                            <strong>1 Dollar Service Coupon:</strong> This coupon allows customers to pay only ₹84 (1 USD) for a single service when applied.
+                                            It can only be used when there is exactly 1 service in the cart.
+                                        </p>
                                     </div>
                                 )}
 
@@ -423,7 +433,8 @@ export default function AdminCoupons() {
                                             <div>
                                                 {coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` :
                                                     coupon.discount_type === 'fixed' ? `₹${coupon.discount_value}` :
-                                                        `${coupon.free_months} months free`}
+                                                        coupon.discount_type === '1DollarService' ? '₹84 (1 USD)' :
+                                                            `${coupon.free_months} months free`}
                                             </div>
                                         </div>
                                         <div>

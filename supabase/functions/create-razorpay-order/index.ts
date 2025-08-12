@@ -120,6 +120,13 @@ serve(async (req) => {
                     if (!usage) {
                         // Check usage limits
                         if (!coupon.max_uses || coupon.current_uses < coupon.max_uses) {
+                            // Special validation for 1DollarService coupon
+                            if (coupon.discount_type === '1DollarService') {
+                                if (cart_items.length !== 1) {
+                                    throw new Error('1DollarService coupon can only be applied when there is exactly 1 service in the cart');
+                                }
+                            }
+
                             // For multiple items in cart, apply discount only to the lowest price item
                             const lowestPriceItem = Math.min(...cart_items.map(item => item.price))
 
@@ -139,6 +146,13 @@ serve(async (req) => {
                                 } else {
                                     // Apply to full subtotal if only one item
                                     couponDiscount = coupon.discount_value
+                                }
+                            } else if (coupon.discount_type === '1DollarService') {
+                                // For 1DollarService, calculate discount to make the service cost ₹84 (1 USD)
+                                if (cart_items.length === 1) {
+                                    const servicePrice = cart_items[0].price;
+                                    couponDiscount = servicePrice - 84; // Make the service cost ₹84
+                                    couponDiscount = Math.max(couponDiscount, 0); // Don't allow negative discount
                                 }
                             } else if (coupon.discount_type === 'free_months') {
                                 // For free months, always apply only to the lowest price item
