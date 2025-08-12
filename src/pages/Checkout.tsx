@@ -124,9 +124,9 @@ const CheckoutPage = () => {
                 const couponsWithUsage = (coupons || [])
                     .filter(c => {
                         // For free_months coupons, ensure free_months > 0
-                        if (c.discount_type === 'free_months') return c.free_months > 0;
-                        // For service_one, no discount_value needed
-                        if (c.discount_type === 'service_one') return true;
+                        if (c.discount_type === 'free_months') {
+                            return c.free_months > 0;
+                        }
                         // For other types, ensure discount_value > 0
                         return c.discount_value > 0;
                     })
@@ -332,20 +332,6 @@ const CheckoutPage = () => {
 
                 // Don't exceed the actual item price
                 discount = Math.min(discount, lowestPriceItem);
-            } else if (coupon.discount_type === 'service_one') {
-                // Make the lowest-priced service cost ₹1 (services only)
-                const serviceItems = cart.filter(item => item.type === 'service');
-                if (serviceItems.length > 0) {
-                    const lowestServicePrice = Math.min(...serviceItems.map(i => i.price));
-                    const desiredPrice = 1;
-                    const discountToApply = Math.max(0, lowestServicePrice - desiredPrice);
-                    if (cart.length > 1) {
-                        discount = Math.min(discountToApply, lowestServicePrice);
-                    } else {
-                        // Only one item in cart and it's a service
-                        discount = Math.min(discountToApply, subtotal);
-                    }
-                }
             }
 
             setAppliedCoupon(coupon);

@@ -15,7 +15,7 @@ interface Coupon {
     id: string;
     code: string;
     description: string;
-    discount_type: 'percentage' | 'fixed' | 'free_months' | 'service_one';
+    discount_type: 'percentage' | 'fixed' | 'free_months';
     discount_value: number;
     free_months: number;
     max_uses: number | null;
@@ -37,7 +37,7 @@ export default function AdminCoupons() {
     const [formData, setFormData] = useState({
         code: '',
         description: '',
-        discount_type: 'percentage' as 'percentage' | 'fixed' | 'free_months' | 'service_one',
+        discount_type: 'percentage' as 'percentage' | 'fixed' | 'free_months',
         discount_value: 0,
         free_months: 0,
         max_uses: '',
@@ -94,7 +94,7 @@ export default function AdminCoupons() {
                 code: formData.code.toUpperCase(),
                 description: formData.description,
                 discount_type: formData.discount_type,
-                discount_value: formData.discount_type === 'service_one' ? 0 : formData.discount_value,
+                discount_value: formData.discount_value,
                 free_months: formData.discount_type === 'free_months' ? formData.free_months : 0,
                 max_uses: formData.max_uses ? parseInt(formData.max_uses) : null,
                 valid_from: new Date(formData.valid_from).toISOString(),
@@ -206,31 +206,6 @@ export default function AdminCoupons() {
         });
     };
 
-    const createServiceOneCoupon = async () => {
-        try {
-            const code = `SERV1-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-            const now = new Date();
-            const in90Days = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
-            const { error } = await supabase.from('coupons').insert({
-                code,
-                description: 'Make one service ₹1 (once per user). Applies to services only, not bundles or addons.',
-                discount_type: 'service_one',
-                discount_value: 0,
-                free_months: 0,
-                max_uses: null,
-                valid_from: now.toISOString(),
-                valid_until: in90Days.toISOString(),
-                is_active: true,
-            });
-            if (error) throw error;
-            toast({ title: 'Coupon Created', description: `Code ${code} created.` });
-            loadCoupons();
-        } catch (e: any) {
-            console.error('Failed to create service_one coupon', e);
-            toast({ title: 'Error', description: e.message || 'Failed to create coupon', variant: 'destructive' });
-        }
-    };
-
     if (profile?.role !== 'admin') {
         return (
             <div className="container mx-auto px-4 py-8">
@@ -254,9 +229,6 @@ export default function AdminCoupons() {
                 <Button onClick={() => setShowForm(true)} className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
                     Create Coupon
-                </Button>
-                <Button onClick={createServiceOneCoupon} variant="outline" className="ml-2">
-                    Quick-create ₹1 Service Coupon
                 </Button>
             </div>
 
@@ -286,7 +258,7 @@ export default function AdminCoupons() {
                                     <Label htmlFor="discount_type">Discount Type *</Label>
                                     <Select
                                         value={formData.discount_type}
-                                        onValueChange={(value: 'percentage' | 'fixed' | 'free_months' | 'service_one') =>
+                                        onValueChange={(value: 'percentage' | 'fixed' | 'free_months') =>
                                             setFormData({ ...formData, discount_type: value })
                                         }
                                     >
@@ -297,12 +269,11 @@ export default function AdminCoupons() {
                                             <SelectItem value="percentage">Percentage Off</SelectItem>
                                             <SelectItem value="fixed">Fixed Amount Off</SelectItem>
                                             {/* <SelectItem value="free_months">Free Months</SelectItem> */}
-                                            <SelectItem value="service_one">Make one service ₹1</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
 
-                                {formData.discount_type !== 'free_months' && formData.discount_type !== 'service_one' && (
+                                {formData.discount_type !== 'free_months' && (
                                     <div>
                                         <Label htmlFor="discount_value">
                                             {formData.discount_type === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'}
@@ -452,7 +423,6 @@ export default function AdminCoupons() {
                                             <div>
                                                 {coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` :
                                                     coupon.discount_type === 'fixed' ? `₹${coupon.discount_value}` :
-                                                    coupon.discount_type === 'service_one' ? `Make one service ₹1` :
                                                         `${coupon.free_months} months free`}
                                             </div>
                                         </div>
