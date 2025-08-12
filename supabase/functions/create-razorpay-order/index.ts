@@ -158,6 +158,21 @@ serve(async (req) => {
 
                                 // Don't exceed the actual item price
                                 couponDiscount = Math.min(couponDiscount, lowestPriceItem)
+                            } else if (coupon.discount_type === 'service_one') {
+                                // Make the lowest-priced service item cost ₹1 (services only, not bundles/addons)
+                                const serviceItems = cart_items.filter(item => item.type === 'service')
+                                if (serviceItems.length > 0) {
+                                    const lowestServicePrice = Math.min(...serviceItems.map(i => i.price))
+                                    const desiredPrice = 1
+                                    const discountToApply = Math.max(0, lowestServicePrice - desiredPrice)
+                                    if (cart_items.length > 1) {
+                                        // Apply only to that one service item
+                                        couponDiscount = Math.min(discountToApply, lowestServicePrice)
+                                    } else {
+                                        // Only one item in cart and it's a service
+                                        couponDiscount = Math.min(discountToApply, subtotal)
+                                    }
+                                }
                             }
 
                             couponDiscount = Math.min(couponDiscount, subtotal) // Don't discount more than subtotal
