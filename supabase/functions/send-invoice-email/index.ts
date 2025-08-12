@@ -658,6 +658,244 @@ function generateInvoiceHTML(purchase: any, subtotal: number, couponDiscount: nu
     </body>
     </html>
   `;
+            
+            .billing-content strong {
+                font-weight: 600;
+            }
+            
+            /* Items Table */
+            .items-section {
+                padding: 0 20px;
+            }
+            
+            .items-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+            }
+            
+            .items-table th {
+                background: #8B5CF6;
+                color: white;
+                padding: 12px 8px;
+                text-align: left;
+                font-size: 12px;
+                font-weight: bold;
+            }
+            
+            .items-table td {
+                padding: 12px 8px;
+                border-bottom: 1px solid #eee;
+                font-size: 14px;
+            }
+            
+            .items-table tbody tr:nth-child(even) {
+                background: #f9f9f9;
+            }
+            
+            .item-number {
+                width: 30px;
+                text-align: center;
+            }
+            
+            .amount-cell {
+                text-align: right;
+                font-family: monospace;
+            }
+            
+            /* Totals Section */
+            .totals-section {
+                padding: 20px;
+                border-top: 1px solid #ddd;
+            }
+            
+            .totals-left {
+                width: 60%;
+                display: inline-block;
+                vertical-align: top;
+            }
+            
+            .amount-words {
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 20px;
+            }
+            
+            .totals-right {
+                width: 35%;
+                display: inline-block;
+                vertical-align: top;
+                text-align: right;
+            }
+            
+            .total-row {
+                display: flex;
+                justify-content: space-between;
+                margin: 8px 0;
+                font-size: 14px;
+            }
+            
+            .total-row.final {
+                border-top: 2px solid #333;
+                font-weight: bold;
+                font-size: 16px;
+                padding-top: 8px;
+                margin-top: 15px;
+            }
+            
+            /* Terms */
+            .terms-section {
+                padding: 20px;
+                border-top: 1px solid #ddd;
+                background: #f9f9f9;
+            }
+            
+            .terms-title {
+                color: #8B5CF6;
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            
+            .terms-content {
+                font-size: 12px;
+                color: #666;
+            }
+            
+            .terms-content ol {
+                margin-left: 20px;
+            }
+            
+            .terms-content li {
+                margin: 5px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="invoice-container">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <h1>INVOICE</h1>
+                    <p><strong>Invoice No #</strong> ${invoiceNumber}</p>
+                    <p><strong>Invoice Date</strong> ${currentDate}</p>
+                </div>
+                <div class="header-right">
+                    <div class="logo">
+                        <span class="boost">BOOST</span><span class="my">MY</span><span class="sites">SITES</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Billing Information -->
+            <div class="billing-section">
+                <div class="billing-box">
+                    <div class="billing-title">Billed By</div>
+                    <div class="billing-content">
+                        <p><strong>TRIPLE-SEVEN BOOSTMYSITES AI SOLUTIONS LLP</strong></p>
+                        <p>House No: 137, 3rd Main,3rd Cross,4th Phase, Dollars</p>
+                        <p>Colony,JP Nagar,Bangalore South,</p>
+                        <p>Karnataka, India - 560078</p>
+                        <p><strong>GSTIN:</strong> 29AAPFV2264G1ZQ</p>
+                        <p><strong>PAN:</strong> AAPFV2264G</p>
+                    </div>
+                </div>
+                <div class="billing-box">
+                    <div class="billing-title">Billed To</div>
+                    <div class="billing-content">
+                        <p><strong>${purchase.profiles.full_name || 'Valued Customer'}</strong></p>
+                        ${purchase.customer_address ? `<p>${purchase.customer_address}</p>` : ''}
+                        <p>Email: ${purchase.profiles.email}</p>
+                        ${purchase.customer_gst_number ? `<p><strong>GSTIN:</strong> ${purchase.customer_gst_number}</p>` : ''}
+                        ${purchase.customer_business_name ? `<p><strong>Business:</strong> ${purchase.customer_business_name}</p>` : ''}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Items Table -->
+            <div class="items-section">
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th class="item-number">Item</th>
+                            <th>Description</th>
+                            <th>GST Rate</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Taxable Amount</th>
+                            <th>CGST</th>
+                            <th>SGST</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${purchase.purchase_items.map((item: any, index: number) => {
+    const itemPrice = Number(item.item_price);
+    const discountForThisItem = couponDiscount > 0 && index === 0 ? couponDiscount : 0;
+    const taxableAmount = itemPrice - discountForThisItem;
+    const cgst = taxableAmount * 0.09; // 9% CGST
+    const sgst = taxableAmount * 0.09; // 9% SGST
+    const totalWithTax = taxableAmount + cgst + sgst;
+
+    return `
+                            <tr>
+                                <td class="item-number">${index + 1}.</td>
+                                <td>${item.item_name}</td>
+                                <td>18%</td>
+                                <td>1</td>
+                                <td class="amount-cell">₹${itemPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                <td class="amount-cell">₹${taxableAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                <td class="amount-cell">₹${cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                <td class="amount-cell">₹${sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                                <td class="amount-cell">₹${totalWithTax.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                            </tr>
+                            `;
+  }).join('')}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Totals -->
+            <div class="totals-section">
+                <div class="totals-left">
+                    <div class="amount-words">
+                        <strong>Total (in words) :</strong> ${convertNumberToWords(Math.round(total))} RUPEES ONLY
+                    </div>
+                </div>
+                <div class="totals-right">
+                    <div class="total-row">
+                        <span>Taxable Amount</span>
+                        <span>₹${(subtotal - couponDiscount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="total-row">
+                        <span>CGST</span>
+                        <span>₹${(gstAmount / 2).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="total-row">
+                        <span>SGST</span>
+                        <span>₹${(gstAmount / 2).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div class="total-row final">
+                        <span>Total (INR)</span>
+                        <span>₹${total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Terms and Conditions -->
+            <div class="terms-section">
+                <div class="terms-title">Terms and Conditions</div>
+                <div class="terms-content">
+                    <ol>
+                        <li>Amount paid to the company is not refundable.</li>
+                        <li>http://boostmysites.com/terms-and-conditions/</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
 }
 
 serve(async (req) => {

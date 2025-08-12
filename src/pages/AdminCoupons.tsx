@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Plus, Edit, Trash2, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -16,7 +15,7 @@ interface Coupon {
     id: string;
     code: string;
     description: string;
-    discount_type: 'percentage' | 'fixed' | 'free_months' | 'service_one_dollar';
+    discount_type: 'percentage' | 'fixed' | 'free_months';
     discount_value: number;
     free_months: number;
     max_uses: number | null;
@@ -38,7 +37,7 @@ export default function AdminCoupons() {
     const [formData, setFormData] = useState({
         code: '',
         description: '',
-        discount_type: 'percentage' as 'percentage' | 'fixed' | 'free_months' | 'service_one_dollar',
+        discount_type: 'percentage' as 'percentage' | 'fixed' | 'free_months',
         discount_value: 0,
         free_months: 0,
         max_uses: '',
@@ -95,7 +94,7 @@ export default function AdminCoupons() {
                 code: formData.code.toUpperCase(),
                 description: formData.description,
                 discount_type: formData.discount_type,
-                discount_value: formData.discount_type === 'service_one_dollar' ? 84 : formData.discount_value,
+                discount_value: formData.discount_value,
                 free_months: formData.discount_type === 'free_months' ? formData.free_months : 0,
                 max_uses: formData.max_uses ? parseInt(formData.max_uses) : null,
                 valid_from: new Date(formData.valid_from).toISOString(),
@@ -227,32 +226,10 @@ export default function AdminCoupons() {
                     <h1 className="text-3xl font-bold">Coupon Management</h1>
                     <p className="text-gray-600">Create and manage discount coupons</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button 
-                        onClick={() => {
-                            setFormData({
-                                code: 'DOLLAR1',
-                                description: 'Any service for just $1 USD (₹84)',
-                                discount_type: 'service_one_dollar',
-                                discount_value: 84,
-                                free_months: 0,
-                                max_uses: '',
-                                valid_from: new Date().toISOString().split('T')[0],
-                                valid_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                                is_active: true
-                            });
-                            setShowForm(true);
-                        }}
-                        variant="outline"
-                        size="sm"
-                    >
-                        Quick: $1 Service
-                    </Button>
-                    <Button onClick={() => setShowForm(true)} className="flex items-center gap-2">
-                        <Plus className="h-4 w-4" />
-                        Create Coupon
-                    </Button>
-                </div>
+                <Button onClick={() => setShowForm(true)} className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Create Coupon
+                </Button>
             </div>
 
             {showForm && (
@@ -279,25 +256,24 @@ export default function AdminCoupons() {
 
                                 <div>
                                     <Label htmlFor="discount_type">Discount Type *</Label>
-                                     <Select
-                                         value={formData.discount_type}
-                                         onValueChange={(value: 'percentage' | 'fixed' | 'free_months' | 'service_one_dollar') =>
-                                             setFormData({ ...formData, discount_type: value })
-                                         }
-                                     >
+                                    <Select
+                                        value={formData.discount_type}
+                                        onValueChange={(value: 'percentage' | 'fixed' | 'free_months') =>
+                                            setFormData({ ...formData, discount_type: value })
+                                        }
+                                    >
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="percentage">Percentage Off</SelectItem>
                                             <SelectItem value="fixed">Fixed Amount Off</SelectItem>
-                                            <SelectItem value="service_one_dollar">Service for $1 USD (₹84)</SelectItem>
                                             {/* <SelectItem value="free_months">Free Months</SelectItem> */}
                                         </SelectContent>
                                     </Select>
                                 </div>
 
-                                {formData.discount_type !== 'free_months' && formData.discount_type !== 'service_one_dollar' && (
+                                {formData.discount_type !== 'free_months' && (
                                     <div>
                                         <Label htmlFor="discount_value">
                                             {formData.discount_type === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'}
@@ -311,16 +287,6 @@ export default function AdminCoupons() {
                                             max={formData.discount_type === 'percentage' ? '100' : undefined}
                                             required
                                         />
-                                    </div>
-                                )}
-
-                                {formData.discount_type === 'service_one_dollar' && (
-                                    <div className="col-span-full">
-                                        <Alert>
-                                            <AlertDescription>
-                                                This coupon will set any service price to ₹84 (~$1 USD). Final amount after GST will be approximately ₹99.
-                                            </AlertDescription>
-                                        </Alert>
                                     </div>
                                 )}
 
@@ -452,15 +418,14 @@ export default function AdminCoupons() {
                                     <p className="text-gray-600 mb-2">{coupon.description}</p>
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                         <div>
-                                             <span className="font-medium">Discount:</span>
-                                             <div>
-                                                 {coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` :
-                                                     coupon.discount_type === 'fixed' ? `₹${coupon.discount_value}` :
-                                                     coupon.discount_type === 'service_one_dollar' ? `Service for ₹84` :
-                                                         `${coupon.free_months} months free`}
-                                             </div>
-                                         </div>
+                                        <div>
+                                            <span className="font-medium">Discount:</span>
+                                            <div>
+                                                {coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` :
+                                                    coupon.discount_type === 'fixed' ? `₹${coupon.discount_value}` :
+                                                        `${coupon.free_months} months free`}
+                                            </div>
+                                        </div>
                                         <div>
                                             <span className="font-medium">Usage:</span>
                                             <div>

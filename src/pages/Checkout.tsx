@@ -127,10 +127,6 @@ const CheckoutPage = () => {
                         if (c.discount_type === 'free_months') {
                             return c.free_months > 0;
                         }
-                        // For service_one_dollar coupons, always valid
-                        if (c.discount_type === 'service_one_dollar') {
-                            return true;
-                        }
                         // For other types, ensure discount_value > 0
                         return c.discount_value > 0;
                     })
@@ -314,14 +310,6 @@ const CheckoutPage = () => {
                 } else {
                     // Apply to full subtotal if only one item
                     discount = coupon.discount_value;
-                }
-            } else if (coupon.discount_type === 'service_one_dollar') {
-                // Find the lowest price service item (not bundle or addon)
-                const serviceItems = cart.filter(item => item.type === 'service');
-                if (serviceItems.length > 0) {
-                    const lowestPriceService = Math.min(...serviceItems.map(item => item.price));
-                    // Set discount to make the service cost ₹84 (discount = original_price - 84)
-                    discount = Math.max(0, lowestPriceService - 84);
                 }
             } else if (coupon.discount_type === 'free_months') {
                 // For free months, always apply only to the lowest price item
