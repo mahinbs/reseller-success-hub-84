@@ -356,10 +356,6 @@ const CheckoutPage = () => {
             setAppliedCoupon(coupon);
             setCouponDiscount(Math.min(discount, subtotal)); // Don't discount more than subtotal
 
-            toast({
-                title: "Coupon Applied!",
-                description: `You saved ₹${Math.min(discount, subtotal).toFixed(2)}`,
-            });
 
         } catch (error) {
             console.error('Error applying coupon:', error);
