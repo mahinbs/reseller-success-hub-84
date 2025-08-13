@@ -102,7 +102,7 @@ const CartPage = () => {
             </p>
 
             <Button
-              onClick={() => navigate(isInDashboard ? "/dashboard/services" : "/services")}
+              onClick={() => navigate(isInDashboard ? "/dashboard/services" : "/")}
               className="gradient-primary"
             >
               Browse Services
@@ -193,7 +193,7 @@ const CartPage = () => {
 
               <Button
                 variant="ghost"
-                onClick={() => navigate(isInDashboard ? "/dashboard/services" : "/services")}
+                onClick={() => navigate(isInDashboard ? "/dashboard/services" : "/")}
                 className="hover:scale-105 transition-all-smooth"
               >
                 Continue Shopping
