@@ -785,8 +785,15 @@ const CheckoutPage = () => {
                                     </div>
                                     {appliedCoupon && couponDiscount > 0 && (
                                         <div className="flex justify-between text-sm text-green-600">
-                                            <span>Coupon Discount ({appliedCoupon.code})</span>
-                                            <span>-₹{couponDiscount.toFixed(2)}</span>
+                                            <span>
+                                                {appliedCoupon.discount_type === '1DollarService' 
+                                                    ? 'First month just for ₹84 INR'
+                                                    : `Coupon Discount (${appliedCoupon.code})`
+                                                }
+                                            </span>
+                                            {appliedCoupon.discount_type !== '1DollarService' && (
+                                                <span>-₹{couponDiscount.toFixed(2)}</span>
+                                            )}
                                         </div>
                                     )}
                                     <div className="flex justify-between text-sm text-muted-foreground">
