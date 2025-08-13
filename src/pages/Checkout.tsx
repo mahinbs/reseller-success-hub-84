@@ -787,7 +787,7 @@ const CheckoutPage = () => {
                                         <div className="flex justify-between text-sm text-green-600">
                                             <span>
                                                 {appliedCoupon.discount_type === '1DollarService' 
-                                                    ? 'First month just for ₹84 INR'
+                                                    ? `First month just for ₹${totalAmount.toFixed(2)} INR`
                                                     : `Coupon Discount (${appliedCoupon.code})`
                                                 }
                                             </span>
