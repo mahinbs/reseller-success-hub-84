@@ -130,10 +130,10 @@ const FeeHikePolicy = () => {
         );
       case 'not-paid':
         return (
-          <div className="flex items-center gap-2 text-destructive">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <XCircle className="h-4 w-4" />
             <span>Payment Status: Not Paid</span>
-            <Badge variant="destructive">
+            <Badge variant="outline" className="border-muted-foreground/30 text-muted-foreground">
               Not Paid
             </Badge>
           </div>
@@ -150,24 +150,24 @@ const FeeHikePolicy = () => {
             <div className="space-y-2">
               <Badge 
                 variant="outline" 
-                className="text-sm px-4 py-2 border-destructive/30 bg-destructive/10 text-destructive animate-pulse"
+                className="text-sm px-4 py-2 border-primary/30 bg-primary/10 text-primary animate-pulse"
               >
-                {isEffective ? '🚨 POLICY NOW ACTIVE' : '⚠️ Effective: 1 September 2025'}
+                {isEffective ? 'POLICY NOW ACTIVE' : 'Effective: 1 September 2025'}
               </Badge>
               
               {!isEffective && (
-                <p className="text-lg font-semibold text-destructive animate-pulse">
-                  ⏰ Lock in current rates before prices increase by 20%!
+                <p className="text-lg font-semibold text-primary animate-pulse">
+                  Lock in current rates before prices increase by 20%!
                 </p>
               )}
             </div>
             
             {!isEffective && (
-              <Card className="bg-card/50 backdrop-blur border-destructive/20 shadow-lg">
+              <Card className="bg-card/50 backdrop-blur border-primary/20 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="flex items-center justify-center gap-2 text-destructive">
+                  <CardTitle className="flex items-center justify-center gap-2 text-primary">
                     <Clock className="h-5 w-5" />
-                    ⚡ Time Until Price Increase
+                    Time Until Price Increase
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
                     Save 20% by booking before this deadline!
@@ -176,19 +176,19 @@ const FeeHikePolicy = () => {
                 <CardContent>
                   <div className="grid grid-cols-4 gap-4 text-center">
                     <div className="space-y-1">
-                      <div className="text-4xl font-bold text-destructive animate-pulse">{timeLeft.days}</div>
+                      <div className="text-4xl font-bold text-primary animate-pulse">{timeLeft.days}</div>
                       <div className="text-sm text-muted-foreground font-medium">Days</div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-4xl font-bold text-destructive animate-pulse">{timeLeft.hours}</div>
+                      <div className="text-4xl font-bold text-primary animate-pulse">{timeLeft.hours}</div>
                       <div className="text-sm text-muted-foreground font-medium">Hours</div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-4xl font-bold text-destructive animate-pulse">{timeLeft.minutes}</div>
+                      <div className="text-4xl font-bold text-primary animate-pulse">{timeLeft.minutes}</div>
                       <div className="text-sm text-muted-foreground font-medium">Minutes</div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-4xl font-bold text-destructive animate-pulse">{timeLeft.seconds}</div>
+                      <div className="text-4xl font-bold text-primary animate-pulse">{timeLeft.seconds}</div>
                       <div className="text-sm text-muted-foreground font-medium">Seconds</div>
                     </div>
                   </div>
@@ -208,7 +208,7 @@ const FeeHikePolicy = () => {
             {/* Main CTA Section */}
             <div className="space-y-4 py-6">
               <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold">💰 Last Chance to Save 20%</h2>
+                <h2 className="text-2xl font-bold">Last Chance to Save 20%</h2>
                 <p className="text-muted-foreground">
                   Book now at current prices before the fee increase takes effect
                 </p>
@@ -229,12 +229,12 @@ const FeeHikePolicy = () => {
                   className="glossy-button text-lg px-8 py-4 h-auto font-semibold animate-pulse hover:animate-none"
                 >
                   <ExternalLink className="h-5 w-5 mr-2" />
-                  🚀 Book Now - Save 20%
+                  Book Now - Save 20%
                 </Button>
               </div>
               
               <p className="text-center text-xs text-muted-foreground">
-                💡 Trusted by 500+ clients • No hidden fees • 30-day guarantee
+                Trusted by 500+ clients • No hidden fees • 30-day guarantee
               </p>
             </div>
           </div>
@@ -244,32 +244,31 @@ const FeeHikePolicy = () => {
             <CardContent className="pt-8">
               <div className="policy-prose space-y-8">
                 <div className="text-center space-y-4">
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-destructive bg-clip-text text-transparent">
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                     Fee Hike & Project Limit Policy
                   </h1>
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-destructive/10 rounded-full border border-destructive/20">
-                    <span className="text-destructive font-semibold">📅 Effective Date: 1 September 2025</span>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20">
+                    <span className="text-primary font-semibold">Effective Date: 1 September 2025</span>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8">
                   {/* Fee Increase Section */}
-                  <div className="space-y-4 p-6 bg-gradient-to-br from-destructive/5 to-destructive/10 rounded-lg border border-destructive/20">
+                  <div className="space-y-4 p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">📈</span>
-                      <h2 className="text-2xl font-bold text-destructive">1. Fee Increase (20%)</h2>
+                      <h2 className="text-2xl font-bold text-primary">1. Fee Increase (20%)</h2>
                     </div>
                     <div className="space-y-3 text-muted-foreground">
                       <p className="flex items-start gap-2">
-                        <span className="text-destructive">•</span>
+                        <span className="text-primary">•</span>
                         We are adjusting our service fees by <strong className="text-foreground">20%</strong> across all service offerings and packages.
                       </p>
                       <p className="flex items-start gap-2">
-                        <span className="text-destructive">•</span>
+                        <span className="text-primary">•</span>
                         This change reflects ongoing investments in service quality, infrastructure, support, and operational enhancements.
                       </p>
                       <p className="flex items-start gap-2">
-                        <span className="text-destructive">•</span>
+                        <span className="text-primary">•</span>
                         We remain committed to delivering exceptional value and results—this update ensures we can continue doing so sustainably.
                       </p>
                     </div>
@@ -278,7 +277,6 @@ const FeeHikePolicy = () => {
                   {/* Project Cap Section */}
                   <div className="space-y-4 p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">📊</span>
                       <h2 className="text-2xl font-bold text-primary">2. Project Cap (5/month)</h2>
                     </div>
                     <div className="space-y-3 text-muted-foreground">
@@ -296,22 +294,18 @@ const FeeHikePolicy = () => {
 
                 <div className="border-t border-border pt-8">
                   <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                    <span className="text-2xl">💡</span>
                     Why This Update Matters
                   </h2>
                   <div className="grid md:grid-cols-3 gap-6">
                     <div className="text-center space-y-2 p-4 bg-success/5 rounded-lg border border-success/20">
-                      <div className="text-3xl">🚀</div>
                       <h3 className="font-semibold text-success">Sustaining Excellence</h3>
                       <p className="text-sm text-muted-foreground">The fee adjustment enables us to invest further in tools, talent, and processes that elevate your experience.</p>
                     </div>
                     <div className="text-center space-y-2 p-4 bg-primary/5 rounded-lg border border-primary/20">
-                      <div className="text-3xl">⭐</div>
                       <h3 className="font-semibold text-primary">Maintaining Quality</h3>
                       <p className="text-sm text-muted-foreground">Capping projects prevents overextension and helps ensure every order receives the attention it deserves.</p>
                     </div>
                     <div className="text-center space-y-2 p-4 bg-secondary/20 rounded-lg border border-secondary/20">
-                      <div className="text-3xl">✅</div>
                       <h3 className="font-semibold">Transparent & Fair</h3>
                       <p className="text-sm text-muted-foreground">These changes apply across the board—no hidden costs or exceptions.</p>
                     </div>
@@ -320,19 +314,18 @@ const FeeHikePolicy = () => {
 
                 <div className="border-t border-border pt-8">
                   <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                    <span className="text-2xl">⚙️</span>
                     How It Works
                   </h2>
                   <div className="space-y-4">
                     <div className="p-4 bg-muted/30 rounded-lg border border-border">
                       <p className="flex items-start gap-2">
-                        <span className="text-destructive font-bold">💰</span>
+                        <span className="text-primary font-bold">•</span>
                         The <strong>20% fee increase</strong> applies to all new purchases, bundles, add-ons, and subscriptions from the effective date forward.
                       </p>
                     </div>
                     <div className="p-4 bg-muted/30 rounded-lg border border-border">
                       <p className="flex items-start gap-2">
-                        <span className="text-primary font-bold">📈</span>
+                        <span className="text-primary font-bold">•</span>
                         You are now permitted to submit <strong>up to 5 new projects each calendar month</strong>. Any requests beyond this limit will be scheduled for the following month.
                       </p>
                     </div>
@@ -341,7 +334,6 @@ const FeeHikePolicy = () => {
 
                 <div className="border-t border-border pt-8 text-center">
                   <h2 className="text-2xl font-bold mb-4 flex items-center justify-center gap-2">
-                    <span className="text-2xl">🤝</span>
                     Need Support?
                   </h2>
                   <p className="text-muted-foreground max-w-2xl mx-auto">
