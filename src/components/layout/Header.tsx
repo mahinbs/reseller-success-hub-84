@@ -57,6 +57,9 @@ export const Header = () => {
               <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
                 <Link to="/terms">Terms & Conditions</Link>
               </Button>
+              <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+                <Link to="/policy/fee-hike">Fee Hike Notice</Link>
+              </Button>
             </>
           )}
         </nav>

@@ -108,6 +108,10 @@ serve(async (req) => {
                 await handleOrderPaid(supabase, orderEntity)
                 break
 
+            case 'payment_link.paid':
+                await handlePaymentLinkPaid(supabase, payload.payload.payment_link.entity, paymentEntity)
+                break
+
             default:
                 console.log(`Unhandled webhook event: ${event}`)
         }
@@ -285,4 +289,43 @@ async function handleOrderPaid(supabase: any, order: any) {
     } catch (error) {
         console.error('Error handling order.paid:', error)
     }
-} 
+}
+
+// Handle payment link paid event
+async function handlePaymentLinkPaid(supabase: any, paymentLink: any, payment: any) {
+    try {
+        console.log(`Processing payment_link.paid for payment link: ${paymentLink.id}`)
+
+        // Check if this is the fee hike policy payment link
+        if (paymentLink.short_url !== 'https://rzp.io/rzp/0xZSXed') {
+            console.log('Not a fee hike policy payment link, skipping')
+            return
+        }
+
+        // Insert policy payment record
+        const { error: insertError } = await supabase
+            .from('policy_payments')
+            .insert({
+                email: paymentLink.customer?.email || payment.email,
+                phone: paymentLink.customer?.contact || payment.contact,
+                amount: paymentLink.amount_paid / 100, // Convert from paise to rupees
+                currency: paymentLink.currency,
+                status: 'paid',
+                rzp_payment_id: payment.id,
+                rzp_payment_link_id: paymentLink.id,
+                rzp_short_url: paymentLink.short_url,
+                raw_payload: { paymentLink, payment }
+            })
+
+        if (insertError) {
+            console.error('Error inserting policy payment record:', insertError)
+            throw insertError
+        }
+
+        console.log(`Successfully processed payment_link.paid for payment link: ${paymentLink.id}`)
+
+    } catch (error) {
+        console.error('Error handling payment_link.paid:', error)
+        throw error
+    }
+}

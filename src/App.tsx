@@ -27,6 +27,7 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminCoupons from "./pages/AdminCoupons";
 import Terms from "./pages/Terms";
+import FeeHikePolicy from "./pages/FeeHikePolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -139,6 +140,14 @@ const App = () => (
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <Terms />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/policy/fee-hike" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <FeeHikePolicy />
                     </ProtectedRoute>
                   </>
                 } />
