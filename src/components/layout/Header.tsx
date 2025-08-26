@@ -50,9 +50,14 @@ export const Header = () => {
             </Link>
           </Button>
           {!user && (
-            <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
-              <Link to="/about">About</Link>
-            </Button>
+            <>
+              <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+                <Link to="/about">About</Link>
+              </Button>
+              <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+                <Link to="/terms">Terms & Conditions</Link>
+              </Button>
+            </>
           )}
         </nav>
 

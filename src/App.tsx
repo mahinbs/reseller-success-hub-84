@@ -26,6 +26,7 @@ import PaymentFailure from "./pages/PaymentFailure";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminCoupons from "./pages/AdminCoupons";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -130,6 +131,14 @@ const App = () => (
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <CartPage />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/terms" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <Terms />
                     </ProtectedRoute>
                   </>
                 } />
