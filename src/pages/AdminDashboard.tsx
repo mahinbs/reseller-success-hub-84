@@ -927,9 +927,9 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
             ) : (
               <div className="divide-y divide-border/20">
                 {users.map((user) => (
-                  <div key={user.id} className="p-6 flex items-center justify-between hover:bg-muted/10 transition-all-smooth group">
+                  <div key={user.id} className="p-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="glass-subtle p-3 rounded-xl group-hover:scale-110 transition-transform">
+                      <div className="glass-subtle p-3 rounded-xl">
                         <Users className="h-5 w-5 text-primary" />
                       </div>
                       <div>
@@ -970,7 +970,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                       <p className="text-sm text-muted-foreground mb-2">
                         Joined {new Date(user.created_at).toLocaleDateString()}
                       </p>
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1173,7 +1173,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                   </TableHeader>
                   <TableBody>
                     {filteredPurchases.map((purchase) => (
-                      <TableRow key={purchase.id}>
+                      <TableRow key={purchase.id} className="hover:bg-transparent">
                         <TableCell>
                           <div>
                             <p className="font-medium">{purchase.profiles?.full_name || 'Unknown'}</p>
