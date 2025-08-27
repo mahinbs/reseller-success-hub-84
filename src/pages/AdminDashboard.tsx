@@ -98,6 +98,7 @@ interface Purchase {
   profiles?: {
     email: string;
     full_name: string;
+    referral_name?: string;
   } | null;
   purchase_items?: Array<{
     id: string;
@@ -285,7 +286,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
       // Fetch profiles separately
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, email, full_name');
+        .select('id, email, full_name, referral_name');
 
       if (profilesError) throw profilesError;
 
@@ -327,6 +328,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
       const filtered = purchases.filter(purchase =>
         purchase.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         purchase.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        purchase.profiles?.referral_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         purchase.payment_status.toLowerCase().includes(searchTerm.toLowerCase()) ||
         purchase.razorpay_order_id?.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -1167,7 +1169,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search by customer email, name, or order ID..."
+                  placeholder="Search by customer email, name, referral, or order ID..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -1204,6 +1206,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Customer</TableHead>
+                      <TableHead>Referred By</TableHead>
                       <TableHead>Items</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Status</TableHead>
@@ -1220,6 +1223,11 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                             <p className="font-medium">{purchase.profiles?.full_name || 'Unknown'}</p>
                             <p className="text-sm text-muted-foreground">{purchase.profiles?.email}</p>
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm text-muted-foreground">
+                            {purchase.profiles?.referral_name || '-'}
+                          </span>
                         </TableCell>
                         <TableCell>
                           <div>
@@ -1322,6 +1330,10 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Email:</span>
                         <span>{selectedPurchase.profiles?.email}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Referred By:</span>
+                        <span>{selectedPurchase.profiles?.referral_name || '-'}</span>
                       </div>
                       {selectedPurchase.razorpay_order_id && (
                         <div className="flex justify-between">
