@@ -914,7 +914,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
           User Management
         </h1>
 
-        <Card className="glass-card border-0 rounded-2xl overflow-hidden">
+        <Card className="glass-modal border-0 rounded-2xl overflow-hidden">
           <CardContent className="p-0">
             {loading ? (
               <div className="p-6">
@@ -1106,7 +1106,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
             </CardContent>
           </Card>
 
-          <Card className="glass-card border-0 rounded-2xl">
+          <Card className="glass-modal border-0 rounded-2xl">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -1120,7 +1120,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         </div>
 
         {/* Search and Filters */}
-        <Card className="glass-card border-0 rounded-2xl mb-6">
+        <Card className="glass-modal border-0 rounded-2xl mb-6">
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
@@ -1137,7 +1137,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
         </Card>
 
         {/* Purchases Table */}
-        <Card className="glass-card border-0 rounded-2xl">
+        <Card className="glass-modal border-0 rounded-2xl">
           <CardHeader>
             <CardTitle>All Purchases ({filteredPurchases.length})</CardTitle>
             <CardDescription>
