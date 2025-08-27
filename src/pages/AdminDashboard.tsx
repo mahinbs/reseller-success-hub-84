@@ -39,6 +39,7 @@ import { ServiceFormData } from '@/components/admin/ServiceForm';
 import { BundleFormData } from '@/components/admin/BundleForm';
 import { useToast } from '@/hooks/use-toast';
 import { AdminAddons } from './AdminAddons';
+import { normalizeReferralName } from '@/lib/referralMapping';
 
 interface AdminStats {
   totalUsers: number;
@@ -349,13 +350,17 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     if (!searchTerm) {
       setFilteredPurchases(purchases);
     } else {
-      const filtered = purchases.filter(purchase =>
-        purchase.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        purchase.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        purchase.profiles?.referral_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        purchase.payment_status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        purchase.razorpay_order_id?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const filtered = purchases.filter(purchase => {
+        const normalizedReferral = normalizeReferralName(purchase.profiles?.referral_name);
+        return (
+          purchase.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          purchase.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          purchase.profiles?.referral_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          normalizedReferral.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          purchase.payment_status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          purchase.razorpay_order_id?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      });
       setFilteredPurchases(filtered);
     }
   }, [searchTerm, purchases]);
@@ -1250,7 +1255,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                         </TableCell>
                         <TableCell>
                           <span className="text-sm text-muted-foreground">
-                            {purchase.profiles?.referral_name || '-'}
+                            {normalizeReferralName(purchase.profiles?.referral_name)}
                           </span>
                         </TableCell>
                         <TableCell>
@@ -1357,7 +1362,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Referred By:</span>
-                        <span>{selectedPurchase.profiles?.referral_name || '-'}</span>
+                        <span>{normalizeReferralName(selectedPurchase.profiles?.referral_name)}</span>
                       </div>
                       {selectedPurchase.razorpay_order_id && (
                         <div className="flex justify-between">
@@ -1470,7 +1475,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     }>();
 
     filteredPurchases.forEach(p => {
-      const referralName = p.profiles?.referral_name || 'Direct';
+      const referralName = normalizeReferralName(p.profiles?.referral_name);
       const existing = referralMap.get(referralName) || { leads: 0, completed: 0, revenue: 0, conversionTimes: [] };
       
       existing.leads++;
