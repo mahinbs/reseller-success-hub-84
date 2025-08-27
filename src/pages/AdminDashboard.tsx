@@ -132,6 +132,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
   const [purchaseDetailsOpen, setPurchaseDetailsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [purchasesLoading, setPurchasesLoading] = useState(false);
+  const [usersRefreshing, setUsersRefreshing] = useState(false);
 
   // Modal states
   const [serviceModal, setServiceModal] = useState<{
@@ -229,6 +230,38 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     loadAdminData();
   }, [user, profile, toast]);
 
+  // Refresh users with updated purchase stats
+  const refreshUsersWithStats = async () => {
+    setUsersRefreshing(true);
+    try {
+      const usersWithStatsResponse = await supabase.rpc('get_users_with_purchase_stats');
+      
+      if (usersWithStatsResponse.data && Array.isArray(usersWithStatsResponse.data)) {
+        setUsers(usersWithStatsResponse.data as User[]);
+        
+        // Update stats as well
+        setStats(prevStats => ({
+          ...prevStats,
+          totalUsers: usersWithStatsResponse.data.length
+        }));
+        
+        toast({
+          title: 'Success',
+          description: 'User statistics refreshed successfully',
+        });
+      }
+    } catch (error) {
+      console.error('Error refreshing users:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to refresh user statistics',
+        variant: 'destructive',
+      });
+    } finally {
+      setUsersRefreshing(false);
+    }
+  };
+
   // Load purchases with full details
   const loadPurchases = async () => {
     setPurchasesLoading(true);
@@ -271,6 +304,9 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
       console.log('Loaded purchases:', enrichedPurchases);
       setPurchases((enrichedPurchases as unknown as Purchase[]) || []);
       setFilteredPurchases((enrichedPurchases as unknown as Purchase[]) || []);
+      
+      // Also refresh user stats when purchases are refreshed
+      await refreshUsersWithStats();
     } catch (error) {
       console.error('Error loading purchases:', error);
       toast({
@@ -910,9 +946,14 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
   const renderUsersTab = () => (
     <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent mb-8">
-          User Management
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
+            User Management
+          </h1>
+          <Button onClick={refreshUsersWithStats} disabled={usersRefreshing}>
+            {usersRefreshing ? 'Refreshing...' : 'Refresh'}
+          </Button>
+        </div>
 
         <Card className="glass-modal border-0 rounded-2xl overflow-hidden">
           <CardContent className="p-0">
