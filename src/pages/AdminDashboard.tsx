@@ -22,8 +22,15 @@ import {
   BarChart3,
   Search,
   Calendar,
-  CreditCard
+  CreditCard,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  Target,
+  UserCheck,
+  Percent
 } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 import { ServiceModal } from '@/components/admin/ServiceModal';
 import { BundleModal } from '@/components/admin/BundleModal';
 import { DeleteConfirmationModal } from '@/components/admin/DeleteConfirmationModal';
@@ -108,6 +115,22 @@ interface Purchase {
   }> | null;
 }
 
+interface ReferralAnalytics {
+  referralName: string;
+  totalLeads: number;
+  completedPurchases: number;
+  conversionRate: number;
+  totalRevenue: number;
+  avgTicketSize: number;
+  avgConversionTime: number; // in days
+}
+
+interface RevenueData {
+  date: string;
+  revenue: number;
+  orders: number;
+}
+
 interface AdminDashboardProps {
   activeTab?: 'overview' | 'services' | 'bundles' | 'addons' | 'users' | 'purchases' | 'analytics' | 'settings';
 }
@@ -160,6 +183,7 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
   }>({ isOpen: false });
 
   const [operationLoading, setOperationLoading] = useState(false);
+  const [analyticsDateRange, setAnalyticsDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
 
   useEffect(() => {
     if (!user || profile?.role !== 'admin') return;
@@ -1384,18 +1408,380 @@ const AdminDashboard = ({ activeTab = 'overview' }: AdminDashboardProps) => {
     </div>
   );
 
+  // Analytics calculations
+  const getAnalyticsData = () => {
+    const now = new Date();
+    let startDate = new Date();
+    
+    switch (analyticsDateRange) {
+      case '7d':
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case '30d':
+        startDate.setDate(now.getDate() - 30);
+        break;
+      case '90d':
+        startDate.setDate(now.getDate() - 90);
+        break;
+      case 'all':
+        startDate = new Date('2020-01-01');
+        break;
+    }
+
+    const filteredPurchases = purchases.filter(p => new Date(p.created_at) >= startDate);
+    const completedPurchases = filteredPurchases.filter(p => p.payment_status === 'completed');
+    
+    // Overall metrics
+    const totalRevenue = completedPurchases.reduce((sum, p) => sum + Number(p.total_amount), 0);
+    const totalOrders = completedPurchases.length;
+    const avgTicketSize = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+    
+    // Conversion metrics
+    const totalLeads = filteredPurchases.length;
+    const conversionRate = totalLeads > 0 ? (totalOrders / totalLeads) * 100 : 0;
+    
+    // Recurring vs one-time revenue
+    const recurringRevenue = completedPurchases
+      .filter(p => p.purchase_items?.some(item => 
+        item.billing_period && item.billing_period !== 'one-time'
+      ))
+      .reduce((sum, p) => sum + Number(p.total_amount), 0);
+    
+    const oneTimeRevenue = totalRevenue - recurringRevenue;
+    
+    // Average conversion time
+    const avgConversionTime = completedPurchases.reduce((sum, p) => {
+      const created = new Date(p.created_at);
+      const userProfile = users.find(u => u.id === p.user_id);
+      if (userProfile) {
+        const userCreated = new Date(userProfile.created_at);
+        const diffDays = Math.max(0, (created.getTime() - userCreated.getTime()) / (1000 * 60 * 60 * 24));
+        return sum + diffDays;
+      }
+      return sum;
+    }, 0) / Math.max(1, totalOrders);
+
+    // Referral analytics
+    const referralMap = new Map<string, {
+      leads: number;
+      completed: number;
+      revenue: number;
+      conversionTimes: number[];
+    }>();
+
+    filteredPurchases.forEach(p => {
+      const referralName = p.profiles?.referral_name || 'Direct';
+      const existing = referralMap.get(referralName) || { leads: 0, completed: 0, revenue: 0, conversionTimes: [] };
+      
+      existing.leads++;
+      if (p.payment_status === 'completed') {
+        existing.completed++;
+        existing.revenue += Number(p.total_amount);
+        
+        // Calculate conversion time for this purchase
+        const userProfile = users.find(u => u.id === p.user_id);
+        if (userProfile) {
+          const created = new Date(p.created_at);
+          const userCreated = new Date(userProfile.created_at);
+          const diffDays = Math.max(0, (created.getTime() - userCreated.getTime()) / (1000 * 60 * 60 * 24));
+          existing.conversionTimes.push(diffDays);
+        }
+      }
+      
+      referralMap.set(referralName, existing);
+    });
+
+    const referralAnalytics: ReferralAnalytics[] = Array.from(referralMap.entries()).map(([name, data]) => ({
+      referralName: name,
+      totalLeads: data.leads,
+      completedPurchases: data.completed,
+      conversionRate: data.leads > 0 ? (data.completed / data.leads) * 100 : 0,
+      totalRevenue: data.revenue,
+      avgTicketSize: data.completed > 0 ? data.revenue / data.completed : 0,
+      avgConversionTime: data.conversionTimes.length > 0 
+        ? data.conversionTimes.reduce((a, b) => a + b, 0) / data.conversionTimes.length 
+        : 0
+    })).sort((a, b) => b.totalRevenue - a.totalRevenue);
+
+    // Revenue trend data
+    const revenueData: RevenueData[] = [];
+    const daysToShow = analyticsDateRange === '7d' ? 7 : analyticsDateRange === '30d' ? 30 : analyticsDateRange === '90d' ? 90 : 365;
+    
+    for (let i = daysToShow - 1; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      const dayPurchases = completedPurchases.filter(p => 
+        new Date(p.created_at).toISOString().split('T')[0] === dateStr
+      );
+      
+      revenueData.push({
+        date: dateStr,
+        revenue: dayPurchases.reduce((sum, p) => sum + Number(p.total_amount), 0),
+        orders: dayPurchases.length
+      });
+    }
+
+    return {
+      totalRevenue,
+      totalOrders,
+      avgTicketSize,
+      conversionRate,
+      recurringRevenue,
+      oneTimeRevenue,
+      avgConversionTime,
+      referralAnalytics,
+      revenueData
+    };
+  };
+
+  const analyticsData = getAnalyticsData();
+
   const renderAnalyticsTab = () => (
     <div className="py-8 px-4">
       <div className="container mx-auto max-w-7xl">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent mb-8">
-          Analytics & Reports
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent-purple bg-clip-text text-transparent">
+            Analytics & Reports
+          </h1>
+          
+          {/* Date Range Filter */}
+          <div className="flex gap-2">
+            {[
+              { value: '7d', label: '7 Days' },
+              { value: '30d', label: '30 Days' },
+              { value: '90d', label: '90 Days' },
+              { value: 'all', label: 'All Time' }
+            ].map((range) => (
+              <Button
+                key={range.value}
+                variant={analyticsDateRange === range.value ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setAnalyticsDateRange(range.value as any)}
+              >
+                {range.label}
+              </Button>
+            ))}
+          </div>
+        </div>
 
-        <Card className="glass-card border-0 rounded-2xl">
-          <CardContent className="p-12 text-center">
-            <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-semibold mb-2">Advanced Analytics Coming Soon</h3>
-            <p className="text-muted-foreground">Revenue analytics, user behavior insights, and detailed reports will be available here</p>
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="glass-card border-0 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Revenue</p>
+                  <p className="text-2xl font-bold text-green-500">{formatCurrency(analyticsData.totalRevenue)}</p>
+                </div>
+                <DollarSign className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-0 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Conversion Rate</p>
+                  <p className="text-2xl font-bold text-blue-500">{analyticsData.conversionRate.toFixed(1)}%</p>
+                </div>
+                <Target className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-0 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Avg Ticket Size</p>
+                  <p className="text-2xl font-bold text-purple-500">{formatCurrency(analyticsData.avgTicketSize)}</p>
+                </div>
+                <BarChart3 className="h-8 w-8 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-0 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Avg Conversion Time</p>
+                  <p className="text-2xl font-bold text-orange-500">{analyticsData.avgConversionTime.toFixed(1)} days</p>
+                </div>
+                <Clock className="h-8 w-8 text-orange-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Revenue Trend Chart */}
+          <Card className="glass-modal border-0 rounded-2xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Revenue Trend
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={analyticsData.revenueData}>
+                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                    <XAxis 
+                      dataKey="date" 
+                      tickFormatter={(date) => new Date(date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                      className="text-muted-foreground"
+                    />
+                    <YAxis 
+                      tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}k`}
+                      className="text-muted-foreground"
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => [formatCurrency(value), 'Revenue']}
+                      labelFormatter={(date) => new Date(date).toLocaleDateString('en-IN')}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="revenue" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={3}
+                      dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Revenue Split Chart */}
+          <Card className="glass-modal border-0 rounded-2xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Percent className="h-5 w-5" />
+                Revenue Split
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Recurring', value: analyticsData.recurringRevenue, color: 'hsl(var(--primary))' },
+                        { name: 'One-time', value: analyticsData.oneTimeRevenue, color: 'hsl(var(--accent-purple))' }
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={120}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      <Cell fill="hsl(var(--primary))" />
+                      <Cell fill="hsl(var(--accent-purple))" />
+                    </Pie>
+                    <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="flex justify-center gap-6 mt-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-primary"></div>
+                    <span className="text-sm">Recurring ({formatCurrency(analyticsData.recurringRevenue)})</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-accent-purple"></div>
+                    <span className="text-sm">One-time ({formatCurrency(analyticsData.oneTimeRevenue)})</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Referral Performance Table */}
+        <Card className="glass-modal border-0 rounded-2xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <UserCheck className="h-5 w-5" />
+              Referral Performance ({analyticsData.referralAnalytics.length} sources)
+            </CardTitle>
+            <CardDescription>
+              Performance breakdown by referral source
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {analyticsData.referralAnalytics.length === 0 ? (
+              <div className="text-center py-12">
+                <UserCheck className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-semibold mb-2">No referral data</h3>
+                <p className="text-muted-foreground">No referral activity found for the selected time period</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Referral Source</TableHead>
+                      <TableHead>Total Leads</TableHead>
+                      <TableHead>Conversions</TableHead>
+                      <TableHead>Conversion Rate</TableHead>
+                      <TableHead>Total Revenue</TableHead>
+                      <TableHead>Avg Ticket Size</TableHead>
+                      <TableHead>Avg Conversion Time</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {analyticsData.referralAnalytics.map((referral) => (
+                      <TableRow key={referral.referralName}>
+                        <TableCell className="font-medium">
+                          {referral.referralName}
+                        </TableCell>
+                        <TableCell>{referral.totalLeads}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <span>{referral.completedPurchases}</span>
+                            {referral.conversionRate > 50 ? (
+                              <TrendingUp className="h-4 w-4 text-green-500" />
+                            ) : referral.conversionRate > 20 ? (
+                              <TrendingUp className="h-4 w-4 text-yellow-500" />
+                            ) : (
+                              <TrendingDown className="h-4 w-4 text-red-500" />
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant={referral.conversionRate > 50 ? 'default' : referral.conversionRate > 20 ? 'secondary' : 'outline'}
+                            className={
+                              referral.conversionRate > 50 ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+                              referral.conversionRate > 20 ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                              'bg-red-500/10 text-red-500 border-red-500/20'
+                            }
+                          >
+                            {referral.conversionRate.toFixed(1)}%
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-semibold text-green-600">
+                          {formatCurrency(referral.totalRevenue)}
+                        </TableCell>
+                        <TableCell>{formatCurrency(referral.avgTicketSize)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <span>{referral.avgConversionTime.toFixed(1)} days</span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
