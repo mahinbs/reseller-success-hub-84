@@ -49,6 +49,9 @@ export const Header = () => {
               Home
             </Link>
           </Button>
+          <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
+            <Link to="/policy/fee-hike">Fee Policy</Link>
+          </Button>
           {!user && (
             <>
               <Button variant="ghost" asChild className="hover:text-primary transition-all-smooth">
