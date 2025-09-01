@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
 
 const FeeHikePolicy = () => {
   const [timeLeft, setTimeLeft] = useState({
@@ -12,7 +13,9 @@ const FeeHikePolicy = () => {
   });
   const [isEffective, setIsEffective] = useState(false);
 
-  const effectiveDate = new Date('2025-09-01T00:00:00');
+  const effectiveDate = new Date('2025-09-05T00:00:00+05:30');
+  const effectiveDateLabel = format(effectiveDate, 'd MMMM yyyy');
+  const effectiveDateShort = format(effectiveDate, 'd MMM yyyy');
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -66,7 +69,7 @@ const FeeHikePolicy = () => {
                 variant="outline" 
                 className="text-sm px-4 py-2 border-primary/30 bg-primary/10 text-primary animate-pulse"
               >
-                {isEffective ? 'POLICY NOW ACTIVE' : 'Effective: 1 September 2025'}
+                {isEffective ? 'POLICY NOW ACTIVE' : `Effective: ${effectiveDateLabel}`}
               </Badge>
               
               {!isEffective && (
@@ -83,7 +86,7 @@ const FeeHikePolicy = () => {
                     Time Until Price Increase
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    New prices go live on 1 Sep 2025. Pay now to lock current rates.
+                    New prices go live on {effectiveDateShort}. Pay now to lock current rates.
                   </p>
                 </CardHeader>
                 <CardContent>
@@ -131,7 +134,7 @@ const FeeHikePolicy = () => {
                     Fee Hike & Project Limit Policy
                   </h1>
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20">
-                    <span className="text-primary font-semibold">Effective Date: 1 September 2025</span>
+                    <span className="text-primary font-semibold">Effective Date: {effectiveDateLabel}</span>
                   </div>
                 </div>
 
