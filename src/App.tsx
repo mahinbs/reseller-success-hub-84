@@ -28,6 +28,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminCoupons from "./pages/AdminCoupons";
 import Terms from "./pages/Terms";
 import FeeHikePolicy from "./pages/FeeHikePolicy";
+import SlotSignup from "./pages/SlotSignup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -148,6 +149,14 @@ const App = () => (
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <FeeHikePolicy />
+                    </ProtectedRoute>
+                  </>
+                } />
+                <Route path="/slot-signup" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <SlotSignup />
                     </ProtectedRoute>
                   </>
                 } />

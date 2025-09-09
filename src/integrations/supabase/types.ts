@@ -686,6 +686,42 @@ export type Database = {
         }
         Relationships: []
       }
+      slot_signups: {
+        Row: {
+          city: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          payment_proof_url: string | null
+          phone: string
+          signature_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          payment_proof_url?: string | null
+          phone: string
+          signature_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          payment_proof_url?: string | null
+          phone?: string
+          signature_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
