@@ -29,6 +29,7 @@ import AdminCoupons from "./pages/AdminCoupons";
 import Terms from "./pages/Terms";
 import FeeHikePolicy from "./pages/FeeHikePolicy";
 import SlotSignup from "./pages/SlotSignup";
+import SignupSuccess from "./pages/SignupSuccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -152,14 +153,22 @@ const App = () => (
                     </ProtectedRoute>
                   </>
                 } />
-                <Route path="/slot-signup" element={
-                  <>
-                    <Header />
-                    <ProtectedRoute requireAuth={false}>
-                      <SlotSignup />
-                    </ProtectedRoute>
-                  </>
-                } />
+            <Route path="/slot-signup" element={
+              <>
+                <Header />
+                <ProtectedRoute requireAuth={false}>
+                  <SlotSignup />
+                </ProtectedRoute>
+              </>
+            } />
+            <Route path="/signup-success" element={
+              <>
+                <Header />
+                <ProtectedRoute requireAuth={false}>
+                  <SignupSuccess />
+                </ProtectedRoute>
+              </>
+            } />
 
                 {/* Checkout and Payment routes */}
                 <Route path="/checkout" element={

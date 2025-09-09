@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
 import { SignaturePad } from '@/components/SignaturePad';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, CheckCircle } from 'lucide-react';
+import { Upload } from 'lucide-react';
 
 export default function SlotSignup() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -17,8 +20,8 @@ export default function SlotSignup() {
   });
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [signature, setSignature] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +57,15 @@ export default function SlotSignup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!acceptedTerms) {
+      toast({
+        title: "Error",
+        description: "Please accept the Terms & Conditions to continue",
+        variant: "destructive"
+      });
+      return;
+    }
     
     if (!formData.fullName || !formData.email || !formData.phone || !formData.city) {
       toast({
@@ -96,11 +108,12 @@ export default function SlotSignup() {
         throw new Error(result.error || 'Failed to submit form');
       }
 
-      setIsSubmitted(true);
       toast({
         title: "Success!",
         description: "Your slot booking request has been submitted successfully."
       });
+      
+      navigate('/signup-success');
 
     } catch (error) {
       console.error('Form submission error:', error);
@@ -114,34 +127,6 @@ export default function SlotSignup() {
     }
   };
 
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6 text-center">
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Submission Successful!
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Thank you for your slot booking request. We will review your submission and get back to you soon.
-            </p>
-            <Button 
-              onClick={() => {
-                setIsSubmitted(false);
-                setFormData({ fullName: '', email: '', phone: '', city: '' });
-                setPaymentProof(null);
-                setSignature(null);
-              }}
-              variant="outline"
-            >
-              Submit Another Request
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 py-12 px-4">
@@ -249,6 +234,21 @@ export default function SlotSignup() {
                 <SignaturePad onSignatureChange={handleSignatureChange} />
               </div>
 
+              {/* Terms & Conditions */}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="acceptTerms"
+                  checked={acceptedTerms}
+                  onCheckedChange={(checked) => setAcceptedTerms(!!checked)}
+                />
+                <Label htmlFor="acceptTerms" className="text-sm">
+                  I accept the{' '}
+                  <a href="/terms" target="_blank" className="text-primary hover:underline">
+                    Terms & Conditions
+                  </a>
+                </Label>
+              </div>
+
               {/* Important Notice */}
               <Alert>
                 <AlertDescription>
@@ -260,10 +260,10 @@ export default function SlotSignup() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !acceptedTerms}
                 size="lg"
               >
-                {isSubmitting ? "Submitting..." : "Submit Slot Request"}
+                {isSubmitting ? "Submitting..." : "Complete Signup"}
               </Button>
             </form>
           </CardContent>
