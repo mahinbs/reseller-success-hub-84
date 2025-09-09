@@ -178,7 +178,7 @@ export default function SlotSignup() {
 
               {/* Payment Proof Upload */}
               <div className="space-y-2">
-                <Label htmlFor="paymentProof">Payment Proof (Optional)</Label>
+                <Label htmlFor="paymentProof">Payment Proof</Label>
                 <div className="border-2 border-dashed border-input rounded-lg p-4 text-center">
                   <input id="paymentProof" type="file" accept="image/*,.pdf" onChange={handleFileChange} className="hidden" />
                   <label htmlFor="paymentProof" className="cursor-pointer flex flex-col items-center space-y-2">
