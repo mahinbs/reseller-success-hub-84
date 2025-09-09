@@ -17,9 +17,7 @@ export default function SignupSuccess() {
           </h1>
           
           <p className="text-muted-foreground mb-8 leading-relaxed">
-            Thank you for your slot booking request. We have received your information 
-            and will review your submission within 2-3 business days. You will be contacted 
-            via the email or phone number you provided.
+            Thank you for your slot booking request. We have received your information.
           </p>
           
           <div className="flex gap-3 justify-center">

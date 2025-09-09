@@ -252,7 +252,7 @@ export default function SlotSignup() {
               {/* Important Notice */}
               <Alert>
                 <AlertDescription>
-                  <strong>Important:</strong> By submitting this form, you acknowledge that all information provided is accurate and complete. We will review your request within 2-3 business days and contact you via the provided email or phone number.
+                  <strong>Important:</strong> By submitting this form, you acknowledge that all information provided is accurate and complete.
                 </AlertDescription>
               </Alert>
 
