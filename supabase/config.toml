@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.slot-signup-submit]
 verify_jwt = false
+
+[functions.slot-signup-file-url]
+verify_jwt = false

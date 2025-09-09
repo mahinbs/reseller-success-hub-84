@@ -26,6 +26,7 @@ import PaymentFailure from "./pages/PaymentFailure";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminCoupons from "./pages/AdminCoupons";
+import AdminSlotSignups from "./pages/AdminSlotSignups";
 import Terms from "./pages/Terms";
 import FeeHikePolicy from "./pages/FeeHikePolicy";
 import SlotSignup from "./pages/SlotSignup";
@@ -223,6 +224,7 @@ const App = () => (
                   <Route path="bundles" element={<AdminDashboard activeTab="bundles" />} />
                   <Route path="addons" element={<AdminDashboard activeTab="addons" />} />
                   <Route path="users" element={<AdminDashboard activeTab="users" />} />
+                  <Route path="slot-signups" element={<AdminSlotSignups />} />
                   <Route path="purchases" element={<AdminDashboard activeTab="purchases" />} />
                   <Route path="analytics" element={<AdminDashboard activeTab="analytics" />} />
                   <Route path="settings" element={<AdminDashboard activeTab="settings" />} />

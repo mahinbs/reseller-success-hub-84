@@ -28,6 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
     const phone = formData.get('phone') as string;
     const city = formData.get('city') as string;
     const paymentProofFile = formData.get('paymentProof') as File;
+    const governmentIdFile = formData.get('governmentId') as File;
     const signatureFile = formData.get('signature') as File;
 
     // Validate required fields
@@ -38,6 +39,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('Form data received:', { fullName, email, phone, city });
 
     let paymentProofUrl = null;
+    let governmentIdUrl = null;
     let signatureUrl = null;
 
     // Upload payment proof if provided
@@ -58,6 +60,26 @@ const handler = async (req: Request): Promise<Response> => {
 
       paymentProofUrl = `${supabaseUrl}/storage/v1/object/public/slot-submissions/${paymentData.path}`;
       console.log('Payment proof uploaded:', paymentProofUrl);
+    }
+
+    // Upload government ID if provided
+    if (governmentIdFile && governmentIdFile.size > 0) {
+      const governmentIdName = `government-id-${Date.now()}-${governmentIdFile.name}`;
+      const governmentIdArrayBuffer = await governmentIdFile.arrayBuffer();
+      
+      const { data: governmentIdData, error: governmentIdError } = await supabase.storage
+        .from('slot-submissions')
+        .upload(governmentIdName, governmentIdArrayBuffer, {
+          contentType: governmentIdFile.type,
+        });
+
+      if (governmentIdError) {
+        console.error('Government ID upload error:', governmentIdError);
+        return corsError('Failed to upload government ID', 500);
+      }
+
+      governmentIdUrl = `${supabaseUrl}/storage/v1/object/public/slot-submissions/${governmentIdData.path}`;
+      console.log('Government ID uploaded:', governmentIdUrl);
     }
 
     // Upload signature if provided
@@ -89,6 +111,7 @@ const handler = async (req: Request): Promise<Response> => {
         phone: phone,
         city: city,
         payment_proof_url: paymentProofUrl,
+        government_id_url: governmentIdUrl,
         signature_url: signatureUrl,
       })
       .select();

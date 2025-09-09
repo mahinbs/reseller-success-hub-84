@@ -10,7 +10,8 @@ import {
   Settings,
   LogOut,
   Puzzle,
-  Ticket
+  Ticket,
+  UserCheck
 } from 'lucide-react';
 import {
   Sidebar,
@@ -52,6 +53,11 @@ const navigationItems = [
     title: 'Users',
     url: '/admin/users',
     icon: Users
+  },
+  {
+    title: 'Slot Signups',
+    url: '/admin/slot-signups',
+    icon: UserCheck
   },
   {
     title: 'Purchases',

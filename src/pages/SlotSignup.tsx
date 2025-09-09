@@ -18,6 +18,7 @@ export default function SlotSignup() {
     city: ''
   });
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
+  const [governmentId, setGovernmentId] = useState<File | null>(null);
   const [signature, setSignature] = useState<string | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,6 +39,13 @@ export default function SlotSignup() {
     const file = e.target.files?.[0];
     if (file) {
       setPaymentProof(file);
+    }
+  };
+
+  const handleGovernmentIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setGovernmentId(file);
     }
   };
   const handleSignatureChange = (signatureData: string | null) => {
@@ -74,6 +82,15 @@ export default function SlotSignup() {
       });
       return;
     }
+
+    if (!governmentId) {
+      toast({
+        title: "Error",
+        description: "Please upload your Aadhaar card copy",
+        variant: "destructive"
+      });
+      return;
+    }
     setIsSubmitting(true);
     try {
       const submitFormData = new FormData();
@@ -83,6 +100,9 @@ export default function SlotSignup() {
       submitFormData.append('city', formData.city);
       if (paymentProof) {
         submitFormData.append('paymentProof', paymentProof);
+      }
+      if (governmentId) {
+        submitFormData.append('governmentId', governmentId);
       }
       if (signature) {
         const signatureFile = dataURLtoFile(signature, 'signature.png');
@@ -165,6 +185,23 @@ export default function SlotSignup() {
                     <Upload className="w-8 h-8 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">
                       {paymentProof ? paymentProof.name : "Click to upload payment proof"}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      Supports: Images, PDF (Max 10MB)
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Government ID Upload */}
+              <div className="space-y-2">
+                <Label htmlFor="governmentId">Government ID (Aadhaar Card Copy) *</Label>
+                <div className="border-2 border-dashed border-input rounded-lg p-4 text-center">
+                  <input id="governmentId" type="file" accept="image/*,.pdf" onChange={handleGovernmentIdChange} className="hidden" />
+                  <label htmlFor="governmentId" className="cursor-pointer flex flex-col items-center space-y-2">
+                    <Upload className="w-8 h-8 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      {governmentId ? governmentId.name : "Click to upload Aadhaar card copy"}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       Supports: Images, PDF (Max 10MB)

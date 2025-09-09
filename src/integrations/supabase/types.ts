@@ -692,6 +692,7 @@ export type Database = {
           created_at: string
           email: string
           full_name: string
+          government_id_url: string | null
           id: string
           payment_proof_url: string | null
           phone: string
@@ -703,6 +704,7 @@ export type Database = {
           created_at?: string
           email: string
           full_name: string
+          government_id_url?: string | null
           id?: string
           payment_proof_url?: string | null
           phone: string
@@ -714,6 +716,7 @@ export type Database = {
           created_at?: string
           email?: string
           full_name?: string
+          government_id_url?: string | null
           id?: string
           payment_proof_url?: string | null
           phone?: string
