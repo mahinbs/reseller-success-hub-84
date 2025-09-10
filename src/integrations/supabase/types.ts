@@ -725,6 +725,44 @@ export type Database = {
         }
         Relationships: []
       }
+      user_fee_hikes: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          note: string | null
+          percentage: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          note?: string | null
+          percentage?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          note?: string | null
+          percentage?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_fee_hikes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
