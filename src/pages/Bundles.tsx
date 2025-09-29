@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { ResellableBanner } from "@/components/reseller/ResellableBanner";
 import { OnboardingModal } from "@/components/reseller/OnboardingModal";
 import { ResellableTooltip } from "@/components/reseller/ResellableTooltip";
+import { shouldShowActualPrices } from "@/lib/userPricing";
 
 interface Bundle {
   id: string;
@@ -30,6 +31,7 @@ interface Bundle {
 export default function Bundles() {
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showActualPrices, setShowActualPrices] = useState(false);
   const { user } = useAuth();
   const { addToCart } = useCart();
   const { toast } = useToast();
@@ -38,6 +40,23 @@ export default function Bundles() {
   useEffect(() => {
     fetchBundles();
   }, []);
+
+  useEffect(() => {
+    if (user?.email) {
+      checkUserPricing();
+    }
+  }, [user]);
+
+  const checkUserPricing = async () => {
+    try {
+      console.log('🚀 Starting user pricing check for:', user?.email);
+      const shouldShow = await shouldShowActualPrices(user?.email);
+      setShowActualPrices(shouldShow);
+      console.log('🎯 User should show actual prices:', shouldShow);
+    } catch (error) {
+      console.error('❌ Error checking user pricing:', error);
+    }
+  };
 
   const fetchBundles = async () => {
     try {
@@ -95,10 +114,12 @@ export default function Bundles() {
       return;
     }
 
+    const priceToUse = showActualPrices ? calculateOriginalPrice(bundle) : bundle.total_price;
+    
     addToCart({
       id: bundle.id,
       name: bundle.name,
-      price: bundle.total_price,
+      price: priceToUse,
       type: 'bundle',
       billing_period: 'bundle'
     });
@@ -192,9 +213,12 @@ export default function Bundles() {
                       🟢 RESELLER BUNDLE
                     </Badge>
                   </ResellableTooltip>
-                  <Badge className="bg-blue-500 hover:bg-blue-600 text-white">
-                    {bundle.discount_percentage}% OFF
-                  </Badge>
+                  {console.log('🏷️ Rendering discount badge for:', bundle.name, 'showActualPrices:', showActualPrices)}
+                  {!showActualPrices && (
+                    <Badge className="bg-blue-500 hover:bg-blue-600 text-white">
+                      {bundle.discount_percentage}% OFF
+                    </Badge>
+                  )}
                 </div>
 
                 <CardHeader>
@@ -237,21 +261,26 @@ export default function Bundles() {
 
                   {/* Enhanced Pricing with Reseller Context */}
                   <div className="space-y-3 bg-gradient-to-r from-muted/50 to-muted/30 p-4 rounded-lg">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Services Total Value:</span>
-                      <span className="line-through text-muted-foreground">
-                        ₹{calculateOriginalPrice(bundle).toLocaleString()}
-                      </span>
-                    </div>
+                    {console.log('💰 Rendering pricing for:', bundle.name, 'showActualPrices:', showActualPrices)}
+                    {!showActualPrices && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Services Total Value:</span>
+                        <span className="line-through text-muted-foreground">
+                          ₹{calculateOriginalPrice(bundle).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between text-sm">
                       <ResellableTooltip 
-                        content="This is your cost - you set the resell price"
+                        content={showActualPrices ? "Actual cost of all services" : "This is your cost - you set the resell price"}
                         type="price"
                       >
-                        <span className="text-green-600 font-medium cursor-help">Your Bundle Cost:</span>
+                        <span className="text-green-600 font-medium cursor-help">
+                          {showActualPrices ? "Bundle Price:" : "Your Bundle Cost:"}
+                        </span>
                       </ResellableTooltip>
                       <span className="text-green-600 font-bold text-lg">
-                        ₹{bundle.total_price.toLocaleString()}
+                        ₹{showActualPrices ? calculateOriginalPrice(bundle).toLocaleString() : bundle.total_price.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">

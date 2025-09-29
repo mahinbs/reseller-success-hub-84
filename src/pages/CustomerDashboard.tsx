@@ -15,6 +15,7 @@ import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Ma
 import { useToast } from '@/hooks/use-toast';
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal';
 import CustomerAddons from '@/pages/CustomerAddons';
+import { shouldShowActualPrices } from '@/lib/userPricing';
 interface Service {
   id: string;
   name: string;
@@ -74,6 +75,7 @@ const CustomerDashboard = ({
   const [services, setServices] = useState<Service[]>([]);
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showActualPrices, setShowActualPrices] = useState(false);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [userStats, setUserStats] = useState<UserStats>({
@@ -195,6 +197,23 @@ const CustomerDashboard = ({
     };
     loadData();
   }, [user]);
+
+  useEffect(() => {
+    if (user?.email) {
+      checkUserPricing();
+    }
+  }, [user]);
+
+  const checkUserPricing = async () => {
+    try {
+      console.log('🚀 Starting user pricing check for:', user?.email);
+      const shouldShow = await shouldShowActualPrices(user?.email);
+      setShowActualPrices(shouldShow);
+      console.log('🎯 User should show actual prices:', shouldShow);
+    } catch (error) {
+      console.error('❌ Error checking user pricing:', error);
+    }
+  };
   if (authLoading) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -216,10 +235,20 @@ const CustomerDashboard = ({
     return bundle.name.toLowerCase().includes(search.toLowerCase()) || bundle.description.toLowerCase().includes(search.toLowerCase());
   });
   const handleAddToCart = (item: Service | Bundle, type: 'service' | 'bundle') => {
+    let priceToUse;
+    
+    if (type === 'service') {
+      priceToUse = (item as Service).price;
+    } else {
+      // For bundles, use original price for no-discount users
+      const bundle = item as Bundle;
+      priceToUse = showActualPrices ? calculateOriginalPrice(bundle) : bundle.total_price;
+    }
+    
     addToCart({
       id: item.id,
       name: item.name,
-      price: type === 'service' ? (item as Service).price : (item as Bundle).total_price,
+      price: priceToUse,
       type,
       billing_period: type === 'service' ? (item as Service).billing_period : 'bundle'
     });
@@ -610,9 +639,11 @@ const CustomerDashboard = ({
                     </div>
                     <div>
                       <CardTitle className="text-lg">{bundle.name}</CardTitle>
-                      <Badge className="mt-1 bg-blue-500 text-white">
-                        {bundle.discount_percentage}% OFF
-                      </Badge>
+                      {!showActualPrices && (
+                        <Badge className="mt-1 bg-blue-500 text-white">
+                          {bundle.discount_percentage}% OFF
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -637,17 +668,23 @@ const CustomerDashboard = ({
 
                 {/* Pricing */}
                 <div className="space-y-2 p-3 bg-muted/50 rounded-lg">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Original Total:</span>
-                    <span className="line-through">₹{calculateOriginalPrice(bundle).toLocaleString()}</span>
-                  </div>
+                  {!showActualPrices && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Original Total:</span>
+                      <span className="line-through">₹{calculateOriginalPrice(bundle).toLocaleString()}</span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">Bundle Price:</span>
-                    <span className="text-lg font-bold text-primary">₹{bundle.total_price.toLocaleString()}</span>
+                    <span className="text-lg font-bold text-primary">
+                      ₹{showActualPrices ? calculateOriginalPrice(bundle).toLocaleString() : bundle.total_price.toLocaleString()}
+                    </span>
                   </div>
-                  <div className="text-center text-sm text-green-600">
-                    You save ₹{(calculateOriginalPrice(bundle) - bundle.total_price).toLocaleString()}!
-                  </div>
+                  {!showActualPrices && (
+                    <div className="text-center text-sm text-green-600">
+                      You save ₹{(calculateOriginalPrice(bundle) - bundle.total_price).toLocaleString()}!
+                    </div>
+                  )}
                 </div>
 
                 <Button 
