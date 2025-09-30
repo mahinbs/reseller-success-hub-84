@@ -17,7 +17,7 @@ export async function shouldShowActualPrices(userEmail: string | undefined): Pro
   }
   
   // Temporary hardcoded test for known no-discount users
-  const noDiscountEmails = ['mandapati.anilkumar94@gmail.com', 'mahinventeskraft@gmail.com', 'ronaklalwani112@gmail.com'];
+  const noDiscountEmails = ['mandapati.anilkumar94@gmail.com', 'mahinventeskraft@gmail.com'];
   if (noDiscountEmails.includes(userEmail.toLowerCase())) {
     console.log('🔧 HARDCODED: User is in no-discount list:', userEmail);
     return true;
