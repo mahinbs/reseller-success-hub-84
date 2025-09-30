@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.slot-signup-file-url]
 verify_jwt = false
+
+[functions.email-dispatcher]
+verify_jwt = false
