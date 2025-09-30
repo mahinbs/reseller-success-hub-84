@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ShoppingCart, Package, DollarSign, Star, Check } from 'lucide-react';
+import { shouldShowActualPrices, applyPriceHike } from '@/lib/userPricing';
 
 interface Service {
   id: string;
@@ -38,9 +39,25 @@ const BundleDetail = () => {
   const [bundle, setBundle] = useState<Bundle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showActualPrices, setShowActualPrices] = useState(false);
 
   // Check if we're in dashboard context
   const isInDashboard = location.pathname.startsWith('/dashboard');
+
+  useEffect(() => {
+    if (user?.email) {
+      checkUserPricing();
+    }
+  }, [user]);
+
+  const checkUserPricing = async () => {
+    try {
+      const shouldShow = await shouldShowActualPrices(user?.email);
+      setShowActualPrices(shouldShow);
+    } catch (error) {
+      console.error('Error checking user pricing:', error);
+    }
+  };
 
   useEffect(() => {
     const loadBundle = async () => {
@@ -140,17 +157,20 @@ const BundleDetail = () => {
 
   const calculateOriginalPrice = () => {
     if (!bundle.services) return bundle.total_price;
-    return bundle.services.reduce((sum, service) => sum + service.price, 0);
+    const originalTotal = bundle.services.reduce((sum, service) => sum + service.price, 0);
+    return applyPriceHike(originalTotal, user?.email);
   };
 
   const originalPrice = calculateOriginalPrice();
-  const savings = originalPrice - bundle.total_price;
+  const hikedBundlePrice = applyPriceHike(bundle.total_price, user?.email);
+  const savings = originalPrice - hikedBundlePrice;
 
   const handleAddToCart = () => {
+    const priceToUse = showActualPrices ? calculateOriginalPrice() : applyPriceHike(bundle.total_price, user?.email);
     addToCart({
       id: bundle.id,
       name: bundle.name,
-      price: bundle.total_price,
+      price: priceToUse,
       type: 'bundle',
       billing_period: 'bundle'
     });
@@ -208,7 +228,7 @@ const BundleDetail = () => {
                 <div className="flex justify-between text-2xl font-bold border-t pt-2">
                   <span>Bundle Price:</span>
                   <span className="bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
-                    ₹{bundle.total_price.toLocaleString()}
+                    ₹{showActualPrices ? calculateOriginalPrice().toLocaleString() : applyPriceHike(bundle.total_price, user?.email).toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -271,7 +291,7 @@ const BundleDetail = () => {
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-muted-foreground">Individual Price</div>
-                        <div className="text-lg font-bold">₹{service.price}</div>
+                        <div className="text-lg font-bold">₹{applyPriceHike(service.price, user?.email).toLocaleString()}</div>
                       </div>
                     </div>
                   </CardHeader>

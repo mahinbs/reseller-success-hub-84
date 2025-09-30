@@ -17,7 +17,7 @@ export async function shouldShowActualPrices(userEmail: string | undefined): Pro
   }
   
   // Temporary hardcoded test for known no-discount users
-  const noDiscountEmails = ['mandapati.anilkumar94@gmail.com', 'mahinventeskraft@gmail.com'];
+  const noDiscountEmails = ['mandapati.anilkumar94@gmail.com'];
   if (noDiscountEmails.includes(userEmail.toLowerCase())) {
     console.log('🔧 HARDCODED: User is in no-discount list:', userEmail);
     return true;
@@ -63,4 +63,33 @@ export async function canApplyCoupons(userEmail: string | undefined): Promise<bo
 export async function shouldShowDiscounts(userEmail: string | undefined): Promise<boolean> {
   const showActualPrices = await shouldShowActualPrices(userEmail);
   return !showActualPrices;
+}
+
+/**
+ * Check if a user should have a 20% price hike applied
+ * @param userEmail - The user's email address
+ * @returns boolean - true if user should have 20% price hike, false otherwise
+ */
+export function shouldApplyPriceHike(userEmail: string | undefined): boolean {
+  if (!userEmail) {
+    return false;
+  }
+  
+  // Special pricing for users with 20% price hike
+  const priceHikeEmails = ['ronaklalwani112@gmail.com', 'mahinventeskraft@gmail.com'];
+  return priceHikeEmails.includes(userEmail.toLowerCase());
+}
+
+/**
+ * Apply 20% price hike to a price
+ * @param price - The original price
+ * @param userEmail - The user's email address
+ * @returns number - The hiked price if applicable, original price otherwise
+ */
+export function applyPriceHike(price: number, userEmail: string | undefined): number {
+  if (shouldApplyPriceHike(userEmail)) {
+    const hikedPrice = price * 1.20; // 20% increase
+    return Math.round(hikedPrice);
+  }
+  return price;
 }

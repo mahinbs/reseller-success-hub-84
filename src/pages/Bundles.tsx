@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { ResellableBanner } from "@/components/reseller/ResellableBanner";
 import { OnboardingModal } from "@/components/reseller/OnboardingModal";
 import { ResellableTooltip } from "@/components/reseller/ResellableTooltip";
-import { shouldShowActualPrices } from "@/lib/userPricing";
+import { shouldShowActualPrices, applyPriceHike } from "@/lib/userPricing";
 
 interface Bundle {
   id: string;
@@ -114,7 +114,7 @@ export default function Bundles() {
       return;
     }
 
-    const priceToUse = showActualPrices ? calculateOriginalPrice(bundle) : bundle.total_price;
+    const priceToUse = showActualPrices ? calculateOriginalPrice(bundle) : applyPriceHike(bundle.total_price, user?.email);
     
     addToCart({
       id: bundle.id,
@@ -133,12 +133,13 @@ export default function Bundles() {
   const calculateOriginalPrice = (bundle: Bundle) => {
     if (!bundle.services) return bundle.total_price;
     const originalTotal = bundle.services.reduce((sum, service) => sum + service.price, 0);
-    return originalTotal;
+    return applyPriceHike(originalTotal, user?.email);
   };
 
   const calculateSavings = (bundle: Bundle) => {
     const originalPrice = calculateOriginalPrice(bundle);
-    return originalPrice - bundle.total_price;
+    const hikedBundlePrice = applyPriceHike(bundle.total_price, user?.email);
+    return originalPrice - hikedBundlePrice;
   };
 
   if (loading) {
@@ -251,7 +252,7 @@ export default function Bundles() {
                               </Badge>
                             </div>
                             <span className="text-sm text-muted-foreground">
-                              Individual: ₹{service.price.toLocaleString()}
+                              Individual: ₹{applyPriceHike(service.price, user?.email).toLocaleString()}
                             </span>
                           </div>
                         ))}
@@ -261,7 +262,6 @@ export default function Bundles() {
 
                   {/* Enhanced Pricing with Reseller Context */}
                   <div className="space-y-3 bg-gradient-to-r from-muted/50 to-muted/30 p-4 rounded-lg">
-                    {console.log('💰 Rendering pricing for:', bundle.name, 'showActualPrices:', showActualPrices)}
                     {!showActualPrices && (
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Services Total Value:</span>
@@ -280,13 +280,13 @@ export default function Bundles() {
                         </span>
                       </ResellableTooltip>
                       <span className="text-green-600 font-bold text-lg">
-                        ₹{showActualPrices ? calculateOriginalPrice(bundle).toLocaleString() : bundle.total_price.toLocaleString()}
+                        ₹{showActualPrices ? calculateOriginalPrice(bundle).toLocaleString() : applyPriceHike(bundle.total_price, user?.email).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-blue-600">Suggested Resell Price:</span>
                       <span className="text-blue-600 font-semibold">
-                        ₹{calculateSuggestedPrice(bundle.total_price).toLocaleString()}
+                        ₹{calculateSuggestedPrice(applyPriceHike(bundle.total_price, user?.email)).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm border-t pt-2">
@@ -300,7 +300,7 @@ export default function Bundles() {
                         </span>
                       </ResellableTooltip>
                       <span className="text-purple-500 font-bold text-lg">
-                        ₹{calculateProfit(bundle.total_price).toLocaleString()}
+                        ₹{calculateProfit(applyPriceHike(bundle.total_price, user?.email)).toLocaleString()}
                       </span>
                     </div>
                     <div className="text-center pt-2">

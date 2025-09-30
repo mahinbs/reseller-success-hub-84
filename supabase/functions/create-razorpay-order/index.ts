@@ -74,6 +74,17 @@ serve(async (req) => {
             )
         }
 
+        // Get user profile to check for special pricing
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('id', user.id)
+            .single()
+
+        // Check if user should have 20% price hike applied
+        const priceHikeEmails = ['ronaklalwani112@gmail.com', 'mahinventeskraft@gmail.com']
+        const shouldApplyPriceHike = priceHikeEmails.includes(profile?.email || '')
+
         // Parse request body
         const { cart_items, coupon_code, customer_gst_number, business_info }: OrderRequest = await req.json()
 
@@ -87,8 +98,19 @@ serve(async (req) => {
             )
         }
 
+        // Apply 20% price hike if applicable
+        const adjustedCartItems = cart_items.map(item => {
+            if (shouldApplyPriceHike) {
+                return {
+                    ...item,
+                    price: Math.round(item.price * 1.20) // 20% increase
+                }
+            }
+            return item
+        })
+
         // Calculate subtotal
-        const subtotal = cart_items.reduce((sum, item) => sum + item.price, 0)
+        const subtotal = adjustedCartItems.reduce((sum, item) => sum + item.price, 0)
 
         // Apply coupon discount if provided
         let couponDiscount = 0
@@ -128,7 +150,7 @@ serve(async (req) => {
                             }
 
                             // For multiple items in cart, apply discount only to the lowest price item
-                            const lowestPriceItem = Math.min(...cart_items.map(item => item.price))
+                            const lowestPriceItem = Math.min(...adjustedCartItems.map(item => item.price))
 
                             // Apply discount
                             if (coupon.discount_type === 'percentage') {
@@ -227,7 +249,7 @@ serve(async (req) => {
         }
 
         // Create purchase items
-        const purchaseItems = cart_items.map(item => ({
+        const purchaseItems = adjustedCartItems.map(item => ({
             purchase_id: purchase.id,
             service_id: item.type === 'service' ? item.id : null,
             bundle_id: item.type === 'bundle' ? item.id : null,

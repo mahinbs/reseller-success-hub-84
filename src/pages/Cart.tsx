@@ -122,14 +122,16 @@ const CartPage = () => {
             <Badge variant="secondary" className="text-lg px-3 py-1">
               {cart.length} item{cart.length !== 1 ? 's' : ''}
             </Badge>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDebugInfo}
-              className="text-xs"
-            >
-              Debug
-            </Button>
+            {false && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDebugInfo}
+                className="text-xs"
+              >
+                Debug
+              </Button>
+            )}
           </div>
         </div>
 
@@ -253,8 +255,8 @@ const CartPage = () => {
               </CardContent>
             </Card>
 
-            {/* Debug Section - Only visible in development when cart has items */}
-            {import.meta.env.DEV && (
+            {/* Debug Section - Only visible in development when cart has items (disabled) */}
+            {false && import.meta.env.DEV && (
               <Card className="mt-4 opacity-60 hover:opacity-100 transition-opacity">
                 <CardContent className="p-3">
                   <details className="group">

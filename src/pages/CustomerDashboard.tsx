@@ -15,7 +15,7 @@ import { Search, Filter, ShoppingCart, Package, User, DollarSign, TrendingUp, Ma
 import { useToast } from '@/hooks/use-toast';
 import { ProfileEditModal } from '@/components/profile/ProfileEditModal';
 import CustomerAddons from '@/pages/CustomerAddons';
-import { shouldShowActualPrices } from '@/lib/userPricing';
+import { shouldShowActualPrices, applyPriceHike } from '@/lib/userPricing';
 interface Service {
   id: string;
   name: string;
@@ -238,11 +238,11 @@ const CustomerDashboard = ({
     let priceToUse;
     
     if (type === 'service') {
-      priceToUse = (item as Service).price;
+      priceToUse = applyPriceHike((item as Service).price, user?.email);
     } else {
       // For bundles, use original price for no-discount users
       const bundle = item as Bundle;
-      priceToUse = showActualPrices ? calculateOriginalPrice(bundle) : bundle.total_price;
+      priceToUse = showActualPrices ? calculateOriginalPrice(bundle) : applyPriceHike(bundle.total_price, user?.email);
     }
     
     addToCart({
@@ -260,7 +260,7 @@ const CustomerDashboard = ({
   const calculateOriginalPrice = (bundle: Bundle) => {
     if (!bundle.services) return bundle.total_price;
     const originalTotal = bundle.services.reduce((sum, service) => sum + service.price, 0);
-    return originalTotal;
+    return applyPriceHike(originalTotal, user?.email);
   };
 
   // Render different content based on activeTab
@@ -549,7 +549,7 @@ const CustomerDashboard = ({
                 </Badge>
                 <div className="text-right">
                   <div className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-                    ₹{service.price}
+                    ₹{applyPriceHike(service.price, user?.email).toLocaleString()}
                   </div>
                   <div className="text-xs text-muted-foreground">/{service.billing_period}</div>
                 </div>
@@ -677,12 +677,12 @@ const CustomerDashboard = ({
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">Bundle Price:</span>
                     <span className="text-lg font-bold text-primary">
-                      ₹{showActualPrices ? calculateOriginalPrice(bundle).toLocaleString() : bundle.total_price.toLocaleString()}
+                      ₹{showActualPrices ? calculateOriginalPrice(bundle).toLocaleString() : applyPriceHike(bundle.total_price, user?.email).toLocaleString()}
                     </span>
                   </div>
                   {!showActualPrices && (
                     <div className="text-center text-sm text-green-600">
-                      You save ₹{(calculateOriginalPrice(bundle) - bundle.total_price).toLocaleString()}!
+                      You save ₹{(calculateOriginalPrice(bundle) - applyPriceHike(bundle.total_price, user?.email)).toLocaleString()}!
                     </div>
                   )}
                 </div>
