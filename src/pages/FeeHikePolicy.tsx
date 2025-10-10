@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
 
 const FeeHikePolicy = () => {
   const [timeLeft, setTimeLeft] = useState({
@@ -13,11 +12,9 @@ const FeeHikePolicy = () => {
   });
   const [isEffective, setIsEffective] = useState(false);
 
-  const effectiveDate = new Date('2025-09-30T00:00:00+05:30');
-  const effectiveDateLabel = format(effectiveDate, 'd MMMM yyyy');
-  const effectiveDateShort = format(effectiveDate, 'd MMM yyyy');
-
   useEffect(() => {
+    const effectiveDate = new Date('2025-09-30T00:00:00+05:30');
+    
     const calculateTimeLeft = () => {
       const now = new Date();
       const difference = effectiveDate.getTime() - now.getTime();
@@ -69,7 +66,7 @@ const FeeHikePolicy = () => {
                 variant="outline" 
                 className="text-sm px-4 py-2 border-primary/30 bg-primary/10 text-primary animate-pulse"
               >
-                {isEffective ? 'POLICY NOW ACTIVE' : `Effective: ${effectiveDateLabel}`}
+                {isEffective ? 'POLICY NOW ACTIVE' : 'LIMITED TIME OFFER'}
               </Badge>
               
               {!isEffective && (
@@ -86,7 +83,7 @@ const FeeHikePolicy = () => {
                     Time Until Price Increase
                   </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    New prices go live on {effectiveDateShort}. Pay now to lock current rates.
+                    Pay now to lock current rates before the price increase.
                   </p>
                 </CardHeader>
                 <CardContent>
@@ -133,9 +130,6 @@ const FeeHikePolicy = () => {
                   <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                     Fee Hike & Project Limit Policy
                   </h1>
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20">
-                    <span className="text-primary font-semibold">Effective Date: {effectiveDateLabel}</span>
-                  </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8">
