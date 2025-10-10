@@ -780,7 +780,7 @@ const PaymentSuccessPage = () => {
                                         const itemsSubtotal = purchase.items?.reduce((sum, item) => sum + Number(item.price), 0) || 0;
                                         const couponDiscount = Number(purchase.coupon_discount || 0);
                                         const discountedSubtotal = itemsSubtotal - couponDiscount;
-                                        const gstAmount = discountedSubtotal * 0.18;
+                                        const gstAmount = itemsSubtotal * 0.18;  // GST always calculated on original price
                                         const finalTotal = discountedSubtotal + gstAmount;
 
                                         return (

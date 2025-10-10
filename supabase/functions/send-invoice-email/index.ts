@@ -827,7 +827,7 @@ serve(async (req)=>{
     const subtotal = purchase.purchase_items.reduce((sum, item)=>sum + Number(item.item_price), 0);
     const couponDiscount = Number(purchase.coupon_discount || 0);
     const discountedSubtotal = subtotal - couponDiscount;
-    const gstAmount = discountedSubtotal * 0.18;
+    const gstAmount = subtotal * 0.18;  // GST always calculated on original price
     const total = discountedSubtotal + gstAmount;
     // Generate invoice HTML
     const invoiceHtml = generateInvoiceHTML(purchase, subtotal, couponDiscount, gstAmount, total);

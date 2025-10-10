@@ -206,7 +206,7 @@ serve(async (req) => {
 
         // Calculate final amounts
         const discountedSubtotal = subtotal - couponDiscount
-        const gstAmount = discountedSubtotal * 0.18
+        const gstAmount = subtotal * 0.18  // GST always calculated on original price
         let totalAmount = discountedSubtotal + gstAmount
 
         // Ensure minimum amount of ₹1 for Razorpay (even for 100% discount coupons)

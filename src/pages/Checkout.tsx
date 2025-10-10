@@ -162,8 +162,8 @@ const CheckoutPage = () => {
     // Calculate pricing with coupon discount
     const subtotal = getCartTotal();
     const discountedSubtotal = subtotal - couponDiscount;
-    const gstAmount = calculateGST(discountedSubtotal);
-    const totalAmount = getPriceWithGST(discountedSubtotal);
+    const gstAmount = calculateGST(subtotal);  // GST always calculated on original price
+    const totalAmount = discountedSubtotal + gstAmount;
 
     // Form validation
     const validateForm = (): boolean => {
