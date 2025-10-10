@@ -154,6 +154,7 @@ const App = () => (
                     </ProtectedRoute>
                   </>
                 } />
+                
             <Route path="/slot-signup" element={
               <>
                 <Header />
