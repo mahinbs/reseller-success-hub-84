@@ -22,7 +22,7 @@ import {
     ShoppingBag
 } from 'lucide-react';
 import { calculateGST, getPriceWithGST, formatCurrency } from '@/lib/gstUtils';
-import { getOldServicePrice, hasOldPricing } from '@/lib/oldPricing';
+import { getOldServicePrice, hasOldPricing, getOldBundlePrice, hasOldBundlePricing } from '@/lib/oldPricing';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 
@@ -367,59 +367,20 @@ const CheckoutPage = () => {
                     
                     // Check if it's a bundle or service and calculate old price accordingly
                     if (lowestItem.type === 'bundle') {
-                        // For bundles, calculate old price by summing old prices of individual services
-                        // We need to fetch the bundle services from the database
-                        try {
-                            const { data: bundleServicesData } = await supabase
-                                .from('bundle_services')
-                                .select(`
-                                    services:service_id (
-                                        id,
-                                        name,
-                                        price
-                                    )
-                                `)
-                                .eq('bundle_id', lowestItem.id);
-                            
-                            if (bundleServicesData && bundleServicesData.length > 0) {
-                                let oldBundlePrice = 0;
-                                let currentBundlePrice = 0;
-                                
-                                bundleServicesData.forEach(item => {
-                                    const service = item.services;
-                                    if (service) {
-                                        currentBundlePrice += service.price;
-                                        const oldServicePrice = getOldServicePrice(service.name);
-                                        if (oldServicePrice) {
-                                            oldBundlePrice += oldServicePrice;
-                                        } else {
-                                            // If no old price found, use current price
-                                            oldBundlePrice += service.price;
-                                        }
-                                    }
-                                });
-                                
-                                console.log(`Bundle services:`, bundleServicesData.map(item => item.services?.name));
-                                console.log(`Current bundle price: ${currentBundlePrice}, Old bundle price: ${oldBundlePrice}`);
-                                
-                                if (oldBundlePrice < currentBundlePrice) {
-                                    discount = currentBundlePrice - oldBundlePrice;
-                                    // Store the old bundle price for display
-                                    setOldBundlePrices(prev => ({
-                                        ...prev,
-                                        [lowestItem.id]: oldBundlePrice
-                                    }));
-                                    console.log(`✅ Bundle old price discount: ${discount}`);
-                                } else {
-                                    console.log(`❌ No discount for bundle`);
-                                    discount = 0;
-                                }
-                            } else {
-                                console.log(`❌ No services found for bundle`);
-                                discount = 0;
-                            }
-                        } catch (error) {
-                            console.error('Error fetching bundle services:', error);
+                        // For bundles, use the exact old bundle price from the mapping
+                        const oldBundlePrice = getOldBundlePrice(lowestItem.name);
+                        console.log(`Bundle: ${lowestItem.name}, Current: ${lowestItem.price}, Old: ${oldBundlePrice}`);
+                        
+                        if (oldBundlePrice && oldBundlePrice < lowestItem.price) {
+                            discount = lowestItem.price - oldBundlePrice;
+                            // Store the old bundle price for display
+                            setOldBundlePrices(prev => ({
+                                ...prev,
+                                [lowestItem.id]: oldBundlePrice
+                            }));
+                            console.log(`✅ Bundle old price discount: ${discount}`);
+                        } else {
+                            console.log(`❌ No old price found for bundle ${lowestItem.name}`);
                             discount = 0;
                         }
                     } else {
@@ -848,7 +809,7 @@ const CheckoutPage = () => {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                {appliedCoupon?.discount_type === 'old_prices' && item.price === Math.min(...cart.map(i => i.price)) && (hasOldPricing(item.name) || item.type === 'bundle') ? (
+                                                {appliedCoupon?.discount_type === 'old_prices' && item.price === Math.min(...cart.map(i => i.price)) && (hasOldPricing(item.name) || hasOldBundlePricing(item.name)) ? (
                                                     <div>
                                                         <div className="text-xs text-muted-foreground line-through">₹{item.price.toLocaleString()}</div>
                                                         <div className="font-medium text-green-600">

@@ -72,6 +72,33 @@ export const hasOldPricing = (serviceName: string): boolean => {
   return serviceName in oldServicePrices;
 };
 
+// Original bundle prices before the hike
+export const oldBundlePrices: { [bundleName: string]: number } = {
+  "AI Development Bundle": 77777,
+  "Full-Stack Web Bundle": 138640.2,
+  "Mobile & IoT Bundle": 92249.74,
+  "SaaS Starter Bundle": 82507.47,
+  "Super combo": 90355.98
+};
+
+/**
+ * Get the old price for a bundle
+ * @param bundleName - The name of the bundle
+ * @returns The old bundle price or null if not found
+ */
+export const getOldBundlePrice = (bundleName: string): number | null => {
+  return oldBundlePrices[bundleName] || null;
+};
+
+/**
+ * Check if a bundle has old pricing data
+ * @param bundleName - The name of the bundle
+ * @returns true if old bundle pricing exists, false otherwise
+ */
+export const hasOldBundlePricing = (bundleName: string): boolean => {
+  return bundleName in oldBundlePrices;
+};
+
 /**
  * Calculate the discount percentage from new to old price
  * @param oldPrice - The original price
