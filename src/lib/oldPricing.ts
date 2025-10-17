@@ -48,10 +48,18 @@ export const oldServicePrices: OldServicePricing = {
   "IoT Development": 53391.65,
   
   // SaaS Products Category (Affiliate services)
-  "VirtuTeams Affiliate": 19999.99,
-  "Speaksify Affiliate": 19999.99,
-  "Projectsy.ai Affiliate": 19999.99,
-  "ChromeBot.ai Affiliate": 19999.99
+  "VirtuTeams Affiliate": 20000,
+  "VirtuTeams affiliate": 20000,
+  "VirtuTeams afiliate": 20000,
+  "Speaksify Affiliate": 30000,
+  "Speaksify affiliate": 30000,
+  "Speaksify afiliate": 30000,
+  "Projectsy.ai Affiliate": 20000,
+  "Projectsy.ai affiliate": 20000,
+  "Projectsy.ai afiliate": 20000,
+  "ChromeBot.ai Affiliate": 25000,
+  "ChromeBot.ai affiliate": 25000,
+  "ChromeBot.ai afiliate": 25000
 };
 
 /**
