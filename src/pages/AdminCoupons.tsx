@@ -15,7 +15,7 @@ interface Coupon {
     id: string;
     code: string;
     description: string;
-    discount_type: 'percentage' | 'fixed' | 'free_months' | '1DollarService';
+    discount_type: 'percentage' | 'fixed' | 'free_months' | '1DollarService' | 'old_prices';
     discount_value: number;
     free_months: number;
     max_uses: number | null;
@@ -37,7 +37,7 @@ export default function AdminCoupons() {
     const [formData, setFormData] = useState({
         code: '',
         description: '',
-        discount_type: 'percentage' as 'percentage' | 'fixed' | 'free_months' | '1DollarService',
+        discount_type: 'percentage' as 'percentage' | 'fixed' | 'free_months' | '1DollarService' | 'old_prices',
         discount_value: 0,
         free_months: 0,
         max_uses: '',
@@ -94,7 +94,7 @@ export default function AdminCoupons() {
                 code: formData.code.toUpperCase(),
                 description: formData.description,
                 discount_type: formData.discount_type,
-                discount_value: formData.discount_type === '1DollarService' ? 84 : formData.discount_value, // 84 rupees = 1 dollar
+                discount_value: formData.discount_type === '1DollarService' ? 84 : formData.discount_type === 'old_prices' ? 0 : formData.discount_value, // 84 rupees = 1 dollar, 0 for old_prices
                 free_months: formData.discount_type === 'free_months' ? formData.free_months : 0,
                 max_uses: formData.max_uses ? parseInt(formData.max_uses) : null,
                 valid_from: new Date(formData.valid_from).toISOString(),
@@ -269,12 +269,13 @@ export default function AdminCoupons() {
                                             <SelectItem value="percentage">Percentage Off</SelectItem>
                                             <SelectItem value="fixed">Fixed Amount Off</SelectItem>
                                             <SelectItem value="1DollarService">1 Dollar Service</SelectItem>
+                                            <SelectItem value="old_prices">Old Prices (Pre-Hike)</SelectItem>
                                             {/* <SelectItem value="free_months">Free Months</SelectItem> */}
                                         </SelectContent>
                                     </Select>
                                 </div>
 
-                                {formData.discount_type !== 'free_months' && formData.discount_type !== '1DollarService' && (
+                                {formData.discount_type !== 'free_months' && formData.discount_type !== '1DollarService' && formData.discount_type !== 'old_prices' && (
                                     <div>
                                         <Label htmlFor="discount_value">
                                             {formData.discount_type === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'}
@@ -434,7 +435,8 @@ export default function AdminCoupons() {
                                                 {coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` :
                                                     coupon.discount_type === 'fixed' ? `₹${coupon.discount_value}` :
                                                         coupon.discount_type === '1DollarService' ? '₹84 (1 USD)' :
-                                                            `${coupon.free_months} months free`}
+                                                            coupon.discount_type === 'old_prices' ? 'Original Prices' :
+                                                                `${coupon.free_months} months free`}
                                             </div>
                                         </div>
                                         <div>
