@@ -77,7 +77,7 @@ export const oldBundlePrices: { [bundleName: string]: number } = {
   "AI Development Bundle": 77777,
   "Full-Stack Web Bundle": 138640.2,
   "Mobile & IoT Bundle": 92249.74,
-  "SaaS Starter Bundle": 82507.47,
+  "SaaS Starter Bundle": 69999,
   "Super combo": 90355.98
 };
 
