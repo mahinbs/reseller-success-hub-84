@@ -31,6 +31,7 @@ import Terms from "./pages/Terms";
 import FeeHikePolicy from "./pages/FeeHikePolicy";
 import SlotSignup from "./pages/SlotSignup";
 import SignupSuccess from "./pages/SignupSuccess";
+import BaasAnnouncement from "./pages/BaasAnnouncement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -146,14 +147,22 @@ const App = () => (
                     </ProtectedRoute>
                   </>
                 } />
-                <Route path="/policy/fee-hike" element={
+                <Route path="/baas-announcement" element={
+                  <>
+                    <Header />
+                    <ProtectedRoute requireAuth={false}>
+                      <BaasAnnouncement />
+                    </ProtectedRoute>
+                  </>
+                } />
+                {/* <Route path="/policy/fee-hike" element={
                   <>
                     <Header />
                     <ProtectedRoute requireAuth={false}>
                       <FeeHikePolicy />
                     </ProtectedRoute>
                   </>
-                } />
+                } /> */}
                 
             <Route path="/slot-signup" element={
               <>
